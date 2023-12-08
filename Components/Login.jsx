@@ -1,10 +1,12 @@
-import {View, Text} from 'react-native';
+import {View, Text, Button} from 'react-native';
 import React from 'react';
+import CButton from './custom/CButton';
 
 const Login = () => {
   return (
-    <View className="flex-1 items-center justify-center bg-black text-xl">
-      <Text className="text-white">Open up App.js to start working on your app! hello there</Text>
+    <View className="flex-1 items-center justify-center text-xl">
+      <Text className="text-dark">Open up App.js to start working on your app! hello there</Text>
+      <CButton title="Sign In" padding="" twClass=""/>
     </View>
   );
 };
