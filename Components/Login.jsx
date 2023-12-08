@@ -4,7 +4,7 @@ import React from 'react';
 const Login = () => {
   return (
     <View className="flex-1 items-center justify-center bg-black text-xl">
-      <Text >Open up App.js to start working on your app!</Text>
+      <Text className="text-white">Open up App.js to start working on your app! hello there</Text>
     </View>
   );
 };
