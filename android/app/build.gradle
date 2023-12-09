@@ -115,6 +115,7 @@ dependencies {
     def appcompat_version = "1.6.1"
     // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
+
     implementation("androidx.appcompat:appcompat-resources:$appcompat_version")
     debugImplementation("com.facebook.flipper:flipper:${FLIPPER_VERSION}")
     debugImplementation("com.facebook.flipper:flipper-network-plugin:${FLIPPER_VERSION}") {
@@ -128,6 +129,9 @@ dependencies {
     }
     // Import the Firebase BoM
     implementation platform('com.google.firebase:firebase-bom:32.2.2')
+    
+    // When using the BoM, you don't specify versions in Firebase library dependencies
+    implementation("com.google.firebase:firebase-auth:22.3.0")
 }
 
 apply from: file("../../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); applyNativeModulesAppBuildGradle(project)
