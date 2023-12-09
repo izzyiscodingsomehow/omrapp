@@ -2,7 +2,7 @@ import React from 'react';
 import { Text, TouchableOpacity, StyleSheet } from 'react-native';
 
 // Custom Button 
-const CButton = ({ title, padding, textColor, twClass }) => {
+const CButton = ({ title, padding, textColor, twClass, handlePress }) => {
 
     // stylesheet for custom numbers/properties that tailwind cant handle through props
     const styles = StyleSheet.create({
@@ -20,7 +20,12 @@ const CButton = ({ title, padding, textColor, twClass }) => {
 
     // TODO: ADD onPress() PROP 
     return (
-        <TouchableOpacity style={styles.container} className={`bg-[#131316] px-5 rounded-lg ${twClass ? twClass : null}`} >
+        <TouchableOpacity
+            style={styles.container}
+            className={`bg-[#131316] px-5 rounded-lg ${twClass ? twClass : null}`}
+            onPress={handlePress}
+        >
+
             <Text style={styles.text} className={`text-[16px]`}>{title}</Text>
         </TouchableOpacity>
     )
