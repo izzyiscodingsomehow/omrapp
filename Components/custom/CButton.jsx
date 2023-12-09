@@ -17,8 +17,6 @@ const CButton = ({ title, padding, textColor, twClass, handlePress }) => {
 
     // twClass: gets the tailwind classes from the instance and copies them here so they actually work
     // now that i realize, you could just pass the TW classes as props instead of making separate props, oh well i've already coded it out, might as well leave it
-
-    // TODO: ADD onPress() PROP 
     return (
         <TouchableOpacity
             style={styles.container}
@@ -26,7 +24,7 @@ const CButton = ({ title, padding, textColor, twClass, handlePress }) => {
             onPress={handlePress}
         >
 
-            <Text style={styles.text} className={`text-[16px]`}>{title}</Text>
+            <Text style={styles.text} className={`text-[18px] font-semibold text-center`}>{title}</Text>
         </TouchableOpacity>
     )
 }

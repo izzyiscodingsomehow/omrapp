@@ -1,14 +1,40 @@
-import { View, Text, Button } from 'react-native';
+import { View, Text, Button, TextInput, Image, StyleSheet } from 'react-native';
 import React from 'react';
 import CButton from './custom/CButton';
 import SlideView from './custom/SlideView';
+import CTextInput from './custom/CTextInput';
 
 const Login = () => {
+
+  const styles = StyleSheet.create({
+    // position the earth bg
+  });
+
   return (
-    <View className="flex-1 items-center justify-center text-xl">
-      <Text className="text-dark">Open up App.js to start working on your app! hello there</Text>
-      <CButton title="Sign In" twClass="" padding="" handlePress={() => console.log("clicked")} />
-      <SlideView height={200}/>
+    <View className="flex-1 items-center justify-center text-xl bg-white">
+
+      {/* OMR logo */}
+      <Image
+        source={require("../imgs/OMR.png")}
+        width={50}
+        height={50}
+      />
+      {/* earth background */}
+      <Image
+        source={require("../imgs/earthBg.png")}
+        width={50}
+        height={50}
+        style={styles.backgroundImage}
+      />
+
+      <SlideView className="">
+        <View className="p-5">
+          <Text className="text-xl text-black">Create an account</Text>
+          <CTextInput placeholder='+92 XXX XXXXXXX' twClass="p-3 px-4 mt-3 text-lg" />
+          <CButton title={"Sign In"} twClass="mt-4" />
+        </View>
+      </SlideView>
+
     </View>
   );
 };
