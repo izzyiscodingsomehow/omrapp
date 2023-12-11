@@ -1,8 +1,9 @@
 import React from 'react';
-import {Text, View} from 'react-native';
+import { Text, View } from 'react-native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { NavigationContainer } from '@react-navigation/native';
 import Login from './Components/Login';
+import Home from './Components/Home';
 
 const Stack = createNativeStackNavigator();
 function BaseStack() {
@@ -11,15 +12,15 @@ function BaseStack() {
       screenOptions={{
         headerShown: false,
       }}>
-      <Stack.Screen name="Login" component={Login} />
+      <Stack.Screen name="Login" component={Home} />
     </Stack.Navigator>
   );
 }
 const App = () => {
   return (
-      <NavigationContainer>
-        <BaseStack />
-      </NavigationContainer>
+    <NavigationContainer>
+      <BaseStack />
+    </NavigationContainer>
   );
 };
 export default App;
