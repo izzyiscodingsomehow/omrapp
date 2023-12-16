@@ -33,7 +33,7 @@ function DrawerStack() {
 const App = () => {
   return (
     <NavigationContainer>
-      <BaseStack />
+      {/* <BaseStack /> */}
       <DrawerStack />
     </NavigationContainer>
   );
