@@ -3,6 +3,7 @@ import { StyleSheet, Text, View } from 'react-native'
 import MapView, { Marker } from 'react-native-maps'
 import MapViewDirections from 'react-native-maps-directions'
 import Geolocation from '@react-native-community/geolocation'
+import SlideView from './custom/SlideView'
 
 const Home = () => {
 
@@ -73,7 +74,9 @@ const Home = () => {
                     strokeColor='#1a1a1a'
                 />
             </MapView>
-            <Text>Home</Text>
+            <SlideView>
+                <Text>Hello there</Text>
+            </SlideView>
         </View>
     )
 }
