@@ -1,10 +1,10 @@
 import React from 'react'
-import { TextInput } from 'react-native'
+import { TextInput,View,Text } from 'react-native'
 
-const CTextInput = ({ placeholder, twClass }) => {
+const CTextInput = ({ placeholder, twClass,handleChange}) => {
 
     return (
-        <TextInput className={`border border-[#97979B] rounded-lg ${twClass}`} placeholder={placeholder} keyboardType='numeric' />
+        <TextInput className={`border border-[#97979B] rounded-lg ${twClass}`} placeholder={placeholder} onChangeText={handleChange} keyboardType='numeric' />
     )
 }
 

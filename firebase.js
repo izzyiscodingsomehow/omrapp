@@ -6,7 +6,11 @@ import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import 'firebase/compat/auth';
 import 'firebase/compat/firestore';
 import firebase from 'firebase/compat/app';
-
+import { initializeAuth, getReactNativePersistence } from 'firebase/auth';
+import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage';
+// const auth = initializeAuth(app, {
+//   persistence: getReactNativePersistence(ReactNativeAsyncStorage)
+// });
 const firebaseConfig = {
     apiKey: "AIzaSyCeZLlCPtEFYBelb0RPhHTddraTa8jxx88",
     authDomain: "omr-app-93d29.firebaseapp.com",
@@ -19,14 +23,16 @@ const firebaseConfig = {
   
 // Initialize Firebase
 export const app = initializeApp(firebaseConfig);
-// export const auth = getAuth(app);
+//export const auth = getAuth(app);
 export const db = getFirestore(app);
-//export const provider = new GoogleAuthProvider();
-
 /* Initialize Firebase */
 if(!firebase.apps.length) {
     firebase.initializeApp(firebaseConfig);
 }
-
+  
 export { firebase };
-export const auth = firebase.auth();
+//export const auth = firebase.auth();
+firebase.auth().settings.appVerificationDisabledForTesting = true;
+firebase.auth().settings.forceRecaptchaFlowForTesting = false;
+console.log(firebase.auth().settings.forceRecaptchaFlowForTesting);
+console.log(firebase.auth().settings.appVerificationDisabledForTesting);
