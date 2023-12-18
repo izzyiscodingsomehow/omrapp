@@ -31,8 +31,17 @@ function DrawerStack() {
           backgroundColor: "transparent",
           height: 0,
         },
-        // drawerActiveBackgroundColor: "#D9D9D"
-
+        drawerActiveBackgroundColor: "#F0F0F0",
+        drawerActiveTintColor: "#131316",
+        drawerInactiveTintColor: "#131316",
+        drawerStyle: {
+          borderTopRightRadius: 10,
+          borderBottomRightRadius: 10,
+        },
+        drawerLabelStyle: {
+          fontSize: 16,
+          fontWeight: "normal",
+        },
       }}>
 
       <Drawer.Screen name="Login" component={Login} />
