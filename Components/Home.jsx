@@ -6,6 +6,7 @@ import Geolocation from '@react-native-community/geolocation'
 import SlideView from './custom/SlideView'
 import searchIcon from '../imgs/searchIcon.svg'
 import DropDownPicker from 'react-native-dropdown-picker'
+import CButton from './custom/CButton'
 
 const Home = () => {
 
@@ -85,7 +86,14 @@ const Home = () => {
                 />
             </MapView>
             <SlideView>
-                <View className="pt-2 px-4 flex flex-col gap-4 h-[200px]">
+                <View className="rounded-full absolute bg-white top-[-70px] right-4 p-3">
+                    <Image source={require('../imgs/currentLocation.png')} style={{ width: 30, height: 30 }} />
+                </View>
+                <View className="pt-2 px-4 flex flex-col gap-4 h-[300px]">
+
+                    <View className="bg-[#E9E9EA]  rounded-md flex flex-row justify-center items-center w-auto h-14">
+                        {/* PLACEHOLDER FOR TYPES OF VEHICLES */}
+                    </View>
 
                     <View className="bg-[#E9E9EA]  rounded-md flex flex-row justify-center items-center">
                         <Image source={require('../imgs/searchPNG.png')} style={{ width: 20, marginLeft: 20 }} />
@@ -97,13 +105,13 @@ const Home = () => {
                         <TextInput placeholder='Dropoff location' className="w-[70%]  mx-auto text-xl" />
                         <Image source={require('../imgs/arrowRightPNG.png')} style={{ width: 20, marginRight: 20 }} />
                     </View>
+                    <View className="w-auto">
+                        <CButton title={"Let's go"} twClass={""} />
+                    </View>
 
-                    {/* <View className="bg-[#E9E9EA]  rounded-md flex flex-row justify-center items-center">
-                        <Image source={require('../imgs/searchPNG.png')} style={{ width: 20, marginLeft: 20 }} />
-                        <TextInput placeholder='?' className="w-[70%]  mx-auto text-xl" />
-                        <Image source={require('../imgs/arrowRightPNG.png')} style={{ width: 20, marginRight: 20 }} />
-                    </View> */}
-                    <View className="flex flex-row items-center bg-[#E9E9EA] rounded-md">
+                    {/* REMOVED TYPE OF CARGOS BECAUSE IT MAKES THINGS OVERCOMPLICATED */}
+
+                    {/* <View className="flex flex-row items-center bg-[#E9E9EA] rounded-md">
                         <Image source={require('../imgs/boxIconPNG.png')} style={{ width: 26, marginLeft: 20 }} />
                         <DropDownPicker
                             items={cargoTypes}
@@ -132,7 +140,7 @@ const Home = () => {
                                 color:"#6A6A6B",
                             }}
                         />
-                    </View>
+                    </View> */}
                 </View>
             </SlideView>
         </View>

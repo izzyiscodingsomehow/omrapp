@@ -48,7 +48,6 @@ function DrawerStack() {
       <Drawer.Screen name="Home" component={Home} />
       <Drawer.Screen name="Become a Driver" component={Login} />
       <Drawer.Screen name="Settings" component={Login} />
-      <Drawer.Screen name="Support" component={Login} />
       <Drawer.Screen name="FAQ" component={Login} />
     </Drawer.Navigator>
   );
