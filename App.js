@@ -67,7 +67,7 @@ const theme = {
 
 const App = () => {
   return (
-    <NavigationContainer theme={theme} >
+    <NavigationContainer theme={theme}>
       {/* <BaseStack /> */}
       <DrawerStack />
     </NavigationContainer>

@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react'
-import { StyleSheet, Text, View } from 'react-native'
+import { StyleSheet, Text, View, Image, TextInput } from 'react-native'
 import MapView, { Marker } from 'react-native-maps'
 import MapViewDirections from 'react-native-maps-directions'
 import Geolocation from '@react-native-community/geolocation'
 import SlideView from './custom/SlideView'
+import searchIcon from '../imgs/searchIcon.svg'
+import DropDownPicker from 'react-native-dropdown-picker'
 
 const Home = () => {
 
@@ -11,6 +13,14 @@ const Home = () => {
         latitude: 0,
         longitude: 0,
     });
+
+    const [cargoTypes, setCargoTypes] = useState([
+        { label: "Furniture", value: "furniture" },
+        { label: "Electronic Appliances", value: "electronic_appliances" },
+        { label: "Parcel", value: "parcel" },
+    ]);
+    const [open, setOpen] = useState(false);
+    const [value, setValue] = useState(null);
 
     function getCurrentPosition() {
         Geolocation.getCurrentPosition(
@@ -75,7 +85,55 @@ const Home = () => {
                 />
             </MapView>
             <SlideView>
-                <Text>Hello there</Text>
+                <View className="pt-2 px-4 flex flex-col gap-4 h-[200px]">
+
+                    <View className="bg-[#E9E9EA]  rounded-md flex flex-row justify-center items-center">
+                        <Image source={require('../imgs/searchPNG.png')} style={{ width: 20, marginLeft: 20 }} />
+                        <TextInput placeholder='Pickup location' className="w-[70%]  mx-auto text-xl" />
+                        <Image source={require('../imgs/arrowRightPNG.png')} style={{ width: 20, marginRight: 20 }} />
+                    </View>
+                    <View className="bg-[#E9E9EA]  rounded-md flex flex-row justify-center items-center">
+                        <Image source={require('../imgs/searchPNG.png')} style={{ width: 20, marginLeft: 20 }} />
+                        <TextInput placeholder='Dropoff location' className="w-[70%]  mx-auto text-xl" />
+                        <Image source={require('../imgs/arrowRightPNG.png')} style={{ width: 20, marginRight: 20 }} />
+                    </View>
+
+                    {/* <View className="bg-[#E9E9EA]  rounded-md flex flex-row justify-center items-center">
+                        <Image source={require('../imgs/searchPNG.png')} style={{ width: 20, marginLeft: 20 }} />
+                        <TextInput placeholder='?' className="w-[70%]  mx-auto text-xl" />
+                        <Image source={require('../imgs/arrowRightPNG.png')} style={{ width: 20, marginRight: 20 }} />
+                    </View> */}
+                    <View className="flex flex-row items-center bg-[#E9E9EA] rounded-md">
+                        <Image source={require('../imgs/boxIconPNG.png')} style={{ width: 26, marginLeft: 20 }} />
+                        <DropDownPicker
+                            items={cargoTypes}
+                            open={open}
+                            setOpen={setOpen}
+                            value={value}
+                            setValue={setValue}
+                            placeholder='Type of cargo'
+                            dropDownContainerStyle={{
+                                // marginLeft: 16,
+                                maxWidth: 330,
+                                minWidth: "auto",
+                                backgroundColor: "#E9E9EA",
+                                borderWidth: 0,
+                                padding: 5
+
+                            }}
+                            style={{
+                                width: 320,
+                                borderWidth: 0,
+                                backgroundColor: "#E9E9EA",
+                                marginLeft: 5
+                            }}
+                            textStyle={{
+                                fontSize: 19,
+                                color:"#6A6A6B",
+                            }}
+                        />
+                    </View>
+                </View>
             </SlideView>
         </View>
     )
