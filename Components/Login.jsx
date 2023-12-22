@@ -1,16 +1,41 @@
 import {View, Text, Image, StyleSheet} from 'react-native';
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useContext} from 'react';
 import CButton from './custom/CButton';
 import SlideView from './custom/SlideView';
 import CTextInput from './custom/CTextInput';
-import {useNavigation} from '@react-navigation/native';
+// import {useNavigation} from '@react-navigation/native';
 import auth from '@react-native-firebase/auth';
-import firebase from '../firebase';
+import { onAuthStateChanged } from 'firebase/auth';
+import { UserContext } from './contexts/UserContext';
+const Login = ({navigation, route}) => {
+  // useEffect(() => {
+  //   console.log(route.params?.user);
+  //   if (route.params?.user) {
+  //     console.log('user');
+  //   }
+  // }, [route.params?.user]);
+  
+  // const [initializing, setInitializing] = useState(true);
+  // const [user, setUser] = useState();
 
-const Login = () => {
+  // // // Handle user state changes
+  // function onAuthStateChanged(user) {
+  //   //console.log(user);
+  //   console.log('user');
+  //   if (initializing) setInitializing(false);
+  // }
+
+  // useEffect(() => {
+  //   const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
+  //   return subscriber; // unsubscribe on unmount
+  // }, []);
+
+  //if (initializing) return null;
+  const {user,setUser} = useContext(UserContext);
+  const {LoggedIn, setLoggedIn} = useContext(UserContext);
   const [confirm, setConfirm] = useState(null);
   const [code, setCode] = useState('');
-  const navigation = useNavigation();
+  // const navigation = useNavigation();
   const [phoneNumber, setPhoneNumber] = useState('051');
   const handleChange = text => {
     setPhoneNumber(text);
@@ -20,10 +45,9 @@ const Login = () => {
   };
   const handleOTP = async () => {
     try {
-      await confirm.confirm(code).then(user => {
-        console.log(user);
+      await confirm.confirm(code).then(userInfo => {
+        setUser(userInfo);
       });
-      //navigation.navigate('Home');
     } catch (e) {
       console.log(e);
       alert(
@@ -31,6 +55,18 @@ const Login = () => {
       );
     }
   };
+  useEffect(() => {
+    if (user) {
+      console.log(user);
+      navigation.navigate('Home');
+      setLoggedIn(true);
+    }
+    else
+    {
+      setConfirm(null);
+    }
+  }
+  , [user]);
   const handleClick = () => {
     //console.log(phoneNumber);
     if (phoneNumber.length < 10 || phoneNumber.length > 10) {
