@@ -6,6 +6,7 @@ import {NavigationContainer, DefaultTheme} from '@react-navigation/native';
 import Login from './Components/Login';
 import LogOut from './Components/LogOut';
 import Home from './Components/Home';
+import SignUp from './Components/SignUp';
 import CustomDrawer from './Components/custom/CustomDrawer';
 import {ContextProvider} from './Components/contexts/UserContext';
 
@@ -46,12 +47,13 @@ function DrawerStack() {
           fontWeight: 'normal',
         },
       }}>
-      <Drawer.Screen name="Login" component={Login} />
+      <Drawer.Screen name="Login" component={Login} /><Drawer.Screen name="SignUp" component={SignUp} />
       <Drawer.Screen name="Home" component={Home} />
       <Drawer.Screen name="Become a Driver" component={Login} />
       <Drawer.Screen name="Settings" component={Login} />
       <Drawer.Screen name="FAQ" component={Login} />
       <Drawer.Screen name="Logout" component={LogOut} />
+      
     </Drawer.Navigator>
   );
 }
