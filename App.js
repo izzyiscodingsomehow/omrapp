@@ -1,11 +1,14 @@
 import React from 'react';
-import { Text, View } from 'react-native';
-import { createDrawerNavigator } from '@react-navigation/drawer';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
+import {Text, View} from 'react-native';
+import {createDrawerNavigator} from '@react-navigation/drawer';
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import {NavigationContainer, DefaultTheme} from '@react-navigation/native';
 import Login from './Components/Login';
+import LogOut from './Components/LogOut';
 import Home from './Components/Home';
+import SignUp from './Components/SignUp';
 import CustomDrawer from './Components/custom/CustomDrawer';
+import {ContextProvider} from './Components/contexts/UserContext';
 
 const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -27,28 +30,30 @@ function DrawerStack() {
     <Drawer.Navigator
       drawerContent={props => <CustomDrawer {...props} />}
       screenOptions={{
-        headerTitle: '', headerStyle: {
-          backgroundColor: "transparent",
+        headerTitle: '',
+        headerStyle: {
+          backgroundColor: 'transparent',
           height: 0,
         },
-        drawerActiveBackgroundColor: "#F0F0F0",
-        drawerActiveTintColor: "#131316",
-        drawerInactiveTintColor: "#131316",
+        drawerActiveBackgroundColor: '#F0F0F0',
+        drawerActiveTintColor: '#131316',
+        drawerInactiveTintColor: '#131316',
         drawerStyle: {
           borderTopRightRadius: 10,
           borderBottomRightRadius: 10,
         },
         drawerLabelStyle: {
           fontSize: 16,
-          fontWeight: "normal",
+          fontWeight: 'normal',
         },
       }}>
-
-      <Drawer.Screen name="Login" component={Login} />
+      <Drawer.Screen name="Login" component={Login} /><Drawer.Screen name="SignUp" component={SignUp} />
       <Drawer.Screen name="Home" component={Home} />
       <Drawer.Screen name="Become a Driver" component={Login} />
       <Drawer.Screen name="Settings" component={Login} />
       <Drawer.Screen name="FAQ" component={Login} />
+      <Drawer.Screen name="Logout" component={LogOut} />
+      
     </Drawer.Navigator>
   );
 }
@@ -58,18 +63,18 @@ const theme = {
   colors: {
     ...DefaultTheme.colors,
     primary: '#D9D9D9',
-    text: "#131316",
-  }
-
-
-}
+    text: '#131316',
+  },
+};
 
 const App = () => {
   return (
-    <NavigationContainer theme={theme}>
-      {/* <BaseStack /> */}
-      <DrawerStack />
-    </NavigationContainer>
+    <ContextProvider>
+      <NavigationContainer theme={theme}>
+        {/* <BaseStack /> */}
+        <DrawerStack />
+      </NavigationContainer>
+    </ContextProvider>
   );
 };
 export default App;

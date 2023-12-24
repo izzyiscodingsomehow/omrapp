@@ -1,16 +1,47 @@
 import {View, Text, Image, StyleSheet} from 'react-native';
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useContext} from 'react';
 import CButton from './custom/CButton';
 import SlideView from './custom/SlideView';
 import CTextInput from './custom/CTextInput';
-import {useNavigation} from '@react-navigation/native';
+// import {useNavigation} from '@react-navigation/native';
 import auth from '@react-native-firebase/auth';
-import firebase from '../firebase';
+import { onAuthStateChanged } from 'firebase/auth';
+import { UserContext } from './contexts/UserContext';
+const Login = ({navigation, route}) => {
+  const settings = auth().settings;
+  useEffect(() => {
+  settings.appVerificationDisabledForTesting = true;
+  //console.log(settings.appVerificationDisabledForTesting);
+  }, []);
+  // useEffect(() => {
+  //   console.log(route.params?.user);
+  //   if (route.params?.user) {
+  //     console.log('user');
+  //   }
+  // }, [route.params?.user]);
+  
+  // const [initializing, setInitializing] = useState(true);
+  // const [user, setUser] = useState();
 
-const Login = () => {
+  // // // Handle user state changes
+  // function onAuthStateChanged(user) {
+  //   //console.log(user);
+  //   console.log('user');
+  //   if (initializing) setInitializing(false);
+  // }
+
+  // useEffect(() => {
+  //   const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
+  //   return subscriber; // unsubscribe on unmount
+  // }, []);
+
+  //if (initializing) return null;
+  const {user,setUser} = useContext(UserContext);
+  const {LoggedIn, setLoggedIn} = useContext(UserContext);
   const [confirm, setConfirm] = useState(null);
   const [code, setCode] = useState('');
-  const navigation = useNavigation();
+  
+  
   const [phoneNumber, setPhoneNumber] = useState('051');
   const handleChange = text => {
     setPhoneNumber(text);
@@ -20,10 +51,20 @@ const Login = () => {
   };
   const handleOTP = async () => {
     try {
-      await confirm.confirm(code).then(user => {
-        console.log(user);
+      //await confirm.confirm(code).then(userInfo => {
+      await confirm.confirm('123654').then(userInfo => {
+        userInfo.additionalUserInfo.isNewUser = true;
+        if(userInfo.additionalUserInfo.isNewUser){
+          console.log("new user");
+          navigation.navigate('SignUp');
+          //in signup update user info and then set async data "ASYNC DATA STORAGE CALLS GET DATA ALWAYS"and login the user
+        }
+        else{
+          console.log("old user");
+          setUser(userInfo);
+          //set async user data and in get data set user state and login the user
+        }
       });
-      //navigation.navigate('Home');
     } catch (e) {
       console.log(e);
       alert(
@@ -31,15 +72,35 @@ const Login = () => {
       );
     }
   };
-  const handleClick = () => {
-    //console.log(phoneNumber);
-    if (phoneNumber.length < 10 || phoneNumber.length > 10) {
-      alert('Please enter a valid phone number');
-      return;
-    } else if (phoneNumber.length == 10) {
-      const phone = '+92' + phoneNumber;
-      signInWithPhoneNumber(phone);
+  useEffect(() => {
+    if (user) {
+      // console.log(user.additionalUserInfo.isNewUser);
+      //console.log("user:",user);
+      navigation.navigate('Home');
     }
+    else
+    {
+      setConfirm(null);
+    }
+  }
+  , [user]);
+  
+  useEffect(() => {
+    if(LoggedIn){
+      navigation.navigate('Home');
+    }
+  }, [LoggedIn]);
+  const handleClick = () => {
+    // Dummy for testing
+    signInWithPhoneNumber('+923432616877');
+    // This is actual code for phone number verification
+    // if (phoneNumber.length < 10 || phoneNumber.length > 10) {
+    //   alert('Please enter a valid phone number');
+    //   return;
+    // } else if (phoneNumber.length == 10) {
+    //   const phone = '+92' + phoneNumber;
+    //   signInWithPhoneNumber(phone);
+    // }
     //navigation.navigate('Home');
   };
   async function signInWithPhoneNumber(phoneNumber) {
@@ -69,7 +130,7 @@ const Login = () => {
 
           <SlideView className="">
             <View className="p-5">
-              <Text className="text-xl text-black">Create an account</Text>
+              <Text className="text-xl text-black">Sign In With Phone Number</Text>
               <View className={` rounded-lg p-3 px-4 mt-3 text-lg items-center flex flex-row`}>
               <Text className="text-xl text-grey pr-2 mt-3">+92</Text>
               <CTextInput

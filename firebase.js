@@ -32,7 +32,8 @@ if(!firebase.apps.length) {
   
 export { firebase };
 //export const auth = firebase.auth();
-firebase.auth().settings.appVerificationDisabledForTesting = true;
-firebase.auth().settings.forceRecaptchaFlowForTesting = false;
-console.log(firebase.auth().settings.forceRecaptchaFlowForTesting);
-console.log(firebase.auth().settings.appVerificationDisabledForTesting);
+export const settings = firebase.auth().settings;
+settings.appVerificationDisabledForTesting = true;
+// settings.forceRecaptchaFlowForTesting = false;
+// console.log(settings.forceRecaptchaFlowForTesting);
+console.log(settings.appVerificationDisabledForTesting);
