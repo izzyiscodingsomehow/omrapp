@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { StyleSheet, Text, View, Image, TextInput } from 'react-native'
 import MapView, { Marker } from 'react-native-maps'
 import MapViewDirections from 'react-native-maps-directions'
+import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete'
 import Geolocation from '@react-native-community/geolocation'
 import SlideView from './custom/SlideView'
 import searchIcon from '../imgs/searchIcon.svg'
@@ -84,18 +85,54 @@ const Home = () => {
                 </View>
                 <View className="pt-2 px-4 flex flex-col gap-4 h-[300px]">
 
-                    <View className="bg-[#E9E9EA]  rounded-md flex flex-row justify-center items-center w-auto h-14">
+                    <View className="bg-[#E9E9EA]  rounded-md flex flex-row justify-evenly items-center w-auto h-14 ">
                         {/* PLACEHOLDER FOR TYPES OF VEHICLES */}
+                        <Text>Pickup</Text>
+                        <Text>Box Truck</Text>
+                        <Text>Mini Truck</Text>
+                        <Text>Semi Truck</Text>
                     </View>
 
                     <View className="bg-[#E9E9EA]  rounded-md flex flex-row justify-center items-center">
                         <Image source={require('../imgs/searchPNG.png')} style={{ width: 20, marginLeft: 20 }} />
-                        <TextInput placeholder='Pickup location' className="w-[70%]  mx-auto text-xl" />
+                        {/* <TextInput placeholder='Pickup location' className="w-[70%]  mx-auto text-xl" /> */}
+                        <GooglePlacesAutocomplete
+                            placeholder='Pickup location'
+                            onPress={(data, details = null) => {
+                                console.log("PICKUP: ", data, details);
+
+                            }}
+                            query={{
+                                key: "AIzaSyBzkP_jIc71HLCelXc5UtgNZu1jhFIs9Q4",
+                                language: 'en'
+                            }}
+                            styles={{
+                                container: styles.mapsContainer,
+                                textInputContainer: styles.mapsTextInputContainer,
+                                textInput: styles.mapsTextInput
+                            }}
+                        />
                         <Image source={require('../imgs/arrowRightPNG.png')} style={{ width: 20, marginRight: 20 }} />
                     </View>
                     <View className="bg-[#E9E9EA]  rounded-md flex flex-row justify-center items-center">
                         <Image source={require('../imgs/searchPNG.png')} style={{ width: 20, marginLeft: 20 }} />
-                        <TextInput placeholder='Dropoff location' className="w-[70%]  mx-auto text-xl" />
+                        {/* <TextInput placeholder='Dropoff location' className="w-[70%]  mx-auto text-xl" /> */}
+                        <GooglePlacesAutocomplete
+                            placeholder='Dropoff location'
+                            onPress={(data, details = null) => {
+                                console.log("DROP: ", data, details);
+
+                            }}
+                            query={{
+                                key: "AIzaSyBzkP_jIc71HLCelXc5UtgNZu1jhFIs9Q4",
+                                language: 'en'
+                            }}
+                            styles={{
+                                container: styles.mapsContainer,
+                                textInputContainer: styles.mapsTextInputContainer,
+                                textInput: styles.mapsTextInput
+                            }}
+                        />
                         <Image source={require('../imgs/arrowRightPNG.png')} style={{ width: 20, marginRight: 20 }} />
                     </View>
                     <View className="w-auto">
@@ -149,6 +186,20 @@ const styles = StyleSheet.create({
     },
     mapView: {
         ...StyleSheet.absoluteFillObject,
+    },
+    mapsContainer: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center"
+    },
+    mapsTextInput: {
+        position: "relative",
+        top: 2,
+        backgroundColor: "transparent",
+
+    },
+    mapsTextInputContainer: {
+
     }
 })
 

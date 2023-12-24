@@ -1,8 +1,12 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import { View, Text, Image } from 'react-native'
 import { DrawerContentScrollView, DrawerItemList } from '@react-navigation/drawer'
+import { UserContext } from '../contexts/UserContext';
 
 const CustomDrawer = (props) => {
+
+    const { user, setUser } = useContext(UserContext);
+
     return (
         <>
             <View style={{ flex: 1 }}>
@@ -11,8 +15,8 @@ const CustomDrawer = (props) => {
                     <View style={{ paddingVertical: 15, flex: 1, flexDirection: 'row', alignItems: "center", gap: 15 }} className="border-b border-b-[#D2D3D4] mx-4 mb-2">
                         <Image source={require("../../imgs/userPFP.jpg")} style={{ width: 50, height: 50, borderRadius: 100 }} />
                         <View className="">
-                            <Text className="text-[16px] text-black">Jamal Kamal</Text>
-                            <Text className="text-[14px]">+92 310 1234567</Text>
+                            <Text className="text-[16px] text-black">{user ? user.displayName : "Jamal Kamal"}</Text>
+                            <Text className="text-[14px]">{user ? user.phoneNumber : "N/A"}</Text>
                         </View>
                     </View>
                     <DrawerItemList {...props} />

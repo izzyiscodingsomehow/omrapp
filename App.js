@@ -9,6 +9,7 @@ import Home from './Components/Home';
 import SignUp from './Components/SignUp';
 import CustomDrawer from './Components/custom/CustomDrawer';
 import {ContextProvider} from './Components/contexts/UserContext';
+import FAQ from './Components/FAQ';
 
 const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -51,7 +52,7 @@ function DrawerStack() {
       <Drawer.Screen name="Home" component={Home} />
       <Drawer.Screen name="Become a Driver" component={Login} />
       <Drawer.Screen name="Settings" component={Login} />
-      <Drawer.Screen name="FAQ" component={Login} />
+      <Drawer.Screen name="FAQ" component={FAQ} />
       <Drawer.Screen name="Logout" component={LogOut} />
       
     </Drawer.Navigator>
