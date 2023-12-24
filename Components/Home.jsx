@@ -15,13 +15,6 @@ const Home = () => {
         longitude: 0,
     });
 
-    const [cargoTypes, setCargoTypes] = useState([
-        { label: "Furniture", value: "furniture" },
-        { label: "Electronic Appliances", value: "electronic_appliances" },
-        { label: "Parcel", value: "parcel" },
-    ]);
-    const [open, setOpen] = useState(false);
-    const [value, setValue] = useState(null);
 
     function getCurrentPosition() {
         Geolocation.getCurrentPosition(
