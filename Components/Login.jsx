@@ -164,13 +164,11 @@ const Login = ({navigation, route}) => {
             <View className="p-5">
               <Text className="text-xl text-black">Enter OTP</Text>
               <CTextInput
-                placeholder="f.e 123546"
+                placeholder="XXXXXX"
                 twClass="p-3 px-4 mt-3 text-lg"
                 handleChange={handleCode}
               />
-              <CButton
-                title={'Confirm Code'}
-                twClass="mt-4"
+              <CButton title={'Confirm Code'} twClass="mt-4"
                 handlePress={handleOTP}
               />
             </View>
