@@ -8,6 +8,7 @@ import SlideView from './custom/SlideView'
 import searchIcon from '../imgs/searchIcon.svg'
 import DropDownPicker from 'react-native-dropdown-picker'
 import CButton from './custom/CButton'
+import mapStyle from '../mapStyle.json'
 
 const Home = () => {
 
@@ -67,6 +68,7 @@ const Home = () => {
                 style={styles.mapView}
                 region={region}
                 onRegionChangeComplete={(newRegion) => setRegion(newRegion)}
+                customMapStyle={mapStyle}
             >
                 <Marker coordinate={position} title='origin' />
                 <Marker coordinate={destination} title='destination' />

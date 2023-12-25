@@ -9,16 +9,18 @@ const ContextProvider = ({children},navigation) => {
   const [AsyncUserData, setAsyncUserData] = useState();
   const [LoggedIn, setLoggedIn] = useState(false);
   const [hasData, setHasData] = useState(false);
+
   const storeUserData = async () => {
     try {
       const jsonValue = JSON.stringify(user);
-      //await AsyncStorage.setItem('userdata', jsonValue);
+      // await AsyncStorage.setItem('userdata', jsonValue);
       setHasData(true);
       console.log('storedata');
     } catch (error) {
       console.log('storedata Error: ', error, '\n');
     }
   };
+
   const getUserData = async () => {
     try {
       console.log('getdata1')
