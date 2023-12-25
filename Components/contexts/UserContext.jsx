@@ -6,10 +6,10 @@ const UserContext = createContext([]);
 const ContextProvider = ({children}, navigation) => {
   const {type, isConnected} = useNetInfo();
   const [user, setUser] = useState(null);
-  const [AsyncUserData, setAsyncUserData] = useState();
+  //const [AsyncUserData, setAsyncUserData] = useState();
   const [LoggedIn, setLoggedIn] = useState(false);
   const [hasData, setHasData] = useState(false);
-
+  const [SignedUp, setSignedUp] = useState(false);
   const storeUserData = async () => {
     try {
       if (!hasData) {
@@ -51,7 +51,7 @@ const ContextProvider = ({children}, navigation) => {
   // Store in Context API
   return (
     <UserContext.Provider
-      value={{user, setUser, LoggedIn, setLoggedIn, hasData}}>
+      value={{user, setUser, LoggedIn, setLoggedIn, hasData, SignedUp,setSignedUp}}>
       {children}
     </UserContext.Provider>
   );
