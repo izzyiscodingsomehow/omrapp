@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { StyleSheet, Text, View, Image, TextInput } from 'react-native'
+import { StyleSheet, Text, View, Image, TextInput, TouchableOpacity } from 'react-native'
 import MapView, { Marker } from 'react-native-maps'
 import MapViewDirections from 'react-native-maps-directions'
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete'
@@ -9,6 +9,7 @@ import searchIcon from '../imgs/searchIcon.svg'
 import DropDownPicker from 'react-native-dropdown-picker'
 import CButton from './custom/CButton'
 import mapStyle from '../mapStyle.json'
+import { request, PERMISSIONS, RESULTS, check } from 'react-native-permissions'
 
 const Home = () => {
 
@@ -22,7 +23,7 @@ const Home = () => {
         Geolocation.getCurrentPosition(
 
             (position) => {
-                console.log(position.coords);
+                console.log(position);
                 setPosition({
                     latitude: position.coords.latitude,
                     longitude: position.coords.longitude,
@@ -31,22 +32,35 @@ const Home = () => {
             (error) => {
                 // See error code charts below.
                 console.log(error.code, error.message);
-            },
-            {
-                enableHighAccuracy: true, timeout: 15000, maximumAge: 10000
             }
         )
     }
 
-    useEffect(() => {
-        getCurrentPosition();
 
+    useEffect(() => {
+        // request location access
+        // request(PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION)
+        //     .then((result) => {
+        //         // user granted location access
+        //         if (result == RESULTS.GRANTED) {
+        //         }
+        //         // user did not grant location access
+        //         else {
+        //             console.log("Please give permission to access location");
+        //         }
+        //     })
+        //     .catch(err => {
+        //         // error handling
+        //         console.log(err);
+        //     })
+        getCurrentPosition();
+        console.log("POSITION: ", position);
     }, []);
 
     // temp region
     const [region, setRegion] = useState({
-        latitude: 37.7,
-        longitude: -122.4,
+        latitude: 31.5497,
+        longitude: 74.358,
         latitudeDelta: 0.09,
         longitudeDelta: 0.04,
     });
@@ -68,10 +82,10 @@ const Home = () => {
                 style={styles.mapView}
                 region={region}
                 onRegionChangeComplete={(newRegion) => setRegion(newRegion)}
-                customMapStyle={mapStyle}
+            // customMapStyle={mapStyle}
             >
                 <Marker coordinate={position} title='origin' />
-                <Marker coordinate={destination} title='destination' />
+                {/* <Marker coordinate={destination} title='destination' /> */}
 
                 <MapViewDirections
                     origin={position}
@@ -82,24 +96,33 @@ const Home = () => {
                 />
             </MapView>
             <SlideView>
-                <View className="rounded-full absolute bg-white top-[-70px] right-4 p-3">
-                    <Image source={require('../imgs/currentLocation.png')} style={{ width: 30, height: 30 }} />
-                </View>
+                <TouchableOpacity
+                    onPress={getCurrentPosition}
+                    style={{
+                        position: "absolute",
+                        top: -70,
+                        right: 15
+                    }}
+                >
+                    <View className="rounded-full bg-white p-3">
+                        <Image source={require('../imgs/currentLocation.png')} style={{ width: 30, height: 30 }} />
+                    </View>
+                </TouchableOpacity>
                 <View className="pt-2 px-4 flex flex-col gap-4 h-[300px]">
 
                     <View className=" rounded-md flex flex-row justify-evenly items-center w-auto ">
                         {/* PLACEHOLDER FOR TYPES OF VEHICLES */}
                         <View className="flex flex-col justify-center items-center gap-1 w-1/3">
                             <Image source={require('../imgs/pickupIcon.png')} style={{ width: 50 }} />
-                            <Text className="text-[17px]">Pickup Truck</Text>
+                            <Text className="text-[17px] text-black">Pickup Truck</Text>
                         </View>
                         <View className="flex flex-col justify-center items-center gap-1 w-1/3">
                             <Image source={require('../imgs/boxTruckIcon.png')} style={{ width: 50 }} />
-                            <Text className="text-[17px]">Box Truck</Text>
+                            <Text className="text-[17px] text-black">Box Truck</Text>
                         </View>
                         <View className="flex flex-col justify-center items-center gap-1 w-1/3">
                             <Image source={require('../imgs/semiTruckIcon.png')} style={{ width: 55 }} />
-                            <Text className="text-[17px] relative bottom-[5]">Semi Truck</Text>
+                            <Text className="text-[17px] relative bottom-[5] text-black">Semi Truck</Text>
                         </View>
                     </View>
 
@@ -206,10 +229,11 @@ const styles = StyleSheet.create({
         position: "relative",
         top: 2,
         backgroundColor: "transparent",
+        color: "black"
 
     },
     mapsTextInputContainer: {
-
+        color: "black"
     }
 })
 
