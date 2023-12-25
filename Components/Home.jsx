@@ -85,12 +85,20 @@ const Home = () => {
                 </View>
                 <View className="pt-2 px-4 flex flex-col gap-4 h-[300px]">
 
-                    <View className="bg-[#E9E9EA]  rounded-md flex flex-row justify-evenly items-center w-auto h-14 ">
+                    <View className=" rounded-md flex flex-row justify-evenly items-center w-auto ">
                         {/* PLACEHOLDER FOR TYPES OF VEHICLES */}
-                        <Text>Pickup</Text>
-                        <Text>Box Truck</Text>
-                        <Text>Mini Truck</Text>
-                        <Text>Semi Truck</Text>
+                        <View className="flex flex-col justify-center items-center gap-1 w-1/3">
+                            <Image source={require('../imgs/pickupIcon.png')} style={{ width: 50 }} />
+                            <Text className="text-[17px]">Pickup Truck</Text>
+                        </View>
+                        <View className="flex flex-col justify-center items-center gap-1 w-1/3">
+                            <Image source={require('../imgs/boxTruckIcon.png')} style={{ width: 50 }} />
+                            <Text className="text-[17px]">Box Truck</Text>
+                        </View>
+                        <View className="flex flex-col justify-center items-center gap-1 w-1/3">
+                            <Image source={require('../imgs/semiTruckIcon.png')} style={{ width: 55 }} />
+                            <Text className="text-[17px] relative bottom-[5]">Semi Truck</Text>
+                        </View>
                     </View>
 
                     <View className="bg-[#E9E9EA]  rounded-md flex flex-row justify-center items-center">
