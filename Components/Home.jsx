@@ -65,16 +65,26 @@ const Home = () => {
         longitudeDelta: 0.04,
     });
 
+    const [origin, setOrigin] = useState({
+        latitude: 0,
+        longitude: 0,
+    });
+
+    const [dropOff, setDropOff] = useState({
+        latitude: 0,
+        longitude: 0,
+    });
+
     // temp origin
-    const origin = {
-        latitude: 37.7,
-        longitude: -122.4,
-    };
+    // const origin = {
+    //     latitude: 37.7,
+    //     longitude: -122.4,
+    // };
     // temp destination
-    const destination = {
-        latitude: 37.9,
-        longitude: -122.6,
-    };
+    // const destination = {
+    //     latitude: 37.9,
+    //     longitude: -122.6,
+    // };
 
     return (
         <View style={styles.container}>
@@ -82,14 +92,14 @@ const Home = () => {
                 style={styles.mapView}
                 region={region}
                 onRegionChangeComplete={(newRegion) => setRegion(newRegion)}
-                //customMapStyle={mapStyle}
+            //customMapStyle={mapStyle}
             >
-                <Marker coordinate={position} title='origin' />
-                {/* <Marker coordinate={destination} title='destination' /> */}
+                <Marker coordinate={origin} title='Your location' />
+                <Marker coordinate={dropOff} title='Dropoff' />
 
                 <MapViewDirections
                     origin={position}
-                    destination={destination}
+                    destination={dropOff}
                     apikey='AIzaSyBzkP_jIc71HLCelXc5UtgNZu1jhFIs9Q4'
                     strokeWidth={2}
                     strokeColor='#1a1a1a'
@@ -108,7 +118,7 @@ const Home = () => {
                         <Image source={require('../imgs/currentLocation.png')} style={{ width: 30, height: 30 }} />
                     </View>
                 </TouchableOpacity>
-                <View className="pt-2 px-4 flex flex-col gap-4 h-[300px]">
+                <View className="pt-2 px-4 flex flex-col gap-4 h-[300px] z-[-4]">
 
                     <View className=" rounded-md flex flex-row justify-evenly items-center w-auto ">
                         {/* PLACEHOLDER FOR TYPES OF VEHICLES */}
@@ -126,34 +136,54 @@ const Home = () => {
                         </View>
                     </View>
 
-                    <View className="bg-[#E9E9EA]  rounded-md flex flex-row justify-center items-center">
-                        <Image source={require('../imgs/searchPNG.png')} style={{ width: 20, marginLeft: 20 }} />
-                        {/* <TextInput placeholder='Pickup location' className="w-[70%]  mx-auto text-xl" /> */}
-                        <GooglePlacesAutocomplete
-                            placeholder='Pickup location'
-                            onPress={(data, details = null) => {
-                                console.log("PICKUP: ", data, details);
+                    <View className="flex">
+                        <View className="bg-[#E9E9EA]  rounded-md flex flex-row justify-center items-center relative z-[-2]">
+                            <Image source={require('../imgs/searchPNG.png')} style={{ width: 20, marginLeft: 20 }} />
+                            {/* <TextInput placeholder='Pickup location' className="w-[70%]  mx-auto text-xl" /> */}
+                            <GooglePlacesAutocomplete
+                                placeholder='Pickup location'
+                                onPress={(data, details = null) => {
+                                    // console.log("PICKUP: ", data, details);
+                                    if (details) {
+                                        const { location } = details.geometry;
+                                        console.log("LOCATION: ", location.lat, "\n", location.lng)
+                                        setOrigin({
+                                            latitude: location.lat,
+                                            longitude: location.lng
+                                        })
+                                    }
 
-                            }}
-                            query={{
-                                key: "AIzaSyBzkP_jIc71HLCelXc5UtgNZu1jhFIs9Q4",
-                                language: 'en'
-                            }}
-                            styles={{
-                                container: styles.mapsContainer,
-                                textInputContainer: styles.mapsTextInputContainer,
-                                textInput: styles.mapsTextInput
-                            }}
-                        />
-                        <Image source={require('../imgs/arrowRightPNG.png')} style={{ width: 20, marginRight: 20 }} />
+                                }}
+                                query={{
+                                    key: "AIzaSyBzkP_jIc71HLCelXc5UtgNZu1jhFIs9Q4",
+                                    language: 'en'
+                                }}
+                                styles={{
+                                    container: styles.mapsContainer,
+                                    textInputContainer: styles.mapsTextInputContainer,
+                                    textInput: styles.mapsTextInput,
+                                    listView: styles.mapsListView
+                                }}
+                                fetchDetails={true}
+                            />
+                            <Image source={require('../imgs/arrowRightPNG.png')} style={{ width: 20, marginRight: 20 }} />
+                        </View>
                     </View>
-                    <View className="bg-[#E9E9EA]  rounded-md flex flex-row justify-center items-center">
+                    <View className="bg-[#E9E9EA]  rounded-md flex flex-row justify-center items-center z-[-3]">
                         <Image source={require('../imgs/searchPNG.png')} style={{ width: 20, marginLeft: 20 }} />
                         {/* <TextInput placeholder='Dropoff location' className="w-[70%]  mx-auto text-xl" /> */}
                         <GooglePlacesAutocomplete
                             placeholder='Dropoff location'
                             onPress={(data, details = null) => {
-                                console.log("DROP: ", data, details);
+                                // console.log("DROP: ", data, details);
+                                if (details) {
+                                    const { location } = details.geometry;
+                                    console.log("LOCATION: ", location.lat, "\n", location.lng)
+                                    setDropOff({
+                                        latitude: location.lat,
+                                        longitude: location.lng
+                                    })
+                                }
 
                             }}
                             query={{
@@ -163,13 +193,15 @@ const Home = () => {
                             styles={{
                                 container: styles.mapsContainer,
                                 textInputContainer: styles.mapsTextInputContainer,
-                                textInput: styles.mapsTextInput
+                                textInput: styles.mapsTextInput,
+                                listView: styles.mapsListView
                             }}
+                            fetchDetails={true}
                         />
                         <Image source={require('../imgs/arrowRightPNG.png')} style={{ width: 20, marginRight: 20 }} />
                     </View>
                     <View className="w-auto">
-                        <CButton title={"Let's go"} twClass={""} />
+                        <CButton title={"Let's go"} twClass={"z-[-4]"} />
                     </View>
 
                     {/* REMOVED TYPE OF CARGOS BECAUSE IT MAKES THINGS OVERCOMPLICATED */}
@@ -223,17 +255,30 @@ const styles = StyleSheet.create({
     mapsContainer: {
         flex: 1,
         justifyContent: "center",
-        alignItems: "center"
+        alignItems: "center",
+        position: "relative",
+        top: 0,
+        left: 0,
+
     },
     mapsTextInput: {
         position: "relative",
         top: 2,
         backgroundColor: "transparent",
-        color: "black"
+        color: "black",
+        zIndex: 1
 
     },
     mapsTextInputContainer: {
-        color: "black"
+        color: "black",
+        zIndex: 1
+    },
+    mapsListView: {
+        backgroundColor: "red",
+        position: "absolute",
+        top: 50,
+        zIndex: 12
+
     }
 })
 
