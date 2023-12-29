@@ -82,7 +82,7 @@ const Home = () => {
                 style={styles.mapView}
                 region={region}
                 onRegionChangeComplete={(newRegion) => setRegion(newRegion)}
-            // customMapStyle={mapStyle}
+                //customMapStyle={mapStyle}
             >
                 <Marker coordinate={position} title='origin' />
                 {/* <Marker coordinate={destination} title='destination' /> */}

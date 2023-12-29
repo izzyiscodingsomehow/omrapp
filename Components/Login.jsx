@@ -7,18 +7,14 @@ import CTextInput from './custom/CTextInput';
 import auth from '@react-native-firebase/auth';
 import { onAuthStateChanged } from 'firebase/auth';
 import { UserContext } from './contexts/UserContext';
+import SignUp from './SignUp';
+
 const Login = ({navigation, route}) => {
   const settings = auth().settings;
   useEffect(() => {
   settings.appVerificationDisabledForTesting = true;
   //console.log(settings.appVerificationDisabledForTesting);
   }, []);
-  // useEffect(() => {
-  //   console.log(route.params?.user);
-  //   if (route.params?.user) {
-  //     console.log('user');
-  //   }
-  // }, [route.params?.user]);
   
   // const [initializing, setInitializing] = useState(true);
   // const [user, setUser] = useState();
@@ -40,8 +36,7 @@ const Login = ({navigation, route}) => {
   const {LoggedIn, setLoggedIn} = useContext(UserContext);
   const [confirm, setConfirm] = useState(null);
   const [code, setCode] = useState('');
-  
-  
+  const {SignedUp} = useContext(UserContext);
   const [phoneNumber, setPhoneNumber] = useState('051');
   const handleChange = text => {
     setPhoneNumber(text);
@@ -49,19 +44,30 @@ const Login = ({navigation, route}) => {
   const handleCode = text => {
     setCode(text);
   };
+  const confirmSignup = async () => {
+    try {
+      await signInWithPhoneNumber('+923432616877');
+      await confirm.confirm('123654').then(userInfo => {
+        userInfo.additionalUserInfo.isNewUser = false;
+      });
+    } catch (e) {
+      console.log(e);
+    }
+  }
   const handleOTP = async () => {
     try {
       //await confirm.confirm(code).then(userInfo => {
       await confirm.confirm('123654').then(userInfo => {
-        userInfo.additionalUserInfo.isNewUser = true;
+        //userInfo.additionalUserInfo.isNewUser = true;
         if(userInfo.additionalUserInfo.isNewUser){
           console.log("new user");
           navigation.navigate('SignUp');
           //in signup update user info and then set async data "ASYNC DATA STORAGE CALLS GET DATA ALWAYS"and login the user
         }
         else{
-          console.log("old user");
+          console.log("old user",userInfo);
           setUser(userInfo);
+          setLoggedIn(true);
           //set async user data and in get data set user state and login the user
         }
       });
@@ -82,14 +88,19 @@ const Login = ({navigation, route}) => {
     {
       setConfirm(null);
     }
-  }
-  , [user]);
-  
+  }, [user]);
   useEffect(() => {
     if(LoggedIn){
       navigation.navigate('Home');
     }
   }, [LoggedIn]);
+  useEffect(() => {
+    if(SignedUp){
+      confirmSignup();
+      navigation.navigate('Home');
+    }
+  }, [SignedUp]);
+
   const handleClick = () => {
     // Dummy for testing
     signInWithPhoneNumber('+923432616877');
