@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { StyleSheet, Text, View, Image, TextInput, TouchableOpacity } from 'react-native'
+import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native'
 import MapView, { Marker } from 'react-native-maps'
 import MapViewDirections from 'react-native-maps-directions'
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete'
@@ -24,35 +24,28 @@ const Home = () => {
 
             (position) => {
                 console.log(position);
-                setPosition({
+                setOrigin({
                     latitude: position.coords.latitude,
                     longitude: position.coords.longitude,
+                })
+                setRegion({
+                    latitude: position.coords.latitude,
+                    longitude: position.coords.longitude,
+                    latitudeDelta: 0.05,
+                    longitudeDelta: 0.05,
                 })
             },
             (error) => {
                 // See error code charts below.
                 console.log(error.code, error.message);
-            }
+            },
+            {enableHighAccuracy: true, timeout: 2000, maximumAge: 1000}
+
         )
     }
 
-
     useEffect(() => {
-        // request location access
-        // request(PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION)
-        //     .then((result) => {
-        //         // user granted location access
-        //         if (result == RESULTS.GRANTED) {
-        //         }
-        //         // user did not grant location access
-        //         else {
-        //             console.log("Please give permission to access location");
-        //         }
-        //     })
-        //     .catch(err => {
-        //         // error handling
-        //         console.log(err);
-        //     })
+        Geolocation.requestAuthorization();
         getCurrentPosition();
         console.log("POSITION: ", position);
     }, []);
@@ -65,26 +58,17 @@ const Home = () => {
         longitudeDelta: 0.04,
     });
 
+  // pickup location
     const [origin, setOrigin] = useState({
         latitude: 0,
         longitude: 0,
     });
 
+  // dropoff location
     const [dropOff, setDropOff] = useState({
         latitude: 0,
         longitude: 0,
     });
-
-    // temp origin
-    // const origin = {
-    //     latitude: 37.7,
-    //     longitude: -122.4,
-    // };
-    // temp destination
-    // const destination = {
-    //     latitude: 37.9,
-    //     longitude: -122.6,
-    // };
 
     return (
         <View style={styles.container}>
@@ -98,7 +82,7 @@ const Home = () => {
                 <Marker coordinate={dropOff} title='Dropoff' />
 
                 <MapViewDirections
-                    origin={position}
+                    origin={origin}
                     destination={dropOff}
                     apikey='AIzaSyBzkP_jIc71HLCelXc5UtgNZu1jhFIs9Q4'
                     strokeWidth={2}
@@ -120,19 +104,19 @@ const Home = () => {
                 </TouchableOpacity>
                 <View className="pt-2 px-4 flex flex-col gap-4 h-[300px] z-[-4]">
 
-                    <View className=" rounded-md flex flex-row justify-evenly items-center w-auto ">
+                    <View className=" rounded-md flex flex-row justify-evenly items-center w-auto">
                         {/* PLACEHOLDER FOR TYPES OF VEHICLES */}
-                        <View className="flex flex-col justify-center items-center gap-1 w-1/3">
+                        <View className="flex flex-col justify-center items-center gap-1 w-1/3 bg-gray-100 rounded">
                             <Image source={require('../imgs/pickupIcon.png')} style={{ width: 50 }} />
-                            <Text className="text-[17px] text-black">Pickup Truck</Text>
+                            <Text className="text-[15px] text-black pb-3">Pickup Truck</Text>
                         </View>
-                        <View className="flex flex-col justify-center items-center gap-1 w-1/3">
+                        <View className="flex flex-col justify-center items-center gap-1 w-1/3 bg-gray-100 rounded">
                             <Image source={require('../imgs/boxTruckIcon.png')} style={{ width: 50 }} />
-                            <Text className="text-[17px] text-black">Box Truck</Text>
+                            <Text className="text-[15px] text-black pb-3">Box Truck</Text>
                         </View>
-                        <View className="flex flex-col justify-center items-center gap-1 w-1/3">
+                        <View className="flex flex-col justify-center items-center gap-1 w-1/3 bg-gray-100 rounded">
                             <Image source={require('../imgs/semiTruckIcon.png')} style={{ width: 55 }} />
-                            <Text className="text-[17px] relative bottom-[5] text-black">Semi Truck</Text>
+                            <Text className="text-[15px] relative bottom-[5] text-black pb-1">Semi Truck</Text>
                         </View>
                     </View>
 
@@ -151,6 +135,12 @@ const Home = () => {
                                             latitude: location.lat,
                                             longitude: location.lng
                                         })
+                                        setRegion({
+                                            latitude: location.lat,
+                                            longitude: location.lng,
+                                            latitudeDelta: 0.05,
+                                            longitudeDelta: 0.05,
+                                       })
                                     }
 
                                 }}
@@ -183,6 +173,12 @@ const Home = () => {
                                         latitude: location.lat,
                                         longitude: location.lng
                                     })
+                                        setRegion({
+                                            latitude: location.lat,
+                                            longitude: location.lng,
+                                            latitudeDelta: 0.09,
+                                            longitudeDelta: 0.05,
+                                       })
                                 }
 
                             }}
