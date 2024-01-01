@@ -49,7 +49,8 @@ function DrawerStack() {
           fontWeight: 'normal',
         },
       }}>
-      <Drawer.Screen name="Login" component={Login} /><Drawer.Screen name="SignUp" component={SignUp} />
+      <Drawer.Screen name="Login" component={Login} />
+      <Drawer.Screen name="SignUp" component={SignUp} />
       <Drawer.Screen name="Home" component={Home} />
       <Drawer.Screen name="Become a Driver" component={Login} />
       <Drawer.Screen name="Settings" component={Settings} />

@@ -33,7 +33,6 @@ const Login = ({navigation, route}) => {
 
   //if (initializing) return null;
   const {user,setUser} = useContext(UserContext);
-  const {LoggedIn, setLoggedIn} = useContext(UserContext);
   const [confirm, setConfirm] = useState(null);
   const [code, setCode] = useState('');
   const {SignedUp} = useContext(UserContext);
@@ -48,7 +47,7 @@ const Login = ({navigation, route}) => {
     try {
       await signInWithPhoneNumber('+923432616877');
       await confirm.confirm('123654').then(userInfo => {
-        userInfo.additionalUserInfo.isNewUser = false;
+        userInfo.additionalUserInfo.isNewUer = false;
       });
     } catch (e) {
       console.log(e);
@@ -62,12 +61,13 @@ const Login = ({navigation, route}) => {
         if(userInfo.additionalUserInfo.isNewUser){
           console.log("new user");
           navigation.navigate('SignUp');
+          setConfirm(null);
           //in signup update user info and then set async data "ASYNC DATA STORAGE CALLS GET DATA ALWAYS"and login the user
         }
         else{
           console.log("old user",userInfo);
           setUser(userInfo);
-          setLoggedIn(true);
+          setConfirm(null);
           //set async user data and in get data set user state and login the user
         }
       });
@@ -80,20 +80,9 @@ const Login = ({navigation, route}) => {
   };
   useEffect(() => {
     if (user) {
-      // console.log(user.additionalUserInfo.isNewUser);
-      //console.log("user:",user);
       navigation.navigate('Home');
-    }
-    else
-    {
-      setConfirm(null);
     }
   }, [user]);
-  useEffect(() => {
-    if(LoggedIn){
-      navigation.navigate('Home');
-    }
-  }, [LoggedIn]);
   useEffect(() => {
     if(SignedUp){
       confirmSignup();
