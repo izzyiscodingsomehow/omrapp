@@ -7,7 +7,6 @@ const ContextProvider = ({children}, navigation) => {
   const {type, isConnected} = useNetInfo();
   const [user, setUser] = useState(null);
   //const [AsyncUserData, setAsyncUserData] = useState();
-  const [LoggedIn, setLoggedIn] = useState(false);
   const [hasData, setHasData] = useState(false);
   const [SignedUp, setSignedUp] = useState(false);
   const storeUserData = async () => {
@@ -33,7 +32,6 @@ const ContextProvider = ({children}, navigation) => {
           console.log('getdata2');
           setHasData(true);
           setUser(JSON.parse(jsonValue));
-          setLoggedIn(true);
         }
       }
     } catch (error) {
@@ -51,7 +49,7 @@ const ContextProvider = ({children}, navigation) => {
   // Store in Context API
   return (
     <UserContext.Provider
-      value={{user, setUser, LoggedIn, setLoggedIn, hasData, SignedUp,setSignedUp}}>
+      value={{user, setUser, hasData, SignedUp,setSignedUp}}>
       {children}
     </UserContext.Provider>
   );
