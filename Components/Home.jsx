@@ -242,6 +242,7 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'flex-end',
         alignItems: 'center',
+        color: "black"
     },
     mapView: {
         ...StyleSheet.absoluteFillObject,
@@ -253,6 +254,7 @@ const styles = StyleSheet.create({
         position: "relative",
         top: 0,
         left: 0,
+        color: "black"
 
     },
     mapsTextInput: {
@@ -268,10 +270,11 @@ const styles = StyleSheet.create({
         zIndex: 1
     },
     mapsListView: {
-        backgroundColor: "red",
+        backgroundColor: "white",
         position: "absolute",
         top: 50,
-        zIndex: 12
+        zIndex: 12,
+        color: "black"
 
     }
 })

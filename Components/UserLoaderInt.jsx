@@ -21,7 +21,7 @@ const UserLoaderInt = () => {
     };
     const trycall = () => {
         const args = {
-            number: user.user.phoneNumber,
+            number: user.phoneNumber,
             prompt: true,
         };
         call(args).catch(console.error);
@@ -105,10 +105,10 @@ const UserLoaderInt = () => {
             </MapView>
             <SlideView>
                     <View className="ml-7">
-                        <Text className="text-xl text-black">Name: {user.user.displayName}</Text>
+                        <Text className="text-xl text-black">Name: {user.displayName}</Text>
                         <TouchableOpacity
                         //Commented because it works for now
-                        //onPress={trycall}
+                        // onPress={trycall}
                         className="flex-row"
                         >
                             <Text className="text-xl text-black mt-3 mr-5">Call</Text>
