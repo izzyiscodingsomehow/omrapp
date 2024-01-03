@@ -58,13 +58,11 @@ const Home = () => {
         longitudeDelta: 0.04,
     });
 
-  // pickup location
     const [origin, setOrigin] = useState({
         latitude: 0,
         longitude: 0,
     });
 
-  // dropoff location
     const [dropOff, setDropOff] = useState({
         latitude: 0,
         longitude: 0,
