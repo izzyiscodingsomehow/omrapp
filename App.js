@@ -11,6 +11,7 @@ import CustomDrawer from './Components/custom/CustomDrawer';
 import {ContextProvider} from './Components/contexts/UserContext';
 import FAQ from './Components/FAQ';
 import Settings from './Components/Settings';
+import UserLoaderInt from './Components/UserLoaderInt';
 
 const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -52,6 +53,7 @@ function DrawerStack() {
       <Drawer.Screen name="Login" component={Login} />
       <Drawer.Screen name="SignUp" component={SignUp} />
       <Drawer.Screen name="Home" component={Home} />
+      <Drawer.Screen name="UserLoaderInt" component={UserLoaderInt} />
       <Drawer.Screen name="Become a Driver" component={Login} />
       <Drawer.Screen name="Settings" component={Settings} />
       <Drawer.Screen name="FAQ" component={FAQ} />
