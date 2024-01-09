@@ -32,6 +32,7 @@ const UserLoaderInt = () => {
         longitude: 0,
     });
 
+    const [slideViewHeight, setSlideViewHeight] = useState(0);
 
     function getCurrentPosition() {
         Geolocation.getCurrentPosition(
@@ -103,8 +104,8 @@ const UserLoaderInt = () => {
                     strokeColor='#1a1a1a'
                 />
             </MapView>
-            <SlideView>
-                    <View className="ml-7">
+            <SlideView height={slideViewHeight < 100 ? slideViewHeight * 3.2 : slideViewHeight}>
+                    <View onLayout={(event) => slideViewHeight == 0 ? setSlideViewHeight(event.nativeEvent.layout.height) : null} className="ml-7">
                         <Text className="text-xl text-black">Name: {user.displayName}</Text>
                         <TouchableOpacity
                         //Commented because it works for now

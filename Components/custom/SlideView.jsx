@@ -19,10 +19,16 @@ const SlideView = ({ height, children }) => {
 
     const styles = StyleSheet.create({
         container: {
-            height: height ? Number(height) : screenHeight,
+            flex: 1,
+            justifyContent: "center",
+            alignItems: "center",
+            // height: height ? Number(height * 2.36) : screenHeight,
+            position : "absolute",
+            bottom: 0,
         }
     })
 
+    console.log(height)
     let newY;
     const panResponder = useRef(
 

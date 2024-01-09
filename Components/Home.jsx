@@ -5,11 +5,8 @@ import MapViewDirections from 'react-native-maps-directions'
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete'
 import Geolocation from '@react-native-community/geolocation'
 import SlideView from './custom/SlideView'
-import searchIcon from '../imgs/searchIcon.svg'
-import DropDownPicker from 'react-native-dropdown-picker'
 import CButton from './custom/CButton'
 import mapStyle from '../mapStyle.json'
-import { request, PERMISSIONS, RESULTS, check } from 'react-native-permissions'
 
 const Home = () => {
 
@@ -17,7 +14,8 @@ const Home = () => {
         latitude: 0,
         longitude: 0,
     });
-
+    
+    const [slideViewHeight, setSlideViewHeight] = useState(0);
 
     function getCurrentPosition() {
         Geolocation.getCurrentPosition(
@@ -48,6 +46,7 @@ const Home = () => {
         Geolocation.requestAuthorization();
         getCurrentPosition();
         console.log("POSITION: ", position);
+    
     }, []);
 
     // temp region
@@ -68,6 +67,7 @@ const Home = () => {
         longitude: 0,
     });
 
+
     return (
         <View style={styles.container}>
             <MapView
@@ -87,7 +87,7 @@ const Home = () => {
                     strokeColor='#1a1a1a'
                 />
             </MapView>
-            <SlideView>
+            <SlideView >
                 <TouchableOpacity
                     onPress={getCurrentPosition}
                     style={{
@@ -100,10 +100,9 @@ const Home = () => {
                         <Image source={require('../imgs/currentLocation.png')} style={{ width: 30, height: 30 }} />
                     </View>
                 </TouchableOpacity>
-                <View className="pt-2 px-4 flex flex-col gap-4 h-[300px] z-[-4]">
+                <View onLayout={(event) => slideViewHeight == 0 ? setSlideViewHeight(event.nativeEvent.layout.height) : null} className=" pt-2 px-4 flex flex-col gap-4 z-[-4]">
 
                     <View className=" rounded-md flex flex-row justify-evenly items-center w-auto">
-                        {/* PLACEHOLDER FOR TYPES OF VEHICLES */}
                         <View className="flex flex-col justify-center items-center gap-1 w-1/3 bg-gray-100 rounded">
                             <Image source={require('../imgs/pickupIcon.png')} style={{ width: 50 }} />
                             <Text className="text-[15px] text-black pb-3">Pickup Truck</Text>
