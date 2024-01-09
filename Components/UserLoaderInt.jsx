@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext } from 'react'
-import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native'
+import { StyleSheet, Text,TextInput, View, Image, TouchableOpacity } from 'react-native'
 import MapView, { Marker } from 'react-native-maps'
 import MapViewDirections from 'react-native-maps-directions'
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete'
@@ -13,15 +13,47 @@ import mapStyle from '../mapStyle.json'
 import { request, PERMISSIONS, RESULTS, check } from 'react-native-permissions'
 import { UserContext } from './contexts/UserContext'
 import call from 'react-native-phone-call'
+import firestore from '@react-native-firebase/firestore';
 
 const UserLoaderInt = () => {
 
+    //chat handling code
+    const [messages, setMessages] = useState([]);
+    const [text, setText] = useState('');
+    const [isFocused, setIsFocused] = useState(false);
+    useEffect(() => {
+        isFocused ? console.log('focused') : console.log('not focused');
+    }, [isFocused]);
+    useEffect(() => {
+    const unsubscribe = firestore()
+        .collection('messages')
+        .orderBy('createdAt')
+        .onSnapshot((snapshot) => {
+        const newMessages = snapshot.docs.map((doc) => doc.data());
+        setMessages(newMessages);
+        });
+
+    return () => unsubscribe();
+    }, []);
+
+    const handleSend = async () => {
+        if(text.length == 0){return;}
+    await firestore().collection('messages').add({
+        text,
+        createdAt: new Date(),
+    });
+
+    setText('');
+    };
+    //chat handling code ends here
+
+
     const handleChange = text => {
-        console.log(text);
+        setText(text)
     };
     const trycall = () => {
         const args = {
-            number: user.phoneNumber,
+            number: user.user.phoneNumber,
             prompt: true,
         };
         call(args).catch(console.error);
@@ -37,7 +69,7 @@ const UserLoaderInt = () => {
         Geolocation.getCurrentPosition(
 
             (position) => {
-                console.log(position);
+                console.log("get curr",position);
                 setOrigin({
                     latitude: position.coords.latitude,
                     longitude: position.coords.longitude,
@@ -85,84 +117,92 @@ const UserLoaderInt = () => {
     });
 
     return (
-        <View style={styles.container}>
-            <MapView
-                style={styles.mapView}
-                region={region}
-                onRegionChangeComplete={(newRegion) => setRegion(newRegion)}
-            //customMapStyle={mapStyle}
-            >
-                <Marker coordinate={origin} title='Your location' />
-                <Marker coordinate={dropOff} title='Dropoff' />
+      <View style={styles.container}>
+        <MapView
+          style={styles.mapView}
+          region={region}
+          onRegionChangeComplete={newRegion => setRegion(newRegion)}
+          //customMapStyle={mapStyle}
+        >
+          <Marker coordinate={origin} title="Your location" />
+          <Marker coordinate={dropOff} title="Dropoff" />
 
-                <MapViewDirections
-                    origin={origin}
-                    destination={dropOff}
-                    apikey='AIzaSyBzkP_jIc71HLCelXc5UtgNZu1jhFIs9Q4'
-                    strokeWidth={2}
-                    strokeColor='#1a1a1a'
+          <MapViewDirections
+            origin={origin}
+            destination={dropOff}
+            apikey="AIzaSyBzkP_jIc71HLCelXc5UtgNZu1jhFIs9Q4"
+            strokeWidth={2}
+            strokeColor="#1a1a1a"
+          />
+        </MapView>
+        <SlideView>
+          {!isFocused ? (
+            <View className="ml-7">
+            <Text className="text-xl text-black">
+              Name: {user.user.displayName}
+            </Text>
+            <TouchableOpacity
+              //Commented because it works for now
+              // onPress={trycall}
+              className="flex-row">
+              <Text className="text-xl text-black mt-3 mr-5">Call</Text>
+              <View className="rounded-full bg-white p-3 ">
+                <Image
+                  source={require('../imgs/phone_icon.png')}
+                  style={{width: 30, height: 30}}
                 />
-            </MapView>
-            <SlideView>
-                    <View className="ml-7">
-                        <Text className="text-xl text-black">Name: {user.displayName}</Text>
-                        <TouchableOpacity
-                        //Commented because it works for now
-                        // onPress={trycall}
-                        className="flex-row"
-                        >
-                            <Text className="text-xl text-black mt-3 mr-5">Call</Text>
-                            <View className="rounded-full bg-white p-3 ">
-                                <Image source={require('../imgs/phone_icon.png')} style={{ width: 30, height: 30 }} />
-                            </View>
-                        </TouchableOpacity>
-                    </View>
-                    <View className="rounded-md flex justify-center items-center z-[-3]">
-                        <CTextInput
-                            placeholder="Chat with your loader"
-                            twClass="p-3 px-4 mt-3 text-lg w-[350]"
-                            handleChange={handleChange}
-                        />
-                    </View>
-                    <View className=" items-center p-2 ml-5">
-                        <CButton title={"Confirm"} twClass={"z-[-4]"} />
-                    </View>
+              </View>
+            </TouchableOpacity>
+          </View>
+          ) : (
+            <View className="ml-7">
+            <TouchableOpacity
+              //Commented because it works for now
+              // onPress={trycall}
+              className="flex-row">
+              <Text className="text-xl text-black mt-3 mr-5">Call</Text>
+              <View className="rounded-full bg-white p-3 ">
+                <Image
+                  source={require('../imgs/phone_icon.png')}
+                  style={{width: 30, height: 30}}
+                />
+              </View>
+            </TouchableOpacity>
+              {messages.map((message, index) => (
+                <Text className="text-l text-black" key={index}>{message.text}</Text>
+              ))}
+            </View>
+          )}
 
-                    {/* REMOVED TYPE OF CARGOS BECAUSE IT MAKES THINGS OVERCOMPLICATED */}
-
-                    {/* <View className="flex flex-row items-center bg-[#E9E9EA] rounded-md">
-                        <Image source={require('../imgs/boxIconPNG.png')} style={{ width: 26, marginLeft: 20 }} />
-                        <DropDownPicker
-                            items={cargoTypes}
-                            open={open}
-                            setOpen={setOpen}
-                            value={value}
-                            setValue={setValue}
-                            placeholder='Type of cargo'
-                            dropDownContainerStyle={{
-                                // marginLeft: 16,
-                                maxWidth: 330,
-                                minWidth: "auto",
-                                backgroundColor: "#E9E9EA",
-                                borderWidth: 0,
-                                padding: 5
-
-                            }}
-                            style={{
-                                width: 320,
-                                borderWidth: 0,
-                                backgroundColor: "#E9E9EA",
-                                marginLeft: 5
-                            }}
-                            textStyle={{
-                                fontSize: 19,
-                                color:"#6A6A6B",
-                            }}
-                        />
-                    </View> */}
-            </SlideView>
-        </View>
-  )
+          <View className="rounded-md flex justify-center items-center z-[-3]">
+            <TextInput
+              placeholder="Chat with your loader"
+              // twClass="p-3 px-4 mt-3 text-lg w-[350]"
+              onFocus={() => setIsFocused(true)}
+              onBlur={() => setIsFocused(false)}
+              className={`border border-[#97979B] rounded-lg p-3 px-4 mt-3 text-lg w-[350]`}
+              value={text}
+              onChangeText={handleChange}
+            />
+          </View>
+            <View className="flex flex-row flex-wrap content-center items-center gap-2 overflow-hidden p-2">
+          <View className=" items-center p-2 ml-5">
+            <CButton
+              title={'Confirm'}
+              twClass={'z-[-4]'}
+            />
+          </View>
+          {isFocused ? (<View className=" items-center p-2 ml-5">
+            <CButton
+              title={'Send'}
+              twClass={'z-[-4] w-[100]'}
+              handlePress={handleSend}
+            />
+          </View>) : (<View></View>)}
+          </View>
+        </SlideView>
+      </View>
+    );
 }
 const styles = StyleSheet.create({
     container: {
