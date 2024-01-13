@@ -1,17 +1,18 @@
 import React from 'react';
-import { Text, View} from 'react-native';
-import {createDrawerNavigator} from '@react-navigation/drawer';
-import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import {NavigationContainer, DefaultTheme} from '@react-navigation/native';
+import { Text, View } from 'react-native';
+import { createDrawerNavigator } from '@react-navigation/drawer';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
 import Login from './Components/Login';
 import LogOut from './Components/LogOut';
 import Home from './Components/Home';
 import SignUp from './Components/SignUp';
 import CustomDrawer from './Components/custom/CustomDrawer';
-import {ContextProvider} from './Components/contexts/UserContext';
+import { ContextProvider } from './Components/contexts/UserContext';
 import FAQ from './Components/FAQ';
 import Settings from './Components/Settings';
 import UserLoaderInt from './Components/UserLoaderInt';
+import { RideContextProvider } from './Components/contexts/RideContext';
 
 const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -58,7 +59,7 @@ function DrawerStack() {
       <Drawer.Screen name="Settings" component={Settings} />
       <Drawer.Screen name="FAQ" component={FAQ} />
       <Drawer.Screen name="Logout" component={LogOut} />
-      
+
     </Drawer.Navigator>
   );
 }
@@ -75,10 +76,12 @@ const theme = {
 const App = () => {
   return (
     <ContextProvider>
-      <NavigationContainer theme={theme}>
-        {/* <BaseStack /> */}
-        <DrawerStack />
-      </NavigationContainer>
+      <RideContextProvider>
+        <NavigationContainer theme={theme}>
+          {/* <BaseStack /> */}
+          <DrawerStack />
+        </NavigationContainer>
+      </RideContextProvider>
     </ContextProvider>
   );
 };
