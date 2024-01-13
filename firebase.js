@@ -1,13 +1,9 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "@firebase/firestore"
-import { getAuth, GoogleAuthProvider } from "firebase/auth";
-import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import 'firebase/compat/auth';
 import 'firebase/compat/firestore';
 import firebase from 'firebase/compat/app';
-import { initializeAuth, getReactNativePersistence } from 'firebase/auth';
-import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage';
 // const auth = initializeAuth(app, {
 //   persistence: getReactNativePersistence(ReactNativeAsyncStorage)
 // });
@@ -32,8 +28,8 @@ if(!firebase.apps.length) {
   
 export { firebase };
 //export const auth = firebase.auth();
-export const settings = firebase.auth().settings;
-settings.appVerificationDisabledForTesting = true;
+// export const settings = firebase.auth().settings;
+// settings.appVerificationDisabledForTesting = true;
 // settings.forceRecaptchaFlowForTesting = false;
 // console.log(settings.forceRecaptchaFlowForTesting);
-console.log(settings.appVerificationDisabledForTesting);
+// console.log(settings.appVerificationDisabledForTesting);

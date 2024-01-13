@@ -99,7 +99,7 @@ const Home = () => {
 
             <SlideView >
                 {
-                    !ride ?
+                    ride ?
                         <UserLoaderInt />
                         :
                         <>

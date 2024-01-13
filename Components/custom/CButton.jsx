@@ -4,7 +4,7 @@ import { RideContext } from '../contexts/RideContext';
 // Custom Button 
 const CButton = ({ title, padding, textColor, twClass, handlePress }) => {
 
-    const { ride, setRide } = useContext(RideContext);
+    const {ride, setRide} = useContext(RideContext);
     // stylesheet for custom numbers/properties that tailwind cant handle through props
     const styles = StyleSheet.create({
         container: {
@@ -22,7 +22,7 @@ const CButton = ({ title, padding, textColor, twClass, handlePress }) => {
         <TouchableOpacity
             style={styles.container}
             className={`bg-[#131316] px-5 rounded-lg ${twClass ? twClass : null}`}
-            onPress={() => setRide(x => !x)}
+            onPress={handlePress}
         >
 
             <Text style={styles.text} className={`text-[18px] font-semibold text-center`}>{title}</Text>

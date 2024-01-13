@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext } from 'react'
-import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native'
+import { StyleSheet, Text, TextInput, View, Image, TouchableOpacity } from 'react-native'
 import MapView, { Marker } from 'react-native-maps'
 import MapViewDirections from 'react-native-maps-directions'
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete'
@@ -13,11 +13,43 @@ import mapStyle from '../mapStyle.json'
 import { request, PERMISSIONS, RESULTS, check } from 'react-native-permissions'
 import { UserContext } from './contexts/UserContext'
 import call from 'react-native-phone-call'
+import firestore from '@react-native-firebase/firestore';
 
 const UserLoaderInt = () => {
 
+    //chat handling code
+    const [messages, setMessages] = useState([]);
+    const [text, setText] = useState('');
+    const [isFocused, setIsFocused] = useState(false);
+    useEffect(() => {
+        isFocused ? console.log('focused') : console.log('not focused');
+    }, [isFocused]);
+    useEffect(() => {
+        const unsubscribe = firestore()
+            .collection('messages')
+            .orderBy('createdAt')
+            .onSnapshot((snapshot) => {
+                const newMessages = snapshot.docs.map((doc) => doc.data());
+                setMessages(newMessages);
+            });
+
+        return () => unsubscribe();
+    }, []);
+
+    const handleSend = async () => {
+        if (text.length == 0) { return; }
+        await firestore().collection('messages').add({
+            text,
+            createdAt: new Date(),
+        });
+
+        setText('');
+    };
+    //chat handling code ends here
+
+
     const handleChange = text => {
-        console.log(text);
+        setText(text)
     };
     const trycall = () => {
         const args = {
@@ -38,7 +70,7 @@ const UserLoaderInt = () => {
         Geolocation.getCurrentPosition(
 
             (position) => {
-                console.log(position);
+                console.log("get curr", position);
                 setOrigin({
                     latitude: position.coords.latitude,
                     longitude: position.coords.longitude,
@@ -87,30 +119,70 @@ const UserLoaderInt = () => {
 
     return (
         <>
-            <View onLayout={(event) => slideViewHeight == 0 ? setSlideViewHeight(event.nativeEvent.layout.height) : null} className="ml-7">
-                <Text className="text-xl text-black">Name: {user.displayName}</Text>
-                <TouchableOpacity
-                    //Commented because it works for now
-                    // onPress={trycall}
-                    className="flex-row"
-                >
-                    <Text className="text-xl text-black mt-3 mr-5">Call</Text>
-                    <View className="rounded-full bg-white p-3 ">
-                        <Image source={require('../imgs/phone_icon.png')} style={{ width: 30, height: 30 }} />
-                    </View>
-                </TouchableOpacity>
-            </View>
+            {!isFocused ? (
+                <View className="ml-7">
+                    <Text className="text-xl text-black">
+                        Name: {user.displayName}
+                    </Text>
+                    <TouchableOpacity
+                        //Commented because it works for now
+                        // onPress={trycall}
+                        className="flex-row">
+                        <Text className="text-xl text-black mt-3 mr-5">Call</Text>
+                        <View className="rounded-full bg-white p-3 ">
+                            <Image
+                                source={require('../imgs/phone_icon.png')}
+                                style={{ width: 30, height: 30 }}
+                            />
+                        </View>
+                    </TouchableOpacity>
+                </View>
+            ) : (
+                <View className="ml-7">
+                    <TouchableOpacity
+                        //Commented because it works for now
+                        // onPress={trycall}
+                        className="flex-row">
+                        <Text className="text-xl text-black mt-3 mr-5">Call</Text>
+                        <View className="rounded-full bg-white p-3 ">
+                            <Image
+                                source={require('../imgs/phone_icon.png')}
+                                style={{ width: 30, height: 30 }}
+                            />
+                        </View>
+                    </TouchableOpacity>
+                    {messages.map((message, index) => (
+                        <Text className="text-l text-black" key={index}>{message.text}</Text>
+                    ))}
+                </View>
+            )
+            }
             <View className="rounded-md flex justify-center items-center z-[-3]">
-                <CTextInput
+                <TextInput
                     placeholder="Chat with your loader"
-                    twClass="p-3 px-4 mt-3 text-lg w-[350]"
-                    handleChange={handleChange}
+                    // twClass="p-3 px-4 mt-3 text-lg w-[350]"
+                    onFocus={() => setIsFocused(true)}
+                    onBlur={() => setIsFocused(false)}
+                    className={`border border-[#97979B] rounded-lg p-3 px-4 mt-3 text-lg w-[350]`}
+                    value={text}
+                    onChangeText={handleChange}
                 />
             </View>
-            <View className=" items-center p-2 ml-5">
-                <CButton title={"Confirm"} twClass={"z-[-4]"} />
+            <View className="flex flex-row flex-wrap content-center items-center gap-2 overflow-hidden p-2">
+                <View className=" items-center p-2 ml-5">
+                    <CButton
+                        title={'Confirm'}
+                        twClass={'z-[-4]'}
+                    />
+                </View>
+                {isFocused ? (<View className=" items-center p-2 ml-5">
+                    <CButton
+                        title={'Send'}
+                        twClass={'z-[-4] w-[100]'}
+                        handlePress={handleSend}
+                    />
+                </View>) : (<View></View>)}
             </View>
-
         </>
     )
 }
