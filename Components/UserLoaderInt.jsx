@@ -14,36 +14,82 @@ import { request, PERMISSIONS, RESULTS, check } from 'react-native-permissions'
 import { UserContext } from './contexts/UserContext'
 import call from 'react-native-phone-call'
 import firestore from '@react-native-firebase/firestore';
+import { doc, updateDoc,setDoc,getDoc } from "firebase/firestore";
+import { db } from '../firebase';
 
 const UserLoaderInt = () => {
 
     //chat handling code
+    const[msgs, setMsgs] = useState([]);
     const [messages, setMessages] = useState([]);
     const [text, setText] = useState('');
     const [isFocused, setIsFocused] = useState(false);
-    useEffect(() => {
-        isFocused ? console.log('focused') : console.log('not focused');
-    }, [isFocused]);
+
+    const { user, setUser } = useContext(UserContext);
+    const [position, setPosition] = useState({
+        latitude: 0,
+        longitude: 0,
+    });
+    const updateMessage = async () => {
+      try {
+        // Get a reference to the document
+        const messageDocRef = doc(db, user.user.uid, user.user.uid);
+    
+        // Fetch the current data of the document
+        const messageDocSnap = await getDoc(messageDocRef);
+    
+        // Check if the document exists
+        if (messageDocSnap.exists()) {
+          // Get the current array of messages from the document data
+          const currentMessages = messageDocSnap.data().messages || [];
+    
+          // Append the new message to the array
+          const newMessage = {
+            userId: user.user.uid,
+            text: text, // Assuming text is a variable containing the new message text
+          };
+    
+          const updatedMessages = [...currentMessages, newMessage];
+    
+          // Update the document with the modified array
+          await updateDoc(messageDocRef, {
+            messages: updatedMessages,
+          });
+    
+          // Clear the text input
+          setText('');
+        } else {
+          console.log('Document does not exist.');
+        }
+      } catch (error) {
+        console.error('Error updating message:', error);
+      }
+    };
+    const [slideViewHeight, setSlideViewHeight] = useState(0);
+
     useEffect(() => {
         const unsubscribe = firestore()
-            .collection('messages')
-            .orderBy('createdAt')
+            .collection(user.user.uid)
+            .doc(user.user.uid)
             .onSnapshot((snapshot) => {
-                const newMessages = snapshot.docs.map((doc) => doc.data());
+                const newMessages = snapshot.data().messages.map((msg) => msg);
                 setMessages(newMessages);
             });
 
         return () => unsubscribe();
     }, []);
 
-    const handleSend = async () => {
-        if (text.length == 0) { return; }
-        await firestore().collection('messages').add({
-            text,
+    const createinterface = async () => {
+      console.log("user", user.user.uid);
+      await setDoc(doc(db, user.user.uid, user.user.uid), {
+            userid: user.user.uid,
+            loaderid: "loader",
+            messages: [{ id:user.user.uid, text}],
             createdAt: new Date(),
-        });
-
-        setText('');
+            cost: 0,
+            transstart:false,
+            transend:false,
+      });
     };
     //chat handling code ends here
 
@@ -58,13 +104,7 @@ const UserLoaderInt = () => {
         };
         call(args).catch(console.error);
     }
-    const { user, setUser } = useContext(UserContext);
-    const [position, setPosition] = useState({
-        latitude: 0,
-        longitude: 0,
-    });
-
-    const [slideViewHeight, setSlideViewHeight] = useState(0);
+    
 
     function getCurrentPosition() {
         Geolocation.getCurrentPosition(
@@ -151,9 +191,14 @@ const UserLoaderInt = () => {
                             />
                         </View>
                     </TouchableOpacity>
+                    <View className="border flex flex-col w-80">
                     {messages.map((message, index) => (
-                        <Text className="text-l text-black" key={index}>{message.text}</Text>
+                      message.userId === user.user.uid ?
+                        <Text className="text-lg text-black text-right w-auto self-end" key={index}>{message.text}</Text>
+                        :
+                        <Text className="text-lg text-black text-left w-auto self-start" key={index}>{message.text}</Text>
                     ))}
+                    </View>
                 </View>
             )
             }
@@ -173,13 +218,14 @@ const UserLoaderInt = () => {
                     <CButton
                         title={'Confirm'}
                         twClass={'z-[-4]'}
+                      //  handlePress={createinterface}
                     />
                 </View>
                 {isFocused ? (<View className=" items-center p-2 ml-5">
                     <CButton
                         title={'Send'}
                         twClass={'z-[-4] w-[100]'}
-                        handlePress={handleSend}
+                        handlePress={updateMessage}
                     />
                 </View>) : (<View></View>)}
             </View>
