@@ -3,7 +3,8 @@ import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native'
 import MapView, { Marker } from 'react-native-maps'
 import MapViewDirections from 'react-native-maps-directions'
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete'
-import Geolocation from '@react-native-community/geolocation'
+// import Geolocation from '@react-native-community/geolocation'
+import Geolocation from 'react-native-geolocation-service';
 import SlideView from './custom/SlideView'
 import CButton from './custom/CButton'
 import mapStyle from '../mapStyle.json'
@@ -39,9 +40,9 @@ const Home = () => {
             },
             (error) => {
                 // See error code charts below.
-                console.log(error.code, error.message);
+                console.log("ERROR CODE: ", error.code, "MESSAGE: ", error.message);
             },
-            { enableHighAccuracy: true, timeout: 2000, maximumAge: 1000 }
+            // { enableHighAccuracy: true, timeout: 2000, maximumAge: 1000 }
 
         )
     }
@@ -99,7 +100,7 @@ const Home = () => {
 
             <SlideView >
                 {
-                    ride ?
+                    !ride ?
                         <UserLoaderInt />
                         :
                         <>
