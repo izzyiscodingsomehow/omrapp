@@ -16,30 +16,124 @@ import call from 'react-native-phone-call'
 import firestore from '@react-native-firebase/firestore';
 import { doc, updateDoc,setDoc,getDoc } from "firebase/firestore";
 import { db } from '../firebase';
+import Mailer from 'react-native-mail';
 
 const UserLoaderInt = () => {
-
+    const DocRef = doc(db, user.user.uid, user.user.uid);
+    
+    // email handling code
+    const sendEmail = async () => {
+        const ConfirmDocSnap = await getDoc(DocRef);
+        const userdoc=ConfirmDocSnap.data();
+        const emailBody = `
+          User Name: ${userdoc.username}
+          Loader Loader:   ${userdoc.loadername}
+          User Phone: ${userdoc.userphone}
+          Loader Phone: ${userdoc.loaderphone}
+          Created At: ${userdoc.createdAt}
+          Cost: ${userdoc.cost}
+        `;
+      
+        Mailer.mail({
+          subject: userdoc.userid,
+          recipients: ['socialomr123@gmail.com'],
+          body: emailBody,
+          isHTML: false,
+        }, (error, event) => {
+          if (error) {
+            alert('Could not send mail. Please try again later.');
+          }
+        });
+      };
     //chat handling code
     const[msgs, setMsgs] = useState([]);
     const [messages, setMessages] = useState([]);
     const [text, setText] = useState('');
+    const [buttonText, setButtonText] = useState('Confirm Ride');
     const [isFocused, setIsFocused] = useState(false);
-
+    const [states, setStates] = useState([false, false, false, false]);
     const { user, setUser } = useContext(UserContext);
     const [position, setPosition] = useState({
         latitude: 0,
         longitude: 0,
     });
+    const setNewStates = (newStates) => {
+        setStates(newStates);
+    }
+    useEffect(() => {
+        const unsubscribe = firestore()
+            .collection(user.user.uid)
+            .doc(user.user.uid)
+            .onSnapshot((snapshot) => {
+                setNewStates([snapshot.data().usertransstart, snapshot.data().loadertransstart, snapshot.data().usertransend, snapshot.data().loadertransend]);
+            });
+
+        return () => unsubscribe();
+    }, []);
+    useEffect(() => {
+        if(states){
+        if (!states[0] && !states[1] && !states[2] && !states[3]) {
+            setButtonText('Confirm Ride');
+            console.log("confirm ride state");
+        }
+        else if (states[0] && states[1] && !states[2] && !states[3]) {
+            setButtonText('End Ride');
+            console.log("ride started state");
+        }
+        else if (states[0] && states[1] && states[2] && states[3]) {
+            setButtonText('');
+            sendEmail();
+            console.log("ride ended state");
+        }
+    }
+    }, [states]);
+    
+    const confirmRide = async () => {
+        try {
+            // Fetch the current data of the document
+            const ConfirmDocSnap = await getDoc(DocRef);
+            const userdoc=ConfirmDocSnap.data().userid;
+
+            // Get the current state of button from the document data
+            const currentConfirm = ConfirmDocSnap.data().usertransstart;
+
+            // if false then set it to true
+            if (buttonText==='Confirm Ride') {
+                if(userdoc===user.user.uid){
+                    await updateDoc(DocRef, {
+                        usertransstart: true,
+                    });
+                }
+                else{
+                    await updateDoc(DocRef, {
+                        loadertransstart: true,
+                    });
+                }
+                console.log("confirm ride");
+            }
+            else if (buttonText==='End Ride') {
+                if(userdoc===user.user.uid){
+                    await updateDoc(DocRef, {
+                        usertransend: true,
+                    });
+                }
+                else{
+                    await updateDoc(DocRef, {
+                        loadertransend: true,
+                    });
+                }
+                console.log("end ride");
+            }
+        }
+        catch (error) {
+            console.error('Error updating message:', error);
+        }
+    };
     const updateMessage = async () => {
       try {
-        // Get a reference to the document
-        const messageDocRef = doc(db, user.user.uid, user.user.uid);
-    
         // Fetch the current data of the document
-        const messageDocSnap = await getDoc(messageDocRef);
+        const messageDocSnap = await getDoc(DocRef);
     
-        // Check if the document exists
-        if (messageDocSnap.exists()) {
           // Get the current array of messages from the document data
           const currentMessages = messageDocSnap.data().messages || [];
     
@@ -52,15 +146,12 @@ const UserLoaderInt = () => {
           const updatedMessages = [...currentMessages, newMessage];
     
           // Update the document with the modified array
-          await updateDoc(messageDocRef, {
+          await updateDoc(DocRef, {
             messages: updatedMessages,
           });
     
           // Clear the text input
           setText('');
-        } else {
-          console.log('Document does not exist.');
-        }
       } catch (error) {
         console.error('Error updating message:', error);
       }
@@ -78,18 +169,29 @@ const UserLoaderInt = () => {
 
         return () => unsubscribe();
     }, []);
-
+    // useEffect(() => {
+    //     //call create interface here
+    //     createinterface();
+    // }, []);
     const createinterface = async () => {
-      console.log("user", user.user.uid);
-      await setDoc(doc(db, user.user.uid, user.user.uid), {
-            userid: user.user.uid,
-            loaderid: "loader",
-            messages: [{ id:user.user.uid, text}],
-            createdAt: new Date(),
-            cost: 0,
-            transstart:false,
-            transend:false,
-      });
+        setButtonText('Confirm Ride');
+        console.log("user", user.user.uid);
+        await setDoc(doc(db, user.user.uid, user.user.uid), {
+                userid: user.user.uid,
+                username: user.displayName,
+                loaderid: "loader",
+                loadername: "loadername",
+                userphone: user.phoneNumber,
+                loaderphone: "loaderphone",
+                messages: [{ id:user.user.uid, text}],
+                createdAt: new Date(),
+                cost: 0,
+                usertransstart:false,
+                loadertransstart:false,
+                usertransend:false,
+                loadertransend:false,
+        });
+        console.log("interface created");
     };
     //chat handling code ends here
 
@@ -215,11 +317,11 @@ const UserLoaderInt = () => {
             </View>
             <View className="flex flex-row flex-wrap content-center items-center gap-2 overflow-hidden p-2">
                 <View className=" items-center p-2 ml-5">
-                    <CButton
-                        title={'Confirm'}
+                {buttonText === '' ? (<></>):(<CButton
+                        title={buttonText}
                         twClass={'z-[-4]'}
-                      //  handlePress={createinterface}
-                    />
+                        handlePress={confirmRide}
+                    />)}
                 </View>
                 {isFocused ? (<View className=" items-center p-2 ml-5">
                     <CButton
