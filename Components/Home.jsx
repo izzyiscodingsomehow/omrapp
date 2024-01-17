@@ -1,16 +1,20 @@
 import React, { useContext, useEffect, useState } from 'react'
-import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native'
+import { StyleSheet, Text, View, Image, TouchableOpacity, Pressable } from 'react-native'
 import MapView, { Marker } from 'react-native-maps'
 import MapViewDirections from 'react-native-maps-directions'
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete'
 // import Geolocation from '@react-native-community/geolocation'
 import Geolocation from 'react-native-geolocation-service';
 import SlideView from './custom/SlideView'
-import CButton from './custom/CButton'
-import mapStyle from '../mapStyle.json'
 import { RideContext, clearRide } from './contexts/RideContext'
 import { endRide } from './contexts/RideContext'
+import { UserContext } from './contexts/UserContext'
 import UserLoaderInt from './UserLoaderInt'
+// import firebase from 'firebase/app'
+import 'firebase/database'
+import database, { firebase } from '@react-native-firebase/database'
+import { app } from '../firebase'
+import { update } from 'firebase/database'
 
 const Home = () => {
 
@@ -19,49 +23,70 @@ const Home = () => {
         longitude: 0,
     });
 
+    const ref = firebase.app().database('https://omr-app-93d29-default-rtdb.asia-southeast1.firebasedatabase.app/').ref('/users/location')
+
+    const updateLocation = async (userId, pickup, dropoff) => {
+        try {
+            await firebase.app().database('https://omr-app-93d29-default-rtdb.asia-southeast1.firebasedatabase.app/').ref(`/users/location/${userId}`).set({
+                pickup,
+                dropoff
+            }).then(() => console.log('Data set.'));
+            // invertRideState();
+        } catch (err) {
+            console.log("Firebase database Error: ", err);
+        }
+    }
+
+
     const [slideViewHeight, setSlideViewHeight] = useState(0);
     const { ride, setRide } = useContext(RideContext);
+    const { user, setUser } = useContext(UserContext);
 
-    function getCurrentPosition() {
-        Geolocation.getCurrentPosition(
+    function watchUsersLocation() {
+        Geolocation.watchPosition(
 
-            (position) => {
+            async (position) => {
                 console.log(position);
                 setOrigin({
                     latitude: position.coords.latitude,
                     longitude: position.coords.longitude,
                 })
-                setRegion({
-                    latitude: position.coords.latitude,
-                    longitude: position.coords.longitude,
-                    latitudeDelta: 0.05,
-                    longitudeDelta: 0.05,
-                })
+
+                // setRegion({
+                //     latitude: position.coords.latitude,
+                //     longitude: position.coords.longitude,
+                //     latitudeDelta: 0.05,
+                //     longitudeDelta: 0.05,
+                // })
+                updateLocation(user.uid, origin, dropOff);
             },
             (error) => {
-                // See error code charts below.
                 console.log("ERROR CODE: ", error.code, "MESSAGE: ", error.message);
             },
-            // { enableHighAccuracy: true, timeout: 2000, maximumAge: 1000 }
+            {
+                enableHighAccuracy: true,
+                interval: 500,
+                fastestInterval: 250
+            }
 
         )
     }
 
+
     useEffect(() => {
         Geolocation.requestAuthorization();
-        getCurrentPosition();
+        // getCurrentPosition();
+        watchUsersLocation();
         console.log("POSITION: ", position);
-        console.log("Ride status: ", ride);
 
-
-    }, []);
+    }, [origin]);
 
     // temp region
     const [region, setRegion] = useState({
-        latitude: 31.5497,
-        longitude: 74.358,
-        latitudeDelta: 0.09,
-        longitudeDelta: 0.04,
+        latitude: 0,
+        longitude: 0,
+        latitudeDelta: 0.05,
+        longitudeDelta: 0.05,
     });
 
     const [origin, setOrigin] = useState({
@@ -75,7 +100,9 @@ const Home = () => {
     });
 
     const invertRideState = () => {
-        setRide(x => !x);
+        console.log("HERES USER: ", user)
+        updateLocation(user.uid, origin, dropOff);
+        // setRide(x => !x);
     }
 
     return (
@@ -105,7 +132,7 @@ const Home = () => {
                         :
                         <>
                             <TouchableOpacity
-                                onPress={getCurrentPosition}
+                                onPress={watchUsersLocation}
                                 style={{
                                     position: "absolute",
                                     top: -70,
@@ -209,9 +236,12 @@ const Home = () => {
                                     />
                                     <Image source={require('../imgs/arrowRightPNG.png')} style={{ width: 20, marginRight: 20 }} />
                                 </View>
-                                <View className="w-auto">
-                                    <CButton title={"Let's go"} twClass={"z-[-4]"}
-                                    />
+                                <View className="w-auto ">
+                                    <Pressable onPress={invertRideState} className="">
+                                        <View className={`bg-[#131316] px-5 rounded-lg z-[-4] p-[10px]`}>
+                                            <Text className={`text-[18px] font-semibold text-center text-white`}>Let's go</Text>
+                                        </View>
+                                    </Pressable>
                                 </View>
 
                             </View>
