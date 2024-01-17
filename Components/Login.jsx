@@ -55,8 +55,8 @@ const Login = ({navigation, route}) => {
   }
   const handleOTP = async () => {
     try {
-      //await confirm.confirm(code).then(userInfo => {
-      await confirm.confirm('123654').then(userInfo => {
+      await confirm.confirm(code).then(userInfo => {
+      // auto code await confirm.confirm('123654').then(userInfo => {
         //userInfo.additionalUserInfo.isNewUser = true;
         if(userInfo.additionalUserInfo.isNewUser){
           console.log("new user");
@@ -92,16 +92,16 @@ const Login = ({navigation, route}) => {
 
   const handleClick = () => {
     // Dummy for testing
-    signInWithPhoneNumber('+923432616877');
+    // signInWithPhoneNumber('+923432616877');
+    
     // This is actual code for phone number verification
-    // if (phoneNumber.length < 10 || phoneNumber.length > 10) {
-    //   alert('Please enter a valid phone number');
-    //   return;
-    // } else if (phoneNumber.length == 10) {
-    //   const phone = '+92' + phoneNumber;
-    //   signInWithPhoneNumber(phone);
-    // }
-    //navigation.navigate('Home');
+    if (phoneNumber.length < 10 || phoneNumber.length > 10) {
+      alert('Please enter a valid phone number');
+      return;
+    } else if (phoneNumber.length == 10) {
+      const phone = '+92' + phoneNumber;
+      signInWithPhoneNumber(phone);
+    }
   };
   async function signInWithPhoneNumber(phoneNumber) {
     const confirmation = await auth().signInWithPhoneNumber(phoneNumber);
