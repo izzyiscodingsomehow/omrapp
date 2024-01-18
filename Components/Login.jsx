@@ -66,7 +66,7 @@ const Login = ({navigation, route}) => {
         }
         else{
           console.log("old user",userInfo);
-          setUser(userInfo);
+          setUser(userInfo.user);
           setConfirm(null);
           //set async user data and in get data set user state and login the user
         }

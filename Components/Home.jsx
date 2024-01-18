@@ -11,6 +11,8 @@ import mapStyle from '../mapStyle.json'
 import { RideContext, clearRide } from './contexts/RideContext'
 import { endRide } from './contexts/RideContext'
 import UserLoaderInt from './UserLoaderInt'
+import { or } from 'firebase/firestore'
+import haversine from 'haversine-distance'
 
 const Home = () => {
 
@@ -18,10 +20,9 @@ const Home = () => {
         latitude: 0,
         longitude: 0,
     });
-
     const [slideViewHeight, setSlideViewHeight] = useState(0);
     const { ride, setRide } = useContext(RideContext);
-
+    const { cost, setCost } = useContext(RideContext);
     function getCurrentPosition() {
         Geolocation.getCurrentPosition(
 
@@ -46,7 +47,13 @@ const Home = () => {
 
         )
     }
-
+    useEffect(() => {
+        if(origin.latitude != 0 && origin.longitude != 0 && dropOff.latitude != 0 && dropOff.longitude != 0){
+            const distance = (haversine(origin, dropOff)/1000)*400;
+            console.log("DISTANCE: ", distance);
+            setCost(distance*400);
+        }
+    }, [origin, dropOff]);
     useEffect(() => {
         Geolocation.requestAuthorization();
         getCurrentPosition();

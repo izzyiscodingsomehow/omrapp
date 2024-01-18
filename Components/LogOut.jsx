@@ -7,10 +7,10 @@ const LogOut = ({ navigation }) => {
   const {user, setUser} = useContext(UserContext);
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
+        navigation.navigate('Login');
         auth().signOut().then(() => console.log('User signed out!'));
         setUser(null);
         console.log('logout');
-        navigation.navigate('Login');
         clearAll();
     });
     // Return the function to unsubscribe from the event so it gets removed on unmount

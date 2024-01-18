@@ -23,57 +23,76 @@ import call from 'react-native-phone-call';
 import firestore from '@react-native-firebase/firestore';
 import {doc, updateDoc, setDoc, getDoc} from 'firebase/firestore';
 import {db} from '../firebase';
-import Mailer from 'react-native-mail';
 
-const UserLoaderInt = () => {
-  const DocRef = doc(db, user.user.uid, user.user.uid);
-
-  // email handling code
-  const sendEmail = async () => {
-    const ConfirmDocSnap = await getDoc(DocRef);
-    const userdoc = ConfirmDocSnap.data();
-    const emailBody = `
-          User Name: ${userdoc.username}
-          Loader Loader:   ${userdoc.loadername}
-          User Phone: ${userdoc.userphone}
-          Loader Phone: ${userdoc.loaderphone}
-          Created At: ${userdoc.createdAt}
-          Cost: ${userdoc.cost}
-        `;
-
-    Mailer.mail(
-      {
-        subject: userdoc.userid,
-        recipients: ['socialomr123@gmail.com'],
-        body: emailBody,
-        isHTML: false,
-      },
-      (error, event) => {
-        if (error) {
-          alert('Could not send mail. Please try again later.');
-        }
-      },
-    );
-  };
+const UserLoaderInt = ({navigation}) => {
+  
   //chat handling code
-  const [msgs, setMsgs] = useState([]);
   const [messages, setMessages] = useState([]);
   const [text, setText] = useState('');
   const [buttonText, setButtonText] = useState('Confirm Ride');
   const [isFocused, setIsFocused] = useState(false);
   const [states, setStates] = useState([false, false, false, false]);
   const {user, setUser} = useContext(UserContext);
+  const [DocRef, setDocRef] = useState(null);
+  const [created, setCreated] = useState(false);
   const [position, setPosition] = useState({
     latitude: 0,
     longitude: 0,
   });
+  
+  let usersid;
+  if(user.photoURL === 'loader'){
+    usersid = route.params.usersid;
+  }
+  else{
+    usersid = user.uid;
+  }
+  usersid=user.uid;
+  
+  useEffect(() => {
+  console.log('user id',usersid);
+  setDocRef(doc(db, usersid, usersid));
+  // console.log(route.params.usersid,route.params.usersname,route.params.usersphone);
+  }, []);
+  // email handling code
+//   const sendEmail = async () => {
+//     const ConfirmDocSnap = await getDoc(DocRef);
+//     const userdoc = ConfirmDocSnap.data();
+//     try {
+//         const response = await fetch('https://your-firebase-project-id.cloudfunctions.net/sendEmail', {
+//             method: 'POST',
+//             headers: {
+//             'Content-Type': 'application/json',
+//             },
+//             body: JSON.stringify({
+//             userdoc: {
+//                 username: userdoc.username,
+//                 loadername: userdoc.loadername,
+//                 userphone: userdoc.loaderphone,
+//                 loaderphone: userdoc.loaderphone,
+//                 createdAt: userdoc.createdAt,
+//                 cost: userdoc.cost,
+//             },
+//             }),
+//         });
+    
+//         if (response.ok) {
+//             console.log('Email sent successfully');
+//         } else {
+//             console.error('Failed to send email');
+//         }
+//         } catch (error) {
+//         console.error('Error:', error);
+//         }
+//   };
+  
   const setNewStates = newStates => {
     setStates(newStates);
   };
   useEffect(() => {
     const unsubscribe = firestore()
-      .collection(user.user.uid)
-      .doc(user.user.uid)
+      .collection(usersid)
+      .doc(usersid)
       .onSnapshot(snapshot => {
         setNewStates([
           snapshot.data().usertransstart,
@@ -95,7 +114,7 @@ const UserLoaderInt = () => {
         console.log('ride started state');
       } else if (states[0] && states[1] && states[2] && states[3]) {
         setButtonText('');
-        sendEmail();
+        navigation.navigate('Home');
         console.log('ride ended state');
       }
     }
@@ -112,7 +131,7 @@ const UserLoaderInt = () => {
 
       // if false then set it to true
       if (buttonText === 'Confirm Ride') {
-        if (userdoc === user.user.uid) {
+        if (userdoc === usersid) {
           await updateDoc(DocRef, {
             usertransstart: true,
           });
@@ -123,7 +142,7 @@ const UserLoaderInt = () => {
         }
         console.log('confirm ride');
       } else if (buttonText === 'End Ride') {
-        if (userdoc === user.user.uid) {
+        if (userdoc === usersid) {
           await updateDoc(DocRef, {
             usertransend: true,
           });
@@ -148,7 +167,7 @@ const UserLoaderInt = () => {
 
       // Append the new message to the array
       const newMessage = {
-        userId: user.user.uid,
+        userId: user.uid,
         text: text, // Assuming text is a variable containing the new message text
       };
 
@@ -169,10 +188,10 @@ const UserLoaderInt = () => {
 
   useEffect(() => {
     const unsubscribe = firestore()
-      .collection(user.user.uid)
-      .doc(user.user.uid)
+      .collection(usersid)
+      .doc(usersid)
       .onSnapshot(snapshot => {
-        const newMessages = snapshot.data().messages.map(msg => msg);
+        const newMessages = snapshot.data().messages.slice(1).map(msg => msg);
         setMessages(newMessages);
       });
 
@@ -184,16 +203,16 @@ const UserLoaderInt = () => {
   // }, []);
   const createinterface = async () => {
     setButtonText('Confirm Ride');
-    console.log('user', user.user.uid);
-    if (user.user.photoURL === 'user') {
-      await setDoc(doc(db, user.user.uid, user.user.uid), {
-        userid: user.user.uid,
+    console.log('user', user.uid);
+    if (user.photoURL === 'user'&& !created) {
+      await setDoc(doc(db, usersid, usersid), {
+        userid: usersid,
         username: user.displayName,
-        loaderid: 'loader',
-        loadername: 'loadername',
+        loaderid: route.params.usersid,
+        loadername: route.params.usersname,
         userphone: user.phoneNumber,
-        loaderphone: 'loaderphone',
-        messages: [{id: user.user.uid, text}],
+        loaderphone: route.params.usersphone,
+        messages: [""],
         createdAt: new Date(),
         cost: 0,
         usertransstart: false,
@@ -203,6 +222,7 @@ const UserLoaderInt = () => {
       });
     }
     console.log('interface created');
+    setCreated(true);
   };
   //chat handling code ends here
 
@@ -267,9 +287,9 @@ const UserLoaderInt = () => {
   });
 
   return (
-    <>
+    <View className="mt-[150]">
       {!isFocused ? (
-        <View className="ml-7">
+        <View className="ml-7 ">
           <Text className="text-xl text-black">Name: {user.displayName}</Text>
           <TouchableOpacity
             //Commented because it works for now
@@ -298,17 +318,17 @@ const UserLoaderInt = () => {
               />
             </View>
           </TouchableOpacity>
-          <View className="border flex flex-col w-80">
+          <View className="flex flex-col w-80">
             {messages.map((message, index) =>
-              message.userId === user.user.uid ? (
+              message.userId === user.uid ? (
                 <Text
-                  className="text-lg text-black text-right w-auto self-end"
+                  className="text-lg text-white text-right w-auto self-end bg-[#000000] rounded-lg p-2"
                   key={index}>
                   {message.text}
                 </Text>
               ) : (
                 <Text
-                  className="text-lg text-black text-left w-auto self-start"
+                  className="text-lg text-white text-left w-auto self-start bg-[#000000] rounded-lg p-2"
                   key={index}>
                   {message.text}
                 </Text>
@@ -352,7 +372,7 @@ const UserLoaderInt = () => {
           <View></View>
         )}
       </View>
-    </>
+    </View>
   );
 };
 const styles = StyleSheet.create({

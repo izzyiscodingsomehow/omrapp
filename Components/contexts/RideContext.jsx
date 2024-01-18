@@ -9,6 +9,7 @@ const RideContextProvider = ({ children }, navigation) => {
 
     const { type, isConnected } = useNetInfo();
     const [ride, setRide] = useState(false);
+    const [cost, setCost] = useState(0);
     //const [AsyncUserData, setAsyncUserData] = useState();
     // const [hasData, setHasData] = useState(false);
 
@@ -44,7 +45,7 @@ const RideContextProvider = ({ children }, navigation) => {
 
     return (
         <RideContext.Provider
-            value={{ ride, setRide }}>
+            value={{ ride, setRide,cost,setCost }}>
             {children}
         </RideContext.Provider>
     );
