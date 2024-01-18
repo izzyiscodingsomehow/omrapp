@@ -22,6 +22,7 @@ import {UserContext} from './contexts/UserContext';
 import call from 'react-native-phone-call';
 import firestore from '@react-native-firebase/firestore';
 import {doc, updateDoc, setDoc, getDoc} from 'firebase/firestore';
+import { RideContext } from './contexts/RideContext';
 import {db} from '../firebase';
 
 const UserLoaderInt = ({navigation}) => {
@@ -35,6 +36,7 @@ const UserLoaderInt = ({navigation}) => {
   const {user, setUser} = useContext(UserContext);
   const [DocRef, setDocRef] = useState(null);
   const [created, setCreated] = useState(false);
+  const {cost, setCost} = useContext(RideContext);
   const [position, setPosition] = useState({
     latitude: 0,
     longitude: 0,
@@ -198,10 +200,10 @@ const UserLoaderInt = ({navigation}) => {
 
     return () => unsubscribe();
   }, []);
-  // useEffect(() => {
-  //     //call create interface here
-  //     createinterface();
-  // }, []);
+  useEffect(() => {
+      //call create interface here
+      createinterface();
+  }, []);
   const createinterface = async () => {
     setButtonText('Confirm Ride');
     console.log('user', user.uid);
@@ -215,7 +217,7 @@ const UserLoaderInt = ({navigation}) => {
         loaderphone: route.params.usersphone,
         messages: [""],
         createdAt: new Date(),
-        cost: 0,
+        cost: cost,
         usertransstart: false,
         loadertransstart: false,
         usertransend: false,

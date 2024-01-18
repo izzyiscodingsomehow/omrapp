@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState } from 'react'
 import { StyleSheet, Text, View, Image, TouchableOpacity, Pressable } from 'react-native'
 import MapView, { Marker } from 'react-native-maps'
 import MapViewDirections from 'react-native-maps-directions'
+import firestore from '@react-native-firebase/firestore';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete'
 import Geolocation from 'react-native-geolocation-service';
 import SlideView from './custom/SlideView'
@@ -11,10 +12,13 @@ import { UserContext } from './contexts/UserContext'
 import UserLoaderInt from './UserLoaderInt'
 import { or } from 'firebase/firestore'
 import haversine from 'haversine-distance'
+const MAX_RADIUS = 10;
 import 'firebase/database'
 import database, { firebase } from '@react-native-firebase/database'
-
-const MAX_RADIUS = 10;
+import { app } from '../firebase'
+import { set, update } from 'firebase/database'
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '../firebase';
 
 const Home = () => {
 
@@ -125,7 +129,6 @@ const Home = () => {
 
         )
     }
-
     const calculateDistance = (user, loader) => {
         console.log(user, loader);
         const distance = ((haversine(user, loader) / 1000) * 400) / 1000 // getting distance in meters and converting to kilometers;
@@ -134,17 +137,30 @@ const Home = () => {
         return distance;
 
     }
+    const [newcost, setNewCost] = useState(0);
     useEffect(() => {
-        if (origin.latitude != 0 && origin.longitude != 0 && dropOff.latitude != 0 && dropOff.longitude != 0) {
-            const distance = (haversine(origin, dropOff) / 1000) * 400;
-            // console.log("DISTANCE: ", distance);
-            setCost(distance * 400);
-        }
-    }, [origin, dropOff]);
+        //write code for getting cost doc from firebase
+        const unsubscribe = firestore()
+        .collection("Cost")
+        .doc("cost-current")
+        .onSnapshot(snapshot => {
+            setNewCost(snapshot.data().cost);
+            console.log("COST: ", snapshot.data().cost);
+        });
 
-
+        return () => unsubscribe();
+    }, []);
+    const handleDirectionsReady = (result) => {
+        console.log("DISTANCE: ", result.distance," ",newcost);
+        console.log(result.distance*newcost)
+        setCost(result.distance * newcost);
+        console.log("COST in handle: ", cost);
+    };
     useEffect(() => {
-        Geolocation.requestAuthorization();
+        console.log("COST in use: ", cost);
+    }, [cost]);
+    useEffect(() => {
+        //Geolocation.requestAuthorization();
         // getCurrentPosition();
         watchUsersLocation();
         // console.log("POSITION: ", position);
@@ -220,6 +236,7 @@ const Home = () => {
                     apikey='AIzaSyBzkP_jIc71HLCelXc5UtgNZu1jhFIs9Q4'
                     strokeWidth={2}
                     strokeColor='#1a1a1a'
+                    onReady={handleDirectionsReady}
                 />
             </MapView>
 
