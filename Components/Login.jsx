@@ -47,7 +47,7 @@ const Login = ({navigation, route}) => {
     try {
       await signInWithPhoneNumber('+923432616877');
       await confirm.confirm('123654').then(userInfo => {
-        userInfo.additionalUserInfo.isNewUer = false;
+        userInfo.additionalUserInfo.isNewUser = false;
       });
     } catch (e) {
       console.log(e);

@@ -43,6 +43,7 @@ const UserLoaderInt = ({navigation}) => {
   let usersid;
   if(user.photoURL === 'loader'){
     usersid = route.params.usersid;
+    console.log("usersid: ", usersid);
   }
   else{
     usersid = user.uid;
@@ -268,10 +269,10 @@ const UserLoaderInt = ({navigation}) => {
 
   // temp region
   const [region, setRegion] = useState({
-    latitude: 31.5497,
-    longitude: 74.358,
-    latitudeDelta: 0.09,
-    longitudeDelta: 0.04,
+    latitude: 0,
+    longitude: 0,
+    latitudeDelta: 0.05,
+    longitudeDelta: 0.05,
   });
 
   // pickup location
@@ -287,7 +288,7 @@ const UserLoaderInt = ({navigation}) => {
   });
 
   return (
-    <View className="mt-[150]">
+    <View className="mt-[10]">
       {!isFocused ? (
         <View className="ml-7 ">
           <Text className="text-xl text-black">Name: {user.displayName}</Text>

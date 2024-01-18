@@ -3,7 +3,6 @@ import { StyleSheet, Text, View, Image, TouchableOpacity, Pressable } from 'reac
 import MapView, { Marker } from 'react-native-maps'
 import MapViewDirections from 'react-native-maps-directions'
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete'
-// import Geolocation from '@react-native-community/geolocation'
 import Geolocation from 'react-native-geolocation-service';
 import SlideView from './custom/SlideView'
 import { RideContext, clearRide } from './contexts/RideContext'
@@ -12,11 +11,10 @@ import { UserContext } from './contexts/UserContext'
 import UserLoaderInt from './UserLoaderInt'
 import { or } from 'firebase/firestore'
 import haversine from 'haversine-distance'
-// import firebase from 'firebase/app'
 import 'firebase/database'
 import database, { firebase } from '@react-native-firebase/database'
-import { app } from '../firebase'
-import { update } from 'firebase/database'
+
+const MAX_RADIUS = 10;
 
 const Home = () => {
 
@@ -25,13 +23,19 @@ const Home = () => {
         longitude: 0,
     });
 
+    const [notification, setNotification] = useState(null);
+    const [pickupName, setPickupName] = useState(null);
+    const [dropoffName, setDropoffName] = useState(null);
+
+
     const ref = firebase.app().database('https://omr-app-93d29-default-rtdb.asia-southeast1.firebasedatabase.app/').ref('/users/location')
 
     const updateLocation = async (userId, pickup, dropoff) => {
         try {
-            await firebase.app().database('https://omr-app-93d29-default-rtdb.asia-southeast1.firebasedatabase.app/').ref(`/users/location/${userId}`).set({
+            await firebase.app().database('https://omr-app-93d29-default-rtdb.asia-southeast1.firebasedatabase.app/').ref(`/users/${userId}`).set({
                 pickup,
-                dropoff
+                dropoff,
+                role: user.photoURL
             }).then(() => console.log('Data set.'));
             // invertRideState();
         } catch (err) {
@@ -39,9 +43,57 @@ const Home = () => {
         }
     }
 
+
+    const getActiveLoaders = async () => {
+        try {
+            const snapshot = await firebase.app().database('https://omr-app-93d29-default-rtdb.asia-southeast1.firebasedatabase.app/').ref('users').orderByChild('role').equalTo('loader').once('value');
+            if (snapshot.exists()) {
+                const loaders = await snapshot.val();
+                console.log('Loaders: ', loaders);
+
+                const filteredUsers = Object.entries(loaders)
+                    .filter(([key, user]) => user.role === 'loader')
+                    .reduce((acc, [key, user]) => ({ ...acc, [key]: user }), {});
+
+                // Map over the filtered users, log keys and user data
+                Object.entries(filteredUsers).map(async ([key, loader]) => {
+                    console.log('User key:', key);
+                    console.log('User data:', loader);
+
+                    // check which loaders are near the user
+                    const notiRef = firebase.app().database('https://omr-app-93d29-default-rtdb.asia-southeast1.firebasedatabase.app/').ref(`notifications/${key}`);
+                    const distance = calculateDistance(origin, loader.pickup);
+                    if (distance <= MAX_RADIUS) {
+                        console.log(key, " is near the user");
+                        await notiRef.set({
+                            message: `Ride requested by ${user.displayName}`,
+                            origin,
+                            dropOff,
+                            pickupName,
+                            dropoffName
+                        }).then(() => {
+                            console.log("sent notification");
+                        })
+                    }
+                    else {
+                        console.log("No loaders near user");
+                    }
+
+                });
+
+            }
+            else {
+                console.log('No loaders found');
+
+            }
+        } catch (err) {
+            console.log("Error while fetching active loaders: ", err);
+        }
+    }
+
     const [slideViewHeight, setSlideViewHeight] = useState(0);
     const { ride, setRide } = useContext(RideContext);
-    const { cost, setCost } = useContext(RideContext);    
+    const { cost, setCost } = useContext(RideContext);
     const { user, setUser } = useContext(UserContext);
 
     function watchUsersLocation() {
@@ -54,12 +106,12 @@ const Home = () => {
                     longitude: position.coords.longitude,
                 })
 
-                // setRegion({
-                //     latitude: position.coords.latitude,
-                //     longitude: position.coords.longitude,
-                //     latitudeDelta: 0.05,
-                //     longitudeDelta: 0.05,
-                // })
+                setRegion({
+                    latitude: position.coords.latitude,
+                    longitude: position.coords.longitude,
+                    latitudeDelta: 0.05,
+                    longitudeDelta: 0.05,
+                })
                 updateLocation(user.uid, origin, dropOff);
             },
             (error) => {
@@ -73,18 +125,42 @@ const Home = () => {
 
         )
     }
+
+    const calculateDistance = (user, loader) => {
+        console.log(user, loader);
+        const distance = ((haversine(user, loader) / 1000) * 400) / 1000 // getting distance in meters and converting to kilometers;
+        console.log("Distance: ", distance);
+
+        return distance;
+
+    }
     useEffect(() => {
-        if(origin.latitude != 0 && origin.longitude != 0 && dropOff.latitude != 0 && dropOff.longitude != 0){
-            const distance = (haversine(origin, dropOff)/1000)*400;
-            console.log("DISTANCE: ", distance);
-            setCost(distance*400);
+        if (origin.latitude != 0 && origin.longitude != 0 && dropOff.latitude != 0 && dropOff.longitude != 0) {
+            const distance = (haversine(origin, dropOff) / 1000) * 400;
+            // console.log("DISTANCE: ", distance);
+            setCost(distance * 400);
         }
     }, [origin, dropOff]);
+
+
     useEffect(() => {
         Geolocation.requestAuthorization();
         // getCurrentPosition();
         watchUsersLocation();
-        console.log("POSITION: ", position);
+        // console.log("POSITION: ", position);
+
+        const onNotificationUpdate = snapshot => {
+            const data = snapshot.val();
+            setNotification(data);
+            console.log("the noti is running");
+        };
+
+        const notificationsRef = firebase.app().database('https://omr-app-93d29-default-rtdb.asia-southeast1.firebasedatabase.app/').ref(`notifications/${user.uid}`); // Replace 'user1' with the user's ID
+
+        notificationsRef.on('value', onNotificationUpdate);
+
+        // Return a cleanup function to unsubscribe when the component unmounts
+        return () => notificationsRef.off('value', onNotificationUpdate);
 
     }, [origin]);
 
@@ -110,10 +186,25 @@ const Home = () => {
         console.log("HERES USER: ", user)
         updateLocation(user.uid, origin, dropOff);
         // setRide(x => !x);
+        getActiveLoaders();
     }
+
+    const handleAction = () => {
+        // Handle the action (e.g., mark the notification as read)
+        // Update the database accordingly
+        console.log("accepted the ride!");
+    };
 
     return (
         <View style={styles.container}>
+            <View>
+                {notification && (
+                    <View className="border">
+                        <Text>{notification.message}</Text>
+                        {notification.actionRequired && <Button title="Take Action" onPress={handleAction} />}
+                    </View>
+                )}
+            </View>
             <MapView
                 style={styles.mapView}
                 region={region}
@@ -135,7 +226,8 @@ const Home = () => {
             <SlideView >
                 {
                     !ride ?
-                        <UserLoaderInt />
+                        // <UserLoaderInt />
+                        <Text>Loading</Text>
                         :
                         <>
                             <TouchableOpacity
@@ -174,10 +266,11 @@ const Home = () => {
                                         <GooglePlacesAutocomplete
                                             placeholder='Pickup location'
                                             onPress={(data, details = null) => {
-                                                // console.log("PICKUP: ", data, details);
+                                                setPickupName(data.description);
                                                 if (details) {
                                                     const { location } = details.geometry;
                                                     console.log("LOCATION: ", location.lat, "\n", location.lng)
+
                                                     setOrigin({
                                                         latitude: location.lat,
                                                         longitude: location.lng
@@ -212,7 +305,7 @@ const Home = () => {
                                     <GooglePlacesAutocomplete
                                         placeholder='Dropoff location'
                                         onPress={(data, details = null) => {
-                                            // console.log("DROP: ", data, details);
+                                            setDropoffName(data.description);
                                             if (details) {
                                                 const { location } = details.geometry;
                                                 console.log("LOCATION: ", location.lat, "\n", location.lng)
