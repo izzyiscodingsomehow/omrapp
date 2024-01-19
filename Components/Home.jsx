@@ -66,17 +66,20 @@ const Home = () => {
                     console.log('User data:', loader);
 
                     // check which loaders are near the user
-                    const notiRef = firebase.app().database('https://omr-app-93d29-default-rtdb.asia-southeast1.firebasedatabase.app/').ref(`notifications/${key}`);
+                    const notiRef = firebase.app().database('https://omr-app-93d29-default-rtdb.asia-southeast1.firebasedatabase.app/').ref(`notifications`);
                     const distance = calculateDistance(origin, loader.pickup);
                     if (distance <= MAX_RADIUS) {
                         console.log(key, " is near the user");
-                        await notiRef.set({
+                        await notiRef.child(ref.push().key).set({
                             message: `Ride requested by ${user.displayName}`,
                             origin,
                             dropOff,
                             pickupName,
-                            dropoffName
+                            dropoffName,
+                            loaderId: key,
+                            userId: user.uid
                         }).then(() => {
+
                             console.log("sent notification");
                         })
                     }
@@ -130,6 +133,7 @@ const Home = () => {
 
         )
     }
+
     const calculateDistance = (user, loader) => {
         console.log(user, loader);
         const distance = ((haversine(user, loader) / 1000) * 400) / 1000 // getting distance in meters and converting to kilometers;
@@ -170,14 +174,16 @@ const Home = () => {
             const data = await snapshot.val();
             setNotification(data);
             console.log("the noti is running");
-            console.log("noti data: ", notification.message);
+            console.log("noti data: ", notification, " with id: ", notification.userId);
+            Object.entries(notification).map(async ([key, user]) => {
+                console.log("Loader: ", user.loaderId, " and User:", user.userId);
+            })
             setShowNotification(true);
-
         };
 
-        const notificationsRef = firebase.app().database('https://omr-app-93d29-default-rtdb.asia-southeast1.firebasedatabase.app/').ref(`notifications/${user.uid}`); // Replace 'user1' with the user's ID
+        const notificationsRef = firebase.app().database('https://omr-app-93d29-default-rtdb.asia-southeast1.firebasedatabase.app/').ref(`notifications`); // Replace 'user1' with the user's ID
 
-        notificationsRef.on('value', onNotificationUpdate);
+        notificationsRef.orderByChild('loaderId').equalTo(user.uid).on('value', onNotificationUpdate);
 
         // Return a cleanup function to unsubscribe when the component unmounts
         return () => notificationsRef.off('value', onNotificationUpdate);
@@ -209,11 +215,34 @@ const Home = () => {
         getActiveLoaders();
     }
 
+
+    const declineRideOffer = () => {
+        // const ref = firebase.app().database('https://omr-app-93d29-default-rtdb.asia-southeast1.firebasedatabase.app/').ref(`/notifications/${user}`);
+    }
+
+    const exchangeData = async (userId, loaderId, pickup, dropoff, pickupName, dropoffName) => {
+        const ref = firebase.app().database('https://omr-app-93d29-default-rtdb.asia-southeast1.firebasedatabase.app/').ref('/users/ongoing-rides');
+        try {
+            await ref.child(ref.push().key).set({
+                userId,
+                loaderId,
+                pickup,
+                dropoff,
+                pickupName,
+                dropoffName
+            }).then(() => console.log('New ride started'));
+            // invertRideState();
+        } catch (err) {
+            console.log("Firebase database Error: ", err);
+        }
+
+    }
+
     const handleAction = () => {
         // Handle the action (e.g., mark the notification as read)
         // Update the database accordingly
         setShowNotification(false);
-        console.log("accepted the ride of ", notification);
+        console.log(user.uid, " accepted the ride of ", notification);
     };
 
     return (
@@ -238,34 +267,42 @@ const Home = () => {
             </MapView>
             {showNotification && (
 
-                <View className="absolute top-10 w-5/6 self-center px-3 py-3 rounded bg-white">
+                <View className="absolute top-10 flex flex-col gap-y-2 w-5/6 self-center rounded">
                     {notification != null ?
-                        <>
-                            <Text className="text-lg">{notification.message}</Text>
-                            <View className="flex gap-x-2 flex-row mt-2 self-end ">
-                                <TouchableOpacity
-                                    // onPress={() => {
-                                    //     handleAction
-                                    // }}
-                                    className="bg-[#ffffff] px-3 border border-[#1a1a1a] rounded py-1"
-                                >
-                                    <Text className="text-lg text-[#1a1a1a]">Decline</Text>
-                                </TouchableOpacity>
-                                <TouchableOpacity
-                                    onPress={() => {
-                                        handleAction()
-                                    }}
-                                    className="bg-[#1a1a1a] px-4 rounded py-1"
-                                >
-                                    <Text className="text-lg text-white">Accept</Text>
-                                </TouchableOpacity>
-                            </View>
-                        </>
+                        (
+                            Object.entries(notification).map(([key, user]) => (
+                                <View key={key} className="bg-white rounded px-3 py-3">
+                                    <Text className="text-lg" >{user.message}</Text>
+                                    <Text className="text-md" >Pickup: {user.pickupName}</Text>
+                                    <Text className="text-md" >Dropoff: {user.dropoffName}</Text>
+                                    <View className="flex gap-x-2 flex-row mt-2 self-end ">
+                                        <TouchableOpacity
+                                            // onPress={() => {
+                                            //     handleAction
+                                            // }}
+                                            className="bg-[#ffffff] px-3 border border-[#1a1a1a] rounded py-1"
+                                        >
+                                            <Text className="text-lg text-[#1a1a1a]">Decline</Text>
+                                        </TouchableOpacity>
+                                        <TouchableOpacity
+                                            onPress={() => {
+                                                handleAction()
+                                            }}
+                                            className="bg-[#1a1a1a] px-4 rounded py-1"
+                                        >
+                                            <Text className="text-lg text-white">Accept</Text>
+                                        </TouchableOpacity>
+                                    </View>
+                                </View>
+
+                            ))
+                        )
                         :
                         null
                     }
                 </View>
-            )}
+            )
+            }
 
             <SlideView >
                 {
@@ -393,7 +430,7 @@ const Home = () => {
 
                 }
             </SlideView>
-        </View>
+        </View >
     )
 }
 
