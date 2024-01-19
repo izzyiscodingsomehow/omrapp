@@ -1,10 +1,12 @@
 import {useState, useEffect, useContext, createContext} from 'react';
+import {Alert} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {useNetInfo} from '@react-native-community/netinfo';
 import {get} from 'react-native/Libraries/TurboModule/TurboModuleRegistry';
+import {useNetInfo} from '@react-native-community/netinfo';
+import RNRestart from 'react-native-restart';
 const UserContext = createContext([]);
 const ContextProvider = ({children}, navigation) => {
-  const {type, isConnected} = useNetInfo();
+  const {isConnected} = useNetInfo();
   const [user, setUser] = useState(null);
   //const [AsyncUserData, setAsyncUserData] = useState();
   const [hasData, setHasData] = useState(false);
@@ -23,7 +25,22 @@ const ContextProvider = ({children}, navigation) => {
       console.log('Error while storing user data: ', error, '\n');
     }
   };
-
+  useEffect(() => {
+    console.log( 'isConnected: ', isConnected)
+    if (isConnected) {
+      console.log('Connected to internet!');
+    }
+    else if (isConnected===false) {
+      Alert.alert(
+        'No Internet!',
+        'The app requires an internet connection.', [
+          {
+            text: 'Reload App',
+            onPress: () => RNRestart.restart(),
+          },
+        ]);
+    }
+}, [isConnected]);
   const getUserData = async () => {
     try {
       if (!hasData) {
