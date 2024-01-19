@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react'
-import { StyleSheet, Text, View, Image, TouchableOpacity, Pressable } from 'react-native'
+import { StyleSheet, Text, View, Image, TouchableOpacity, Pressable, Button } from 'react-native'
 import MapView, { Marker } from 'react-native-maps'
 import MapViewDirections from 'react-native-maps-directions'
 import firestore from '@react-native-firebase/firestore';
@@ -12,13 +12,14 @@ import { UserContext } from './contexts/UserContext'
 import UserLoaderInt from './UserLoaderInt'
 import { or } from 'firebase/firestore'
 import haversine from 'haversine-distance'
-const MAX_RADIUS = 10;
 import 'firebase/database'
 import database, { firebase } from '@react-native-firebase/database'
 import { app } from '../firebase'
 import { set, update } from 'firebase/database'
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase';
+
+const MAX_RADIUS = 10;
 
 const Home = () => {
 
@@ -28,6 +29,7 @@ const Home = () => {
     });
 
     const [notification, setNotification] = useState(null);
+    const [showNotification, setShowNotification] = useState(false);
     const [pickupName, setPickupName] = useState(null);
     const [dropoffName, setDropoffName] = useState(null);
 
@@ -46,7 +48,6 @@ const Home = () => {
             console.log("Firebase database Error: ", err);
         }
     }
-
 
     const getActiveLoaders = async () => {
         try {
@@ -141,18 +142,18 @@ const Home = () => {
     useEffect(() => {
         //write code for getting cost doc from firebase
         const unsubscribe = firestore()
-        .collection("Cost")
-        .doc("cost-current")
-        .onSnapshot(snapshot => {
-            setNewCost(snapshot.data().cost);
-            console.log("COST: ", snapshot.data().cost);
-        });
+            .collection("Cost")
+            .doc("cost-current")
+            .onSnapshot(snapshot => {
+                setNewCost(snapshot.data().cost);
+                console.log("COST: ", snapshot.data().cost);
+            });
 
         return () => unsubscribe();
     }, []);
     const handleDirectionsReady = (result) => {
-        console.log("DISTANCE: ", result.distance," ",newcost);
-        console.log(result.distance*newcost)
+        console.log("DISTANCE: ", result.distance, " ", newcost);
+        console.log(result.distance * newcost)
         setCost(result.distance * newcost);
         console.log("COST in handle: ", cost);
     };
@@ -165,10 +166,13 @@ const Home = () => {
         watchUsersLocation();
         // console.log("POSITION: ", position);
 
-        const onNotificationUpdate = snapshot => {
-            const data = snapshot.val();
+        const onNotificationUpdate = async snapshot => {
+            const data = await snapshot.val();
             setNotification(data);
             console.log("the noti is running");
+            console.log("noti data: ", notification.message);
+            setShowNotification(true);
+
         };
 
         const notificationsRef = firebase.app().database('https://omr-app-93d29-default-rtdb.asia-southeast1.firebasedatabase.app/').ref(`notifications/${user.uid}`); // Replace 'user1' with the user's ID
@@ -178,7 +182,7 @@ const Home = () => {
         // Return a cleanup function to unsubscribe when the component unmounts
         return () => notificationsRef.off('value', onNotificationUpdate);
 
-    }, [origin]);
+    }, [origin, showNotification]);
 
     // temp region
     const [region, setRegion] = useState({
@@ -201,26 +205,19 @@ const Home = () => {
     const invertRideState = () => {
         console.log("HERES USER: ", user)
         updateLocation(user.uid, origin, dropOff);
-        // setRide(x => !x);
+        setRide(x => !x);
         getActiveLoaders();
     }
 
     const handleAction = () => {
         // Handle the action (e.g., mark the notification as read)
         // Update the database accordingly
-        console.log("accepted the ride!");
+        setShowNotification(false);
+        console.log("accepted the ride of ", notification);
     };
 
     return (
         <View style={styles.container}>
-            <View>
-                {notification && (
-                    <View className="border">
-                        <Text>{notification.message}</Text>
-                        {notification.actionRequired && <Button title="Take Action" onPress={handleAction} />}
-                    </View>
-                )}
-            </View>
             <MapView
                 style={styles.mapView}
                 region={region}
@@ -239,12 +236,42 @@ const Home = () => {
                     onReady={handleDirectionsReady}
                 />
             </MapView>
+            {showNotification && (
+
+                <View className="absolute top-10 w-5/6 self-center px-3 py-3 rounded bg-white">
+                    {notification != null ?
+                        <>
+                            <Text className="text-lg">{notification.message}</Text>
+                            <View className="flex gap-x-2 flex-row mt-2 self-end ">
+                                <TouchableOpacity
+                                    // onPress={() => {
+                                    //     handleAction
+                                    // }}
+                                    className="bg-[#ffffff] px-3 border border-[#1a1a1a] rounded py-1"
+                                >
+                                    <Text className="text-lg text-[#1a1a1a]">Decline</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity
+                                    onPress={() => {
+                                        handleAction()
+                                    }}
+                                    className="bg-[#1a1a1a] px-4 rounded py-1"
+                                >
+                                    <Text className="text-lg text-white">Accept</Text>
+                                </TouchableOpacity>
+                            </View>
+                        </>
+                        :
+                        null
+                    }
+                </View>
+            )}
 
             <SlideView >
                 {
                     !ride ?
-                        // <UserLoaderInt />
-                        <Text>Loading</Text>
+                        <UserLoaderInt />
+                        // <Text>Loading</Text>
                         :
                         <>
                             <TouchableOpacity

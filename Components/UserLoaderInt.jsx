@@ -1,4 +1,4 @@
-import React, {useEffect, useState, useContext} from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import {
   StyleSheet,
   Text,
@@ -7,9 +7,9 @@ import {
   Image,
   TouchableOpacity,
 } from 'react-native';
-import MapView, {Marker} from 'react-native-maps';
+import MapView, { Marker } from 'react-native-maps';
 import MapViewDirections from 'react-native-maps-directions';
-import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete';
+import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import Geolocation from '@react-native-community/geolocation';
 import SlideView from './custom/SlideView';
 import searchIcon from '../imgs/searchIcon.svg';
@@ -17,78 +17,78 @@ import DropDownPicker from 'react-native-dropdown-picker';
 import CButton from './custom/CButton';
 import CTextInput from './custom/CTextInput';
 import mapStyle from '../mapStyle.json';
-import {request, PERMISSIONS, RESULTS, check} from 'react-native-permissions';
-import {UserContext} from './contexts/UserContext';
+import { request, PERMISSIONS, RESULTS, check } from 'react-native-permissions';
+import { UserContext } from './contexts/UserContext';
 import call from 'react-native-phone-call';
 import firestore from '@react-native-firebase/firestore';
-import {doc, updateDoc, setDoc, getDoc} from 'firebase/firestore';
+import { doc, updateDoc, setDoc, getDoc } from 'firebase/firestore';
 import { RideContext } from './contexts/RideContext';
-import {db} from '../firebase';
+import { db } from '../firebase';
 
-const UserLoaderInt = ({navigation}) => {
-  
+const UserLoaderInt = ({ navigation }) => {
+
   //chat handling code
   const [messages, setMessages] = useState([]);
   const [text, setText] = useState('');
   const [buttonText, setButtonText] = useState('Confirm Ride');
   const [isFocused, setIsFocused] = useState(false);
   const [states, setStates] = useState([false, false, false, false]);
-  const {user, setUser} = useContext(UserContext);
+  const { user, setUser } = useContext(UserContext);
   const [DocRef, setDocRef] = useState(null);
   const [created, setCreated] = useState(false);
-  const {cost, setCost} = useContext(RideContext);
+  const { cost, setCost } = useContext(RideContext);
   const [position, setPosition] = useState({
     latitude: 0,
     longitude: 0,
   });
-  
+
   let usersid;
-  if(user.photoURL === 'loader'){
+  if (user.photoURL === 'loader') {
     usersid = route.params.usersid;
     console.log("usersid: ", usersid);
   }
-  else{
+  else {
     usersid = user.uid;
   }
-  usersid=user.uid;
-  
+  usersid = user.uid;
+
   useEffect(() => {
-  console.log('user id',usersid);
-  setDocRef(doc(db, usersid, usersid));
-  // console.log(route.params.usersid,route.params.usersname,route.params.usersphone);
+    console.log('user id', usersid);
+    setDocRef(doc(db, usersid, usersid));
+    // console.log(route.params.usersid,route.params.usersname,route.params.usersphone);
   }, []);
   // email handling code
-//   const sendEmail = async () => {
-//     const ConfirmDocSnap = await getDoc(DocRef);
-//     const userdoc = ConfirmDocSnap.data();
-//     try {
-//         const response = await fetch('https://your-firebase-project-id.cloudfunctions.net/sendEmail', {
-//             method: 'POST',
-//             headers: {
-//             'Content-Type': 'application/json',
-//             },
-//             body: JSON.stringify({
-//             userdoc: {
-//                 username: userdoc.username,
-//                 loadername: userdoc.loadername,
-//                 userphone: userdoc.loaderphone,
-//                 loaderphone: userdoc.loaderphone,
-//                 createdAt: userdoc.createdAt,
-//                 cost: userdoc.cost,
-//             },
-//             }),
-//         });
-    
-//         if (response.ok) {
-//             console.log('Email sent successfully');
-//         } else {
-//             console.error('Failed to send email');
-//         }
-//         } catch (error) {
-//         console.error('Error:', error);
-//         }
-//   };
-  
+  //   const sendEmail = async () => {
+  //     const ConfirmDocSnap = await getDoc(DocRef);
+  //     const userdoc = ConfirmDocSnap.data();
+  //     try {
+  //         const response = await fetch('https://your-firebase-project-id.cloudfunctions.net/sendEmail', {
+  //             method: 'POST',
+  //             headers: {
+  //             'Content-Type': 'application/json',
+  //             },
+  //             body: JSON.stringify({
+  //             userdoc: {
+  //                 username: userdoc.username,
+  //                 loadername: userdoc.loadername,
+  //                 userphone: userdoc.loaderphone,
+  //                 loaderphone: userdoc.loaderphone,
+  //                 createdAt: userdoc.createdAt,
+  //                 cost: userdoc.cost,
+  //             },
+  //             }),
+  //         });
+
+  //         if (response.ok) {
+  //             console.log('Email sent successfully');
+  //         } else {
+  //             console.error('Failed to send email');
+  //         }
+  //         } catch (error) {
+  //         console.error('Error:', error);
+  //         }
+  //   };
+
   const setNewStates = newStates => {
     setStates(newStates);
   };
@@ -201,13 +201,13 @@ const UserLoaderInt = ({navigation}) => {
     return () => unsubscribe();
   }, []);
   useEffect(() => {
-      //call create interface here
-      createinterface();
+    //call create interface here
+    createinterface();
   }, []);
   const createinterface = async () => {
     setButtonText('Confirm Ride');
     console.log('user', user.uid);
-    if (user.photoURL === 'user'&& !created) {
+    if (user.photoURL === 'user' && !created) {
       await setDoc(doc(db, usersid, usersid), {
         userid: usersid,
         username: user.displayName,
@@ -259,7 +259,7 @@ const UserLoaderInt = ({navigation}) => {
         // See error code charts below.
         console.log(error.code, error.message);
       },
-      {enableHighAccuracy: true, timeout: 2000, maximumAge: 1000},
+      { enableHighAccuracy: true, timeout: 2000, maximumAge: 1000 },
     );
   }
 
@@ -302,7 +302,7 @@ const UserLoaderInt = ({navigation}) => {
             <View className="rounded-full bg-white p-3 ">
               <Image
                 source={require('../imgs/phone_icon.png')}
-                style={{width: 30, height: 30}}
+                style={{ width: 30, height: 30 }}
               />
             </View>
           </TouchableOpacity>
@@ -317,7 +317,7 @@ const UserLoaderInt = ({navigation}) => {
             <View className="rounded-full bg-white p-3 ">
               <Image
                 source={require('../imgs/phone_icon.png')}
-                style={{width: 30, height: 30}}
+                style={{ width: 30, height: 30 }}
               />
             </View>
           </TouchableOpacity>
