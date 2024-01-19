@@ -72,7 +72,7 @@ const SignUp = ({ navigation }) => {
           </View>
           </View>
           <CButton
-            title={'Confirm Code'}
+            title={'Sign Up'}
             twClass="mt-4"
             handlePress={handleClick}
           />

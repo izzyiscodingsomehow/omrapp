@@ -45,10 +45,11 @@ const Login = ({navigation, route}) => {
   };
   const confirmSignup = async () => {
     try {
-      await signInWithPhoneNumber('+923432616877');
-      await confirm.confirm('123654').then(userInfo => {
+      await confirm.confirm(code).then(userInfo => {
         userInfo.additionalUserInfo.isNewUser = false;
+        console.log("confirmed");
       });
+      setConfirm(null);
     } catch (e) {
       console.log(e);
     }
@@ -61,7 +62,7 @@ const Login = ({navigation, route}) => {
         if(userInfo.additionalUserInfo.isNewUser){
           console.log("new user");
           navigation.navigate('SignUp');
-          setConfirm(null);
+          //setConfirm(null);
           //in signup update user info and then set async data "ASYNC DATA STORAGE CALLS GET DATA ALWAYS"and login the user
         }
         else{
@@ -89,7 +90,6 @@ const Login = ({navigation, route}) => {
       navigation.navigate('Home');
     }
   }, [SignedUp]);
-
   const handleClick = () => {
     // Dummy for testing
     // signInWithPhoneNumber('+923432616877');
@@ -134,7 +134,7 @@ const Login = ({navigation, route}) => {
               <View className={` rounded-lg p-3 px-4 mt-3 text-lg items-center flex flex-row`}>
               <Text className="text-xl text-grey pr-2 mt-3">+92</Text>
               <CTextInput
-                placeholder="f.e 123 12345678"
+                placeholder="f.e 3xx12345678"
                 twClass="p-3 px-4 mt-3 text-lg w-[250]"
                 handleChange={handleChange}
                 keyboardType = "numeric"
@@ -167,6 +167,7 @@ const Login = ({navigation, route}) => {
               <CTextInput
                 placeholder="XXXXXX"
                 twClass="p-3 px-4 mt-3 text-lg"
+                keyboardType = "numeric"
                 handleChange={handleCode}
               />
               <CButton title={'Confirm Code'} twClass="mt-4"

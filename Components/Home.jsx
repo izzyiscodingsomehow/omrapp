@@ -11,7 +11,6 @@ import { endRide } from './contexts/RideContext'
 import { UserContext } from './contexts/UserContext'
 import UserLoaderInt from './UserLoaderInt'
 import { or } from 'firebase/firestore'
-import haversine from 'haversine-distance'
 import 'firebase/database'
 import database, { firebase } from '@react-native-firebase/database'
 import { app } from '../firebase'
@@ -143,6 +142,7 @@ const Home = () => {
 
     }
     const [newcost, setNewCost] = useState(0);
+    let check = 0;
     useEffect(() => {
         //write code for getting cost doc from firebase
         const unsubscribe = firestore()
@@ -150,16 +150,13 @@ const Home = () => {
             .doc("cost-current")
             .onSnapshot(snapshot => {
                 setNewCost(snapshot.data().cost);
-                console.log("COST: ", snapshot.data().cost);
+                check = snapshot.data().cost;
             });
 
         return () => unsubscribe();
     }, []);
     const handleDirectionsReady = (result) => {
-        console.log("DISTANCE: ", result.distance, " ", newcost);
-        console.log(result.distance * newcost)
         setCost(result.distance * newcost);
-        console.log("COST in handle: ", cost);
     };
     useEffect(() => {
         console.log("COST in use: ", cost);
@@ -417,6 +414,7 @@ const Home = () => {
                                     />
                                     <Image source={require('../imgs/arrowRightPNG.png')} style={{ width: 20, marginRight: 20 }} />
                                 </View>
+                                {cost != check ? <Text className="text-[20px] text-black">Fare: {cost} PKR</Text> : null}
                                 <View className="w-auto ">
                                     <Pressable onPress={invertRideState} className="">
                                         <View className={`bg-[#131316] px-5 rounded-lg z-[-4] p-[10px]`}>

@@ -51,11 +51,14 @@ function DrawerStack() {
           fontWeight: 'normal',
         },
       }}>
-      <Drawer.Screen name="Login" component={Login} />
-      <Drawer.Screen name="SignUp" component={SignUp} />
+      <Drawer.Screen name="Login" component={Login}  options={{
+                  drawerItemStyle: { display: 'none' }
+        }}/>
+      <Drawer.Screen name="SignUp" component={SignUp}  options={{
+                  drawerItemStyle: { display: 'none' }
+        }}/>
       <Drawer.Screen name="Home" component={Home} />
       <Drawer.Screen name="UserLoaderInt" component={UserLoaderInt} initialParams={{ usersid:"loader",usersname:"loader",usersphone:"3169973256" }}/>
-      <Drawer.Screen name="Become a Driver" component={Login} />
       <Drawer.Screen name="Settings" component={Settings} />
       <Drawer.Screen name="FAQ" component={FAQ} />
       <Drawer.Screen name="Logout" component={LogOut}  />

@@ -25,7 +25,7 @@ import { doc, updateDoc, setDoc, getDoc } from 'firebase/firestore';
 import { RideContext } from './contexts/RideContext';
 import { db } from '../firebase';
 
-const UserLoaderInt = ({ navigation }) => {
+const UserLoaderInt = ({ navigation, route }) => {
 
   //chat handling code
   const [messages, setMessages] = useState([]);
@@ -51,12 +51,39 @@ const UserLoaderInt = ({ navigation }) => {
     usersid = user.uid;
   }
   usersid = user.uid;
-
+  
   useEffect(() => {
     console.log('user id', usersid);
     setDocRef(doc(db, usersid, usersid));
     // console.log(route.params.usersid,route.params.usersname,route.params.usersphone);
   }, []);
+  useEffect(() => {
+      //call create interface here
+      createinterface();
+  }, []);
+  const createinterface = async () => {
+    setButtonText('Confirm Ride');
+    console.log('user', user.uid);
+    if (user.photoURL === 'user'&& !created) {
+      await setDoc(doc(db, usersid, usersid), {
+        userid: usersid,
+        username: user.displayName,
+        loaderid: route.params.usersid,
+        loadername: route.params.usersname,
+        userphone: user.phoneNumber,
+        loaderphone: route.params.usersphone,
+        messages: [""],
+        createdAt: new Date(),
+        cost: cost,
+        usertransstart: false,
+        loadertransstart: false,
+        usertransend: false,
+        loadertransend: false,
+      });
+    }
+    console.log('interface created');
+    setCreated(true);
+  };
   // email handling code
   //   const sendEmail = async () => {
   //     const ConfirmDocSnap = await getDoc(DocRef);
@@ -93,7 +120,8 @@ const UserLoaderInt = ({ navigation }) => {
     setStates(newStates);
   };
   useEffect(() => {
-    const unsubscribe = firestore()
+    if(created){
+      const unsubscribe = firestore()
       .collection(usersid)
       .doc(usersid)
       .onSnapshot(snapshot => {
@@ -106,7 +134,8 @@ const UserLoaderInt = ({ navigation }) => {
       });
 
     return () => unsubscribe();
-  }, []);
+  }
+  }, [created]);
   useEffect(() => {
     if (states) {
       if (!states[0] && !states[1] && !states[2] && !states[3]) {
@@ -190,43 +219,19 @@ const UserLoaderInt = ({ navigation }) => {
   const [slideViewHeight, setSlideViewHeight] = useState(0);
 
   useEffect(() => {
-    const unsubscribe = firestore()
-      .collection(usersid)
-      .doc(usersid)
-      .onSnapshot(snapshot => {
-        const newMessages = snapshot.data().messages.slice(1).map(msg => msg);
-        setMessages(newMessages);
-      });
+    if(created){
+      const unsubscribe = firestore()
+        .collection(usersid)
+        .doc(usersid)
+        .onSnapshot(snapshot => {
+          const newMessages = snapshot.data().messages.slice(1).map(msg => msg);
+          setMessages(newMessages);
+        });
 
-    return () => unsubscribe();
+      return () => unsubscribe();
+  }
   }, []);
-  useEffect(() => {
-    //call create interface here
-    createinterface();
-  }, []);
-  const createinterface = async () => {
-    setButtonText('Confirm Ride');
-    console.log('user', user.uid);
-    if (user.photoURL === 'user' && !created) {
-      await setDoc(doc(db, usersid, usersid), {
-        userid: usersid,
-        username: user.displayName,
-        loaderid: route.params.usersid,
-        loadername: route.params.usersname,
-        userphone: user.phoneNumber,
-        loaderphone: route.params.usersphone,
-        messages: [""],
-        createdAt: new Date(),
-        cost: cost,
-        usertransstart: false,
-        loadertransstart: false,
-        usertransend: false,
-        loadertransend: false,
-      });
-    }
-    console.log('interface created');
-    setCreated(true);
-  };
+
   //chat handling code ends here
 
   const handleChange = text => {
