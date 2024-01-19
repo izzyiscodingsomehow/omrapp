@@ -62,27 +62,33 @@ const UserLoaderInt = ({ navigation, route }) => {
       createinterface();
   }, []);
   const createinterface = async () => {
-    setButtonText('Confirm Ride');
-    console.log('user', user.uid);
-    if (user.photoURL === 'user'&& !created) {
-      await setDoc(doc(db, usersid, usersid), {
-        userid: usersid,
-        username: user.displayName,
-        loaderid: route.params.usersid,
-        loadername: route.params.usersname,
-        userphone: user.phoneNumber,
-        loaderphone: route.params.usersphone,
-        messages: [""],
-        createdAt: new Date(),
-        cost: cost,
-        usertransstart: false,
-        loadertransstart: false,
-        usertransend: false,
-        loadertransend: false,
-      });
+    if (user.photoURL === 'user' && !created) {
+        const docSnap = await getDoc(DocRef);
+        if (docSnap.exists()) {
+          console.log('interface already created');
+          setCreated(true);
+          return;
+        }
+        else{
+        await setDoc(doc(db, usersid, usersid), {
+          userid: usersid,
+          username: user.displayName,
+          loaderid: route.params.usersid,
+          loadername: route.params.usersname,
+          userphone: user.phoneNumber,
+          loaderphone: route.params.usersphone,
+          messages: [""],
+          createdAt: new Date(),
+          cost: cost,
+          usertransstart: false,
+          loadertransstart: false,
+          usertransend: false,
+          loadertransend: false,
+        });
+        console.log('interface created');
+        setCreated(true);
+      }
     }
-    console.log('interface created');
-    setCreated(true);
   };
   // email handling code
   //   const sendEmail = async () => {
