@@ -1,7 +1,7 @@
 import {useState, useEffect, useContext, createContext} from 'react';
 import {Alert} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {get} from 'react-native/Libraries/TurboModule/TurboModuleRegistry';
+//import {get} from 'react-native/Libraries/TurboModule/TurboModuleRegistry';
 import {useNetInfo} from '@react-native-community/netinfo';
 import RNRestart from 'react-native-restart';
 const UserContext = createContext([]);

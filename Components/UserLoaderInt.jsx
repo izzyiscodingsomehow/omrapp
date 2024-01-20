@@ -7,24 +7,14 @@ import {
   Image,
   TouchableOpacity,
 } from 'react-native';
-import MapView, { Marker } from 'react-native-maps';
-import MapViewDirections from 'react-native-maps-directions';
-import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import Geolocation from '@react-native-community/geolocation';
-import SlideView from './custom/SlideView';
-import searchIcon from '../imgs/searchIcon.svg';
-import DropDownPicker from 'react-native-dropdown-picker';
 import CButton from './custom/CButton';
-import CTextInput from './custom/CTextInput';
-import mapStyle from '../mapStyle.json';
-import { request, PERMISSIONS, RESULTS, check } from 'react-native-permissions';
 import { UserContext } from './contexts/UserContext';
 import call from 'react-native-phone-call';
 import firestore from '@react-native-firebase/firestore';
 import { doc, updateDoc, setDoc, getDoc } from 'firebase/firestore';
 import { RideContext } from './contexts/RideContext';
 import { db } from '../firebase';
-import { update } from 'firebase/database';
 
 const UserLoaderInt = ({ navigation, route, currentRide, updateDropoff, setOnGoingRide, deleteOnGoingRide }) => {
 
@@ -267,60 +257,11 @@ const UserLoaderInt = ({ navigation, route, currentRide, updateDropoff, setOnGoi
   };
   const trycall = () => {
     const args = {
-      number: user.phoneNumber,
+      number: user.loader_phone,
       prompt: true,
     };
     call(args).catch(console.error);
   };
-
-  function getCurrentPosition() {
-    Geolocation.getCurrentPosition(
-      position => {
-        console.log('get curr', position);
-        setOrigin({
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude,
-        });
-        setRegion({
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude,
-          latitudeDelta: 0.05,
-          longitudeDelta: 0.05,
-        });
-      },
-      error => {
-        // See error code charts below.
-        console.log(error.code, error.message);
-      },
-      { enableHighAccuracy: true, timeout: 2000, maximumAge: 1000 },
-    );
-  }
-
-  useEffect(() => {
-    Geolocation.requestAuthorization();
-    getCurrentPosition();
-    console.log('POSITION: ', position);
-  }, []);
-
-  // temp region
-  const [region, setRegion] = useState({
-    latitude: 0,
-    longitude: 0,
-    latitudeDelta: 0.05,
-    longitudeDelta: 0.05,
-  });
-
-  // pickup location
-  const [origin, setOrigin] = useState({
-    latitude: 0,
-    longitude: 0,
-  });
-
-  // dropoff location
-  const [dropOff, setDropOff] = useState({
-    latitude: 0,
-    longitude: 0,
-  });
 
   return (
     <View className="mt-[10]">
@@ -348,7 +289,7 @@ const UserLoaderInt = ({ navigation, route, currentRide, updateDropoff, setOnGoi
         <View className="ml-7">
           <TouchableOpacity
             //Commented because it works for now
-            // onPress={trycall}
+            onPress={trycall}
             className="flex-row">
             <Text className="text-xl text-black mt-3 mr-5">Call</Text>
             <View className="rounded-full bg-white p-3 ">

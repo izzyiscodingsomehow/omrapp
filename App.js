@@ -1,7 +1,5 @@
 import React from 'react';
-import { Text, View } from 'react-native';
 import { createDrawerNavigator } from '@react-navigation/drawer';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
 import Login from './Components/Login';
 import LogOut from './Components/LogOut';
@@ -13,21 +11,7 @@ import FAQ from './Components/FAQ';
 import Settings from './Components/Settings';
 import UserLoaderInt from './Components/UserLoaderInt';
 import { RideContextProvider } from './Components/contexts/RideContext';
-
-const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
-
-function BaseStack() {
-  return (
-    <Stack.Navigator
-      screenOptions={{
-        headerShown: false,
-      }}>
-      <Stack.Screen name="Login" component={Login} />
-      <Stack.Screen name="Home" component={Home} />
-    </Stack.Navigator>
-  );
-}
 
 function DrawerStack() {
   return (
@@ -81,7 +65,6 @@ const App = () => {
     <ContextProvider>
       <RideContextProvider>
         <NavigationContainer theme={theme}>
-          {/* <BaseStack /> */}
           <DrawerStack />
         </NavigationContainer>
       </RideContextProvider>

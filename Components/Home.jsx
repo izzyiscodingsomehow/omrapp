@@ -10,14 +10,15 @@ import { RideContext, clearRide } from './contexts/RideContext'
 import { endRide } from './contexts/RideContext'
 import { UserContext } from './contexts/UserContext'
 import UserLoaderInt from './UserLoaderInt'
-import { or } from 'firebase/firestore'
+//import { or } from 'firebase/firestore'
 import 'firebase/database'
-import database, { firebase } from '@react-native-firebase/database'
+//import database from '@react-native-firebase/database'
+import { firebase } from '@react-native-firebase/database'
 import auth from '@react-native-firebase/auth';
-import { app } from '../firebase'
-import { set, update } from 'firebase/database'
-import { doc, getDoc } from 'firebase/firestore';
-import { db } from '../firebase';
+// import { app } from '../firebase'
+// import { set, update } from 'firebase/database'
+// import { doc, getDoc } from 'firebase/firestore';
+// import { db } from '../firebase';
 import haversine from 'haversine-distance'
 
 const MAX_RADIUS = 10;

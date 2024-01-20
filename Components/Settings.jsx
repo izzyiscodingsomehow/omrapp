@@ -8,7 +8,6 @@ import auth from '@react-native-firebase/auth';
 import CheckBox from '@react-native-community/checkbox';
 const Settings = () => {
     const { user, setUser } = useContext(UserContext);
-  const { setSignedUp } = useContext(UserContext);
   const [toggleCheckBox, setToggleCheckBox] = useState(false)
 
   //console.log(user.displayName);

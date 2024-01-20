@@ -5,9 +5,7 @@ import SlideView from './custom/SlideView';
 import CTextInput from './custom/CTextInput';
 // import {useNavigation} from '@react-navigation/native';
 import auth from '@react-native-firebase/auth';
-import { onAuthStateChanged } from 'firebase/auth';
 import { UserContext } from './contexts/UserContext';
-import SignUp from './SignUp';
 
 const Login = ({navigation, route}) => {
   const settings = auth().settings;

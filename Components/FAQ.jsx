@@ -1,10 +1,6 @@
 import React from 'react'
 import Markdown from '@ronradtke/react-native-markdown-display';
 import {
-    Image,
-    ImageBackground,
-    StyleSheet,
-    Text,
     View,
     ScrollView,
 } from "react-native";
