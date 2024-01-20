@@ -6,8 +6,8 @@ import firestore from '@react-native-firebase/firestore';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete'
 import Geolocation from 'react-native-geolocation-service';
 import SlideView from './custom/SlideView'
-import { RideContext, clearRide } from './contexts/RideContext'
-import { endRide } from './contexts/RideContext'
+import { RideContext } from './contexts/RideContext'
+import { endRide, clearRide } from './contexts/RideContext'
 import { UserContext } from './contexts/UserContext'
 import UserLoaderInt from './UserLoaderInt'
 //import { or } from 'firebase/firestore'
