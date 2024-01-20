@@ -30,14 +30,12 @@ const Home = () => {
         longitude: 0,
     });
 
-
     const [notification, setNotification] = useState(null);
     const [showNotification, setShowNotification] = useState(false);
     const [pickupName, setPickupName] = useState(null);
     const [dropoffName, setDropoffName] = useState(null);
     const [ongoingRide, setOngoingRide] = useState(null);
     const [slideViewHeight, setSlideViewHeight] = useState(0);
-    const { ride, setRide } = useContext(RideContext);
     const [rideInProgress, setRideInProgress] = useState(false);
     const { cost, setCost } = useContext(RideContext);
     const { user, setUser } = useContext(UserContext);
@@ -135,10 +133,10 @@ const Home = () => {
                     console.log("he is near");
                 }
                 else {
-                    console.log("he is near");
+                    console.log("he is not near");
                 }
             },
-            
+        
             (error) => {
                 console.log("ERROR CODE: ", error.code, "MESSAGE: ", error.message);
             },
@@ -238,7 +236,6 @@ const Home = () => {
         })
     }
 
-
     useEffect(() => {
         const loaderIdToFilter = user.uid;
 
@@ -253,7 +250,6 @@ const Home = () => {
                 // Check if loaderId matches the condition
                 if (user.photoURL == 'loader') {
                     console.log("OK SO HERE YOU ARE: ", childSnapshot.val().loaderId);
-                    console.log("OK userrrrrr: ", user);
                     if (childSnapshot.val().loaderId == loaderIdToFilter) {
                         ride = {
                             key: childSnapshot.key,
@@ -261,7 +257,6 @@ const Home = () => {
                         };
                     }
                 }
-
                 else {
                     if (childSnapshot.val().userId == loaderIdToFilter) {
                         ride = {
@@ -471,7 +466,7 @@ const Home = () => {
             <SlideView >
                 {
                     ongoingRide ?
-                        <UserLoaderInt currentRide={ongoingRide} />
+                        <UserLoaderInt currentRide={ongoingRide} updateDropoff={updateDropoff}/>
                         // <Text>Loading</Text>
                         :
                         <>

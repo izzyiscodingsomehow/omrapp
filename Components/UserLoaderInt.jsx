@@ -25,7 +25,7 @@ import { doc, updateDoc, setDoc, getDoc } from 'firebase/firestore';
 import { RideContext } from './contexts/RideContext';
 import { db } from '../firebase';
 
-const UserLoaderInt = ({ navigation, route, currentRide }) => {
+const UserLoaderInt = ({ navigation, route, currentRide, updateDropoff }) => {
 
   //chat handling code
   const [messages, setMessages] = useState([]);
@@ -37,6 +37,7 @@ const UserLoaderInt = ({ navigation, route, currentRide }) => {
   const [DocRef, setDocRef] = useState(null);
   const [created, setCreated] = useState(false);
   const { cost, setCost } = useContext(RideContext);
+  const {ride, setRide} = useContext(RideContext)
   const [position, setPosition] = useState({
     latitude: 0,
     longitude: 0,
@@ -74,8 +75,8 @@ const UserLoaderInt = ({ navigation, route, currentRide }) => {
       }
 
       else {
-        await setDoc(doc(db, usersid, usersid), {
-          userid: usersid,
+        await setDoc(doc(db, currentRide.userId, currentRide.userId), {
+          userid: currentRide.userId,
           username: user.displayName,
           loaderid: currentRide.loaderId,
           loadername: "Dummy",
@@ -133,8 +134,8 @@ const UserLoaderInt = ({ navigation, route, currentRide }) => {
   useEffect(() => {
     if (created) {
       const unsubscribe = firestore()
-        .collection(usersid)
-        .doc(usersid)
+        .collection(currentRide.userId)
+        .doc(currentRide.userId)
         .onSnapshot(snapshot => {
           setNewStates([
             snapshot.data().usertransstart,
@@ -167,6 +168,9 @@ const UserLoaderInt = ({ navigation, route, currentRide }) => {
 
     try {
       // Fetch the current data of the document
+      setRide(true);
+      updateDropoff(currentRide.loaderId, currentRide.dropoff)
+       
       const ConfirmDocSnap = await getDoc(DocRef);
       const userdoc = ConfirmDocSnap.data().userid;
 
@@ -175,7 +179,7 @@ const UserLoaderInt = ({ navigation, route, currentRide }) => {
 
       // if false then set it to true
       if (buttonText === 'Confirm Ride') {
-        if (userdoc === usersid) {
+        if (userdoc === currentRide.userId) {
           await updateDoc(DocRef, {
             usertransstart: true,
           });
@@ -186,7 +190,7 @@ const UserLoaderInt = ({ navigation, route, currentRide }) => {
         }
         console.log('confirm ride');
       } else if (buttonText === 'End Ride') {
-        if (userdoc === usersid) {
+        if (userdoc === currentRide.userId) {
           await updateDoc(DocRef, {
             usertransend: true,
           });
@@ -201,6 +205,7 @@ const UserLoaderInt = ({ navigation, route, currentRide }) => {
       console.error('Error updating message:', error);
     }
   };
+
   const updateMessage = async () => {
     try {
       // Fetch the current data of the document
@@ -228,13 +233,12 @@ const UserLoaderInt = ({ navigation, route, currentRide }) => {
       console.error('Error updating message:', error);
     }
   };
-  const [slideViewHeight, setSlideViewHeight] = useState(0);
 
   useEffect(() => {
     if (created) {
       const unsubscribe = firestore()
-        .collection(usersid)
-        .doc(usersid)
+        .collection(currentRide.userId)
+        .doc(currentRide.userId)
         .onSnapshot(snapshot => {
           const newMessages = snapshot.data().messages.slice(1).map(msg => msg);
           setMessages(newMessages);
@@ -310,15 +314,15 @@ const UserLoaderInt = ({ navigation, route, currentRide }) => {
     <View className="mt-[10]">
       {!isFocused ? (
         <View className="ml-7 ">
-          <View className="flex flex-row">
-            <View className="w-[30px] bg-black"></View>  
-            <Text className="text-xl text-black">{user.displayName}</Text>
+          <View className="flex flex-row items-center gap-3">
+            <View className="w-[50px] h-[50px] bg-gray-200 rounded-full"></View>  
+            <Text className="text-xl text-[#1a1a1a]">{user.displayName}</Text>
           </View>
           <TouchableOpacity
             //Commented because it works for now
             // onPress={trycall}
-            className="flex-row">
-            <Text className="text-xl text-black mt-3 mr-5">Call</Text>
+            className="flex-row border border-gray-200 w-[350px] flex justify-between px-5 rounded-lg mt-3">
+            <Text className="text-xl text-black mt-3">Call the loader</Text>
             <View className="rounded-full bg-white p-3 ">
               <Image
                 source={require('../imgs/phone_icon.png')}
@@ -380,6 +384,7 @@ const UserLoaderInt = ({ navigation, route, currentRide }) => {
               title={buttonText}
               twClass={'z-[-4]'}
               handlePress={confirmRide}
+
             />
           )}
         </View>
