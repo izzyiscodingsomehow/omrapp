@@ -24,8 +24,9 @@ import firestore from '@react-native-firebase/firestore';
 import { doc, updateDoc, setDoc, getDoc } from 'firebase/firestore';
 import { RideContext } from './contexts/RideContext';
 import { db } from '../firebase';
+import { update } from 'firebase/database';
 
-const UserLoaderInt = ({ navigation, route, currentRide, updateDropoff }) => {
+const UserLoaderInt = ({ navigation, route, currentRide, updateDropoff, setOnGoingRide, deleteOnGoingRide }) => {
 
   //chat handling code
   const [messages, setMessages] = useState([]);
@@ -37,7 +38,8 @@ const UserLoaderInt = ({ navigation, route, currentRide, updateDropoff }) => {
   const [DocRef, setDocRef] = useState(null);
   const [created, setCreated] = useState(false);
   const { cost, setCost } = useContext(RideContext);
-  const {ride, setRide} = useContext(RideContext)
+  const { ride, setRide } = useContext(RideContext)
+  const [showEnd, setShowEnd] = useState(false);
   const [position, setPosition] = useState({
     latitude: 0,
     longitude: 0,
@@ -95,6 +97,15 @@ const UserLoaderInt = ({ navigation, route, currentRide, updateDropoff }) => {
       }
     }
   };
+
+  const endRide = () => {
+    setShowEnd(true);
+    setOnGoingRide(null);
+    deleteOnGoingRide(currentRide.loaderId, currentRide.userId);
+    updateDropoff(currentRide.userId, { latitude: 0, longitude: 0 });
+    updateDropoff(currentRide.loaderId, { latitude: 0, longitude: 0 });
+    console.log("Ended ride");
+  }
 
   // email handling code
   //   const sendEmail = async () => {
@@ -170,7 +181,8 @@ const UserLoaderInt = ({ navigation, route, currentRide, updateDropoff }) => {
       // Fetch the current data of the document
       setRide(true);
       updateDropoff(currentRide.loaderId, currentRide.dropoff)
-       
+      setButtonText("End Ride")
+
       const ConfirmDocSnap = await getDoc(DocRef);
       const userdoc = ConfirmDocSnap.data().userid;
 
@@ -312,10 +324,11 @@ const UserLoaderInt = ({ navigation, route, currentRide, updateDropoff }) => {
 
   return (
     <View className="mt-[10]">
-      {!isFocused ? (
+
+      {!isFocused && !showEnd ? (
         <View className="ml-7 ">
           <View className="flex flex-row items-center gap-3">
-            <View className="w-[50px] h-[50px] bg-gray-200 rounded-full"></View>  
+            <View className="w-[50px] h-[50px] bg-gray-200 rounded-full"></View>
             <Text className="text-xl text-[#1a1a1a]">{user.displayName}</Text>
           </View>
           <TouchableOpacity
@@ -375,31 +388,42 @@ const UserLoaderInt = ({ navigation, route, currentRide, updateDropoff }) => {
           onChangeText={handleChange}
         />
       </View>
-      <View className="flex flex-row flex-wrap content-center items-center gap-2 overflow-hidden p-2">
-        <View className=" items-center p-2 ml-5">
+      <View className="flex flex-row flex-wrap justify-center  gap-2 overflow-hidden p-2">
+        <View className=" items-center w-[355px] flex justify-center">
           {buttonText === '' ? (
             <></>
           ) : (
             <CButton
               title={buttonText}
-              twClass={'z-[-4]'}
-              handlePress={confirmRide}
+              twClass={'z-[-4] w-full ml-2'}
+              handlePress={buttonText == 'Confirm Ride' ? confirmRide : endRide}
 
             />
           )}
+          {isFocused && !showEnd ? (
+            <View className=" items-center p-2 ml-5">
+              <CButton
+                title={'Send'}
+                twClass={'z-[-4] w-[100]'}
+                handlePress={updateMessage}
+              />
+            </View>
+          ) : (
+            <View></View>
+          )}
+
+          {
+            showEnd ?
+              (
+                <>
+                  <Text className="text-xl text-[#1a1a1a]">Total Cost: {currentRide.cost}</Text>
+                </>
+              ) :
+              <></>
+          }
         </View>
-        {isFocused ? (
-          <View className=" items-center p-2 ml-5">
-            <CButton
-              title={'Send'}
-              twClass={'z-[-4] w-[100]'}
-              handlePress={updateMessage}
-            />
-          </View>
-        ) : (
-          <View></View>
-        )}
       </View>
+
     </View>
   );
 };

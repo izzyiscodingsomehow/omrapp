@@ -44,6 +44,23 @@ const Home = () => {
 
     // const ref = firebase.app().database('https://omr-app-93d29-default-rtdb.asia-southeast1.firebasedatabase.app/').ref('/users/location')
 
+    const deleteOnGoingRide = (loaderId, userId) => {
+        const ref = firebase.app().database('https://omr-app-93d29-default-rtdb.asia-southeast1.firebasedatabase.app/').ref('/ongoing-rides')
+        const query = ref.orderByChild('loaderId').equalTo(loaderId);
+
+        query.once('value', (snapshot) => {
+            snapshot.forEach((childSnapshot) => {
+                const data = childSnapshot.val();
+
+                // Check if the userId also matches
+                if (data.userId === userId) {
+                    // Remove the node from the database
+                    childSnapshot.ref.remove();
+                }
+            });
+        });
+    }
+
     const updateLocation = async (userId, pickup, dropoff) => {
         try {
             await firebase.app().database('https://omr-app-93d29-default-rtdb.asia-southeast1.firebasedatabase.app/').ref(`/users/${userId}`).set({
@@ -136,7 +153,7 @@ const Home = () => {
                     console.log("he is not near");
                 }
             },
-        
+
             (error) => {
                 console.log("ERROR CODE: ", error.code, "MESSAGE: ", error.message);
             },
@@ -466,7 +483,7 @@ const Home = () => {
             <SlideView >
                 {
                     ongoingRide ?
-                        <UserLoaderInt currentRide={ongoingRide} updateDropoff={updateDropoff}/>
+                        <UserLoaderInt currentRide={ongoingRide} updateDropoff={updateDropoff} setOnGoingRide={setOngoingRide} deleteOnGoingRide={deleteOnGoingRide} />
                         // <Text>Loading</Text>
                         :
                         <>
