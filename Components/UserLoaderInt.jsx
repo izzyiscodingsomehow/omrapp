@@ -25,12 +25,12 @@ import { doc, updateDoc, setDoc, getDoc } from 'firebase/firestore';
 import { RideContext } from './contexts/RideContext';
 import { db } from '../firebase';
 
-const UserLoaderInt = ({ navigation, route }) => {
+const UserLoaderInt = ({ navigation, route, currentRide }) => {
 
   //chat handling code
   const [messages, setMessages] = useState([]);
   const [text, setText] = useState('');
-  const [buttonText, setButtonText] = useState('Confirm Ride');
+  const [buttonText, setButtonText] = useState('Start Ride');
   const [isFocused, setIsFocused] = useState(false);
   const [states, setStates] = useState([false, false, false, false]);
   const { user, setUser } = useContext(UserContext);
@@ -42,41 +42,45 @@ const UserLoaderInt = ({ navigation, route }) => {
     longitude: 0,
   });
 
-  let usersid;
-  if (user.photoURL === 'loader') {
-    usersid = route.params.usersid;
-    console.log("usersid: ", usersid);
-  }
-  else {
-    usersid = user.uid;
-  }
-  usersid = user.uid;
-  
+
+  // let usersid;
+  // if (user.photoURL === 'loader') {
+  //   usersid = route.params.usersid;
+  //   console.log("usersid: ", usersid);
+  // }
+  // else {
+  //   usersid = user.uid;
+  // }
+  // usersid = user.uid;
+
   useEffect(() => {
-    console.log('user id', usersid);
-    setDocRef(doc(db, usersid, usersid));
+    // console.log('user id', usersid);
+    setDocRef(doc(db, currentRide.userId, currentRide.userId));
     // console.log(route.params.usersid,route.params.usersname,route.params.usersphone);
   }, []);
   useEffect(() => {
-      //call create interface here
-      createinterface();
+    //call create interface here
+    createinterface();
   }, []);
+
   const createinterface = async () => {
+
     if (user.photoURL === 'user' && !created) {
-        const docSnap = await getDoc(DocRef);
-        if (docSnap.exists()) {
-          console.log('interface already created');
-          setCreated(true);
-          return;
-        }
-        else{
+      const docSnap = await getDoc(DocRef);
+      if (docSnap.exists()) {
+        console.log('interface already created');
+        setCreated(true);
+        return;
+      }
+
+      else {
         await setDoc(doc(db, usersid, usersid), {
           userid: usersid,
           username: user.displayName,
-          loaderid: route.params.usersid,
-          loadername: route.params.usersname,
+          loaderid: currentRide.loaderId,
+          loadername: "Dummy",
           userphone: user.phoneNumber,
-          loaderphone: route.params.usersphone,
+          loaderphone: user.loader_phone,
           messages: [""],
           createdAt: new Date(),
           cost: cost,
@@ -90,6 +94,7 @@ const UserLoaderInt = ({ navigation, route }) => {
       }
     }
   };
+
   // email handling code
   //   const sendEmail = async () => {
   //     const ConfirmDocSnap = await getDoc(DocRef);
@@ -126,21 +131,21 @@ const UserLoaderInt = ({ navigation, route }) => {
     setStates(newStates);
   };
   useEffect(() => {
-    if(created){
+    if (created) {
       const unsubscribe = firestore()
-      .collection(usersid)
-      .doc(usersid)
-      .onSnapshot(snapshot => {
-        setNewStates([
-          snapshot.data().usertransstart,
-          snapshot.data().loadertransstart,
-          snapshot.data().usertransend,
-          snapshot.data().loadertransend,
-        ]);
-      });
+        .collection(usersid)
+        .doc(usersid)
+        .onSnapshot(snapshot => {
+          setNewStates([
+            snapshot.data().usertransstart,
+            snapshot.data().loadertransstart,
+            snapshot.data().usertransend,
+            snapshot.data().loadertransend,
+          ]);
+        });
 
-    return () => unsubscribe();
-  }
+      return () => unsubscribe();
+    }
   }, [created]);
   useEffect(() => {
     if (states) {
@@ -159,6 +164,7 @@ const UserLoaderInt = ({ navigation, route }) => {
   }, [states]);
 
   const confirmRide = async () => {
+
     try {
       // Fetch the current data of the document
       const ConfirmDocSnap = await getDoc(DocRef);
@@ -225,7 +231,7 @@ const UserLoaderInt = ({ navigation, route }) => {
   const [slideViewHeight, setSlideViewHeight] = useState(0);
 
   useEffect(() => {
-    if(created){
+    if (created) {
       const unsubscribe = firestore()
         .collection(usersid)
         .doc(usersid)
@@ -235,7 +241,7 @@ const UserLoaderInt = ({ navigation, route }) => {
         });
 
       return () => unsubscribe();
-  }
+    }
   }, []);
 
   //chat handling code ends here

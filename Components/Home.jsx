@@ -13,12 +13,15 @@ import UserLoaderInt from './UserLoaderInt'
 import { or } from 'firebase/firestore'
 import 'firebase/database'
 import database, { firebase } from '@react-native-firebase/database'
+import auth from '@react-native-firebase/auth';
 import { app } from '../firebase'
 import { set, update } from 'firebase/database'
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase';
+import haversine from 'haversine-distance'
 
 const MAX_RADIUS = 10;
+// const auth = firebase.auth();
 
 const Home = () => {
 
@@ -27,13 +30,19 @@ const Home = () => {
         longitude: 0,
     });
 
+
     const [notification, setNotification] = useState(null);
     const [showNotification, setShowNotification] = useState(false);
     const [pickupName, setPickupName] = useState(null);
     const [dropoffName, setDropoffName] = useState(null);
+    const [ongoingRide, setOngoingRide] = useState(null);
+    const [slideViewHeight, setSlideViewHeight] = useState(0);
+    const { ride, setRide } = useContext(RideContext);
+    const [rideInProgress, setRideInProgress] = useState(false);
+    const { cost, setCost } = useContext(RideContext);
+    const { user, setUser } = useContext(UserContext);
 
-
-    const ref = firebase.app().database('https://omr-app-93d29-default-rtdb.asia-southeast1.firebasedatabase.app/').ref('/users/location')
+    // const ref = firebase.app().database('https://omr-app-93d29-default-rtdb.asia-southeast1.firebasedatabase.app/').ref('/users/location')
 
     const updateLocation = async (userId, pickup, dropoff) => {
         try {
@@ -69,18 +78,20 @@ const Home = () => {
                     const distance = calculateDistance(origin, loader.pickup);
                     if (distance <= MAX_RADIUS) {
                         console.log(key, " is near the user");
-                        await notiRef.child(ref.push().key).set({
+                        await notiRef.child(notiRef.push().key).set({
                             message: `Ride requested by ${user.displayName}`,
                             origin,
                             dropOff,
                             pickupName,
                             dropoffName,
                             loaderId: key,
-                            userId: user.uid
+                            userId: user.uid,
+                            user_phone: user.phoneNumber
                         }).then(() => {
 
                             console.log("sent notification");
                         })
+
                     }
                     else {
                         console.log("No loaders near user");
@@ -91,17 +102,12 @@ const Home = () => {
             }
             else {
                 console.log('No loaders found');
-
             }
         } catch (err) {
             console.log("Error while fetching active loaders: ", err);
         }
     }
 
-    const [slideViewHeight, setSlideViewHeight] = useState(0);
-    const { ride, setRide } = useContext(RideContext);
-    const { cost, setCost } = useContext(RideContext);
-    const { user, setUser } = useContext(UserContext);
 
     function watchUsersLocation() {
         Geolocation.watchPosition(
@@ -137,12 +143,14 @@ const Home = () => {
         console.log(user, loader);
         const distance = ((haversine(user, loader) / 1000) * 400) / 1000 // getting distance in meters and converting to kilometers;
         console.log("Distance: ", distance);
-
         return distance;
 
     }
+
     const [newcost, setNewCost] = useState(0);
     let check = 0;
+
+
     useEffect(() => {
         //write code for getting cost doc from firebase
         const unsubscribe = firestore()
@@ -155,12 +163,105 @@ const Home = () => {
 
         return () => unsubscribe();
     }, []);
+
+
     const handleDirectionsReady = (result) => {
         setCost(result.distance * newcost);
     };
+
+
     useEffect(() => {
         console.log("COST in use: ", cost);
     }, [cost]);
+
+
+    // weird name i know, but this just checks if the user is the loader and updates his dropoff location
+    const changeLocationWhenRide = (userId) => {
+
+        const usersRef = firebase.app().database('https://omr-app-93d29-default-rtdb.asia-southeast1.firebasedatabase.app/').ref(`users`);
+
+        // Query the database using the user's UID
+        const userQuery = usersRef.child(userId);
+
+        // Use the 'once' method to retrieve data once
+        userQuery.once('value')
+            .then((snapshot) => {
+                if (snapshot.exists()) {
+                    // Data found, update the state
+                    // setUserData(snapshot.val());
+                    console.log("here is the user: ", snapshot.val());
+                } else {
+                    // No data found for the given UID
+                    // setUserData(null);
+                }
+            })
+            .catch((error) => {
+                console.error('Error fetching user data:', error);
+            });
+
+    }
+
+    useEffect(() => {
+        const loaderIdToFilter = user.uid;
+
+        // Reference to the 'ongoing-rides' node
+        const ongoingRidesRef = firebase.app().database('https://omr-app-93d29-default-rtdb.asia-southeast1.firebasedatabase.app/').ref('ongoing-rides');
+
+        // Event listener for value changes
+        const onValueChange = async (snapshot) => {
+            let ride = null;
+
+            await snapshot.forEach((childSnapshot) => {
+                // Check if loaderId matches the condition
+                if (user.photoURL == 'loader') {
+                    console.log("OK SO HERE YOU ARE: ", childSnapshot.val().loaderId);
+                    console.log("OK userrrrrr: ", user);
+                    if (childSnapshot.val().loaderId == loaderIdToFilter) {
+                        ride = {
+                            key: childSnapshot.key,
+                            ...childSnapshot.val(),
+                        };
+                    }
+                }
+
+                else {
+                    if (childSnapshot.val().userId == loaderIdToFilter) {
+                        ride = {
+                            key: childSnapshot.key,
+                            ...childSnapshot.val(),
+                        };
+                    }
+                }
+            });
+            setOngoingRide(ride);
+            changeLocationWhenRide(ongoingRide.loaderId)
+        };
+
+        // Add the listener
+        ongoingRidesRef.on('value', onValueChange);
+        console.log("this is the current ride: ", ongoingRide);
+        setRideInProgress(true);
+        if (ongoingRide != null) {
+            setRegion({
+                latitude: ongoingRide.pickup.latitude,
+                longitude: ongoingRide.pickup.longitude,
+                latitudeDelta: 0.04,
+                longitudeDelta: 0.04,
+            })
+            setOrigin({
+                latitude: ongoingRide.pickup.latitude,
+                longitude: ongoingRide.pickup.longitude,
+            })
+            setDropOff({
+                latitude: ongoingRide.dropoff.latitude,
+                longitude: ongoingRide.dropoff.longitude,
+            })
+        }
+        // Clean up the listener when the component is unmounted
+        return () => ongoingRidesRef.off('value', onValueChange);
+    }, [rideInProgress]);
+
+
     useEffect(() => {
         //Geolocation.requestAuthorization();
         // getCurrentPosition();
@@ -170,12 +271,15 @@ const Home = () => {
         const onNotificationUpdate = async snapshot => {
             const data = await snapshot.val();
             setNotification(data);
-            console.log("the noti is running");
-            console.log("noti data: ", notification, " with id: ", notification.userId);
-            Object.entries(notification).map(async ([key, user]) => {
-                console.log("Loader: ", user.loaderId, " and User:", user.userId);
-            })
-            setShowNotification(true);
+            // console.log("the noti is running");
+            // console.log("noti data: ", notification, " with id: ", notification.userId);
+            if (notification != null) {
+
+                Object.entries(notification).map(async ([key, user]) => {
+                    console.log("Loader: ", user.loaderId, " and User:", user.userId);
+                })
+                setShowNotification(true);
+            }
         };
 
         const notificationsRef = firebase.app().database('https://omr-app-93d29-default-rtdb.asia-southeast1.firebasedatabase.app/').ref(`notifications`); // Replace 'user1' with the user's ID
@@ -183,6 +287,7 @@ const Home = () => {
         notificationsRef.orderByChild('loaderId').equalTo(user.uid).on('value', onNotificationUpdate);
 
         // Return a cleanup function to unsubscribe when the component unmounts
+        // checkForOnGoingRides();
         return () => notificationsRef.off('value', onNotificationUpdate);
 
     }, [origin, showNotification]);
@@ -206,28 +311,50 @@ const Home = () => {
     });
 
     const invertRideState = () => {
-        console.log("HERES USER: ", user)
+        // console.log("HERES USER: ", user)
         updateLocation(user.uid, origin, dropOff);
-        setRide(x => !x);
+        // setRide(x => !x);
         getActiveLoaders();
     }
 
+    const deleteRideNotification = (key) => {
+        const ref = firebase.app().database('https://omr-app-93d29-default-rtdb.asia-southeast1.firebasedatabase.app/').ref(`/notifications/${key}`);
+        ref.remove()
+            .then(() => {
+                console.log('successfully deleted notification of the ride');
+            }).catch(err => {
+                console.log("ERROR: while deleting notification: ", err);
+            })
 
-    const declineRideOffer = () => {
-        // const ref = firebase.app().database('https://omr-app-93d29-default-rtdb.asia-southeast1.firebasedatabase.app/').ref(`/notifications/${user}`);
     }
 
-    const exchangeData = async (userId, loaderId, pickup, dropoff, pickupName, dropoffName) => {
-        const ref = firebase.app().database('https://omr-app-93d29-default-rtdb.asia-southeast1.firebasedatabase.app/').ref('/users/ongoing-rides');
+
+    const exchangeData = async (ride) => {
+
+        const data = notification[ride];
+        console.log("ACCEPTINGGG", data);
+
+        const loader_phone = await auth().currentUser.phoneNumber;
+
+        const ref = firebase.app().database('https://omr-app-93d29-default-rtdb.asia-southeast1.firebasedatabase.app/').ref('ongoing-rides');
         try {
             await ref.child(ref.push().key).set({
-                userId,
-                loaderId,
-                pickup,
-                dropoff,
-                pickupName,
-                dropoffName
-            }).then(() => console.log('New ride started'));
+                userId: data.userId,
+                loaderId: data.loaderId,
+                pickup: data.origin,
+                dropoff: data.dropOff,
+                pickupName: data.pickupName,
+                dropoffName: data.dropoffName,
+                loaderLocation: origin,
+                rideType: "truck",
+                cost,
+                user_phone: data.user_phone,
+                loader_phone
+
+            }).then(() => {
+                deleteRideNotification(ride)
+                console.log('New ride started')
+            });
             // invertRideState();
         } catch (err) {
             console.log("Firebase database Error: ", err);
@@ -235,11 +362,12 @@ const Home = () => {
 
     }
 
-    const handleAction = () => {
+    const handleAction = (key) => {
         // Handle the action (e.g., mark the notification as read)
         // Update the database accordingly
         setShowNotification(false);
-        console.log(user.uid, " accepted the ride of ", notification);
+        exchangeData(key);
+        // console.log(user.uid, " accepted the ride of ", notification);
     };
 
     return (
@@ -283,7 +411,7 @@ const Home = () => {
                                         </TouchableOpacity>
                                         <TouchableOpacity
                                             onPress={() => {
-                                                handleAction()
+                                                handleAction(key)
                                             }}
                                             className="bg-[#1a1a1a] px-4 rounded py-1"
                                         >
@@ -301,10 +429,11 @@ const Home = () => {
             )
             }
 
+
             <SlideView >
                 {
-                    !ride ?
-                        <UserLoaderInt />
+                    ongoingRide ?
+                        <UserLoaderInt currentRide={ongoingRide} />
                         // <Text>Loading</Text>
                         :
                         <>
