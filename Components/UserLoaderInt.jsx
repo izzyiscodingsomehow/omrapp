@@ -257,7 +257,7 @@ const UserLoaderInt = ({ navigation, route, currentRide, updateDropoff, setOnGoi
   };
   const trycall = () => {
     const args = {
-      number: user.loader_phone,
+      number: user.uid===currentRide.userId?user.loader_phone:user.user_phone,
       prompt: true,
     };
     call(args).catch(console.error);
