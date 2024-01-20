@@ -41,6 +41,8 @@ const Home = () => {
     const [rideInProgress, setRideInProgress] = useState(false);
     const { cost, setCost } = useContext(RideContext);
     const { user, setUser } = useContext(UserContext);
+    const [isLoader, setIsLoader] = useState(false);
+    const [pickedUser, setPickedUser] = useState(false);
 
     // const ref = firebase.app().database('https://omr-app-93d29-default-rtdb.asia-southeast1.firebasedatabase.app/').ref('/users/location')
 
@@ -50,6 +52,7 @@ const Home = () => {
                 pickup,
                 dropoff,
                 role: user.photoURL
+
             }).then(() => console.log('Data set.'));
             // invertRideState();
         } catch (err) {
@@ -108,7 +111,6 @@ const Home = () => {
         }
     }
 
-
     function watchUsersLocation() {
         Geolocation.watchPosition(
 
@@ -126,7 +128,17 @@ const Home = () => {
                     longitudeDelta: 0.05,
                 })
                 updateLocation(user.uid, origin, dropOff);
+
+                let dist = calculateDistance(origin, dropOff);
+
+                if (dist < 1) {
+                    console.log("he is near");
+                }
+                else {
+                    console.log("he is near");
+                }
             },
+            
             (error) => {
                 console.log("ERROR CODE: ", error.code, "MESSAGE: ", error.message);
             },
@@ -185,11 +197,25 @@ const Home = () => {
 
         // Use the 'once' method to retrieve data once
         userQuery.once('value')
-            .then((snapshot) => {
+            .then(async (snapshot) => {
                 if (snapshot.exists()) {
                     // Data found, update the state
                     // setUserData(snapshot.val());
                     console.log("here is the user: ", snapshot.val());
+
+                    if (snapshot.val().role == 'loader') {
+                        setIsLoader(true);
+                        if (!pickedUser) {
+                            await updateDropoff(userId, ongoingRide.pickup)
+
+                        }
+                        else {
+                            await updateDropoff(userId, ongoingRide.dropoff)
+                        }
+
+                    }
+
+
                 } else {
                     // No data found for the given UID
                     // setUserData(null);
@@ -200,6 +226,18 @@ const Home = () => {
             });
 
     }
+
+    const updateDropoff = async (userId, dropoff) => {
+        const ref = firebase.app().database('https://omr-app-93d29-default-rtdb.asia-southeast1.firebasedatabase.app/').ref(`users/${userId}`);
+
+        await ref.update({
+            dropoff
+        }).then(() => {
+            console.log("updated dropoff");
+            setDropOff(dropoff)
+        })
+    }
+
 
     useEffect(() => {
         const loaderIdToFilter = user.uid;

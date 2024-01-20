@@ -310,7 +310,10 @@ const UserLoaderInt = ({ navigation, route, currentRide }) => {
     <View className="mt-[10]">
       {!isFocused ? (
         <View className="ml-7 ">
-          <Text className="text-xl text-black">Name: {user.displayName}</Text>
+          <View className="flex flex-row">
+            <View className="w-[30px] bg-black"></View>  
+            <Text className="text-xl text-black">{user.displayName}</Text>
+          </View>
           <TouchableOpacity
             //Commented because it works for now
             // onPress={trycall}
