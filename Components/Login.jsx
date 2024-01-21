@@ -1,4 +1,4 @@
-import {View, Text, Image, StyleSheet} from 'react-native';
+import {View, Text, Image, StyleSheet,Alert} from 'react-native';
 import React, {useEffect, useState, useContext} from 'react';
 import CButton from './custom/CButton';
 import SlideView from './custom/SlideView';
@@ -72,9 +72,9 @@ const Login = ({navigation, route}) => {
       });
     } catch (e) {
       console.log(e);
-      alert(
-        'The verification code from SMS/TOTP is invalid. Please check and enter the correct verification code again.',
-      );
+      Alert.alert(
+        'Invalid OTP!',
+        'The verification code from SMS/TOTP is invalid. Please check and enter the correct verification code again.', );
     }
   };
   useEffect(() => {
@@ -94,7 +94,9 @@ const Login = ({navigation, route}) => {
     
     // This is actual code for phone number verification
     if (phoneNumber.length < 10 || phoneNumber.length > 10) {
-      alert('Please enter a valid phone number');
+      Alert.alert(
+        'Invalid Phone Number!',
+        'Please enter the number in correct form', );
       return;
     } else if (phoneNumber.length == 10) {
       const phone = '+92' + phoneNumber;
