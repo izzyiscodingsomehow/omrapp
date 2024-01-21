@@ -168,7 +168,7 @@ const Home = () => {
                     latitudeDelta: 0.05,
                     longitudeDelta: 0.05,
                 })
-                
+
                 updateLocation(user.uid, origin, dropOff);
 
                 let dist = calculateDistance(origin, dropOff);
@@ -498,9 +498,9 @@ const Home = () => {
                         (
                             Object.entries(notification).map(([key, user]) => (
                                 <View key={key} className="bg-white rounded px-3 py-3">
-                                    <Text className="text-lg" >{user.message}</Text>
-                                    <Text className="text-md" >Pickup: {user.pickupName}</Text>
-                                    <Text className="text-md" >Dropoff: {user.dropoffName}</Text>
+                                    <Text className="text-lg text-[#1a1a1a]" >{user.message}</Text>
+                                    <Text className="text-md text-[#5a5a5a]" >Pickup: {user.pickupName}</Text>
+                                    <Text className="text-md text-[#5a5a5a]" >Dropoff: {user.dropoffName}</Text>
                                     <View className="flex gap-x-2 flex-row mt-2 self-end ">
                                         <TouchableOpacity
                                             onPress={() => {
