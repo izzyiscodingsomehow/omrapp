@@ -59,6 +59,8 @@ const UserLoaderInt = ({ navigation, currentRide, updateDropoff, setOnGoingRide,
   const createinterface = async () => {
     console.log('creating interface');
     console.log('user id', currentRide);
+    // if you want it to work from loader interface for now then change user.photoURL to loader or do this
+    // if (!created) {
     if (user.photoURL === 'user' && !created) {
       const docSnap = await getDoc(DocRef);
       if (docSnap.exists()) {
