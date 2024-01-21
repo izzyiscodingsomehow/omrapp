@@ -168,6 +168,7 @@ const Home = () => {
                     latitudeDelta: 0.05,
                     longitudeDelta: 0.05,
                 })
+                
                 updateLocation(user.uid, origin, dropOff);
 
                 let dist = calculateDistance(origin, dropOff);
@@ -337,6 +338,26 @@ const Home = () => {
         return () => ongoingRidesRef.off('value', onValueChange);
     }, [rideInProgress]);
 
+    function filterByLoaderId(obj, loaderIdToKeep) {
+        const result = {};
+
+        for (const key in obj) {
+            if (obj[key] && typeof obj[key] === 'object') {
+                if (obj[key].loaderId === loaderIdToKeep) {
+                    result[key] = obj[key];
+                } else {
+                    const nestedResult = filterByLoaderId(obj[key], loaderIdToKeep);
+                    if (Object.keys(nestedResult).length > 0) {
+                        result[key] = nestedResult;
+                    }
+                }
+            }
+        }
+
+        return result;
+    }
+
+    const notificationsRef = firebase.app().database('https://omr-app-93d29-default-rtdb.asia-southeast1.firebasedatabase.app/').ref(`notifications`); // Replace 'user1' with the user's ID
 
     useEffect(() => {
         //Geolocation.requestAuthorization();
@@ -360,7 +381,7 @@ const Home = () => {
             }
 
         };
-        const notificationsRef = firebase.app().database('https://omr-app-93d29-default-rtdb.asia-southeast1.firebasedatabase.app/').ref(`notifications`); // Replace 'user1' with the user's ID
+
 
         notificationsRef.orderByChild('loaderId').equalTo(user.uid).on('value', onNotificationUpdate);
 
@@ -368,7 +389,7 @@ const Home = () => {
 
         return () => notificationsRef.off('value', onNotificationUpdate);
 
-    }, [origin, showNotification, notification]);
+    }, [origin, showNotification, notification, notificationsRef]);
 
     // temp region
     const [region, setRegion] = useState({
@@ -529,7 +550,7 @@ const Home = () => {
                             </TouchableOpacity>
                             <View onLayout={(event) => slideViewHeight == 0 ? setSlideViewHeight(event.nativeEvent.layout.height) : null} className=" pt-2 px-4 flex flex-col gap-4 z-[-4]">
 
-                                <View className=" rounded-md flex flex-row justify-evenly items-center w-auto">
+                                {/* <View className=" rounded-md flex flex-row justify-evenly items-center w-auto">
                                     <View className="flex flex-col justify-center items-center gap-1 w-1/3  rounded">
                                         <Image source={require('../imgs/pickupIcon.png')} style={{ width: 50 }} />
                                         <Text className="text-[15px] text-black pb-3">Pickup Truck</Text>
@@ -542,7 +563,7 @@ const Home = () => {
                                         <Image source={require('../imgs/semiTruckIcon.png')} style={{ width: 55 }} />
                                         <Text className="text-[15px] relative bottom-[5] text-black pb-1">Semi Truck</Text>
                                     </View>
-                                </View>
+                                </View> */}
 
                                 <View className="flex">
                                     <View className="bg-[#E9E9EA]  rounded-md flex flex-row justify-center items-center relative z-[-2]">
