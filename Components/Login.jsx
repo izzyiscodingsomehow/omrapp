@@ -1,5 +1,5 @@
-import {View, Text, Image, StyleSheet} from 'react-native';
-import React, {useEffect, useState, useContext} from 'react';
+import { View, Text, Image, StyleSheet } from 'react-native';
+import React, { useEffect, useState, useContext } from 'react';
 import CButton from './custom/CButton';
 import SlideView from './custom/SlideView';
 import CTextInput from './custom/CTextInput';
@@ -7,13 +7,13 @@ import CTextInput from './custom/CTextInput';
 import auth from '@react-native-firebase/auth';
 import { UserContext } from './contexts/UserContext';
 
-const Login = ({navigation, route}) => {
+const Login = ({ navigation, route }) => {
   const settings = auth().settings;
   useEffect(() => {
-  settings.appVerificationDisabledForTesting = true;
-  //console.log(settings.appVerificationDisabledForTesting);
+    settings.appVerificationDisabledForTesting = true;
+    //console.log(settings.appVerificationDisabledForTesting);
   }, []);
-  
+
   // const [initializing, setInitializing] = useState(true);
   // const [user, setUser] = useState();
 
@@ -30,10 +30,10 @@ const Login = ({navigation, route}) => {
   // }, []);
 
   //if (initializing) return null;
-  const {user,setUser} = useContext(UserContext);
+  const { user, setUser } = useContext(UserContext);
   const [confirm, setConfirm] = useState(null);
   const [code, setCode] = useState('');
-  const {SignedUp} = useContext(UserContext);
+  const { SignedUp } = useContext(UserContext);
   const [phoneNumber, setPhoneNumber] = useState('051');
   const handleChange = text => {
     setPhoneNumber(text);
@@ -55,16 +55,16 @@ const Login = ({navigation, route}) => {
   const handleOTP = async () => {
     try {
       await confirm.confirm(code).then(userInfo => {
-      // auto code await confirm.confirm('123654').then(userInfo => {
+        // auto code await confirm.confirm('123654').then(userInfo => {
         //userInfo.additionalUserInfo.isNewUser = true;
-        if(userInfo.additionalUserInfo.isNewUser){
+        if (userInfo.additionalUserInfo.isNewUser) {
           console.log("new user");
           navigation.navigate('SignUp');
           //setConfirm(null);
           //in signup update user info and then set async data "ASYNC DATA STORAGE CALLS GET DATA ALWAYS"and login the user
         }
-        else{
-          console.log("old user",userInfo);
+        else {
+          console.log("old user", userInfo);
           setUser(userInfo.user);
           setConfirm(null);
           //set async user data and in get data set user state and login the user
@@ -83,7 +83,7 @@ const Login = ({navigation, route}) => {
     }
   }, [user]);
   useEffect(() => {
-    if(SignedUp){
+    if (SignedUp) {
       confirmSignup();
       navigation.navigate('Home');
     }
@@ -91,7 +91,7 @@ const Login = ({navigation, route}) => {
   const handleClick = () => {
     // Dummy for testing
     // signInWithPhoneNumber('+923432616877');
-    
+
     // This is actual code for phone number verification
     if (phoneNumber.length < 10 || phoneNumber.length > 10) {
       alert('Please enter a valid phone number');
@@ -130,13 +130,13 @@ const Login = ({navigation, route}) => {
             <View className="p-5">
               <Text className="text-xl text-black">Sign In With Phone Number</Text>
               <View className={` rounded-lg p-3 px-4 mt-3 text-lg items-center flex flex-row`}>
-              <Text className="text-xl text-grey pr-2 mt-3">+92</Text>
-              <CTextInput
-                placeholder="f.e 3xx12345678"
-                twClass="p-3 px-4 mt-3 text-lg w-[250]"
-                handleChange={handleChange}
-                keyboardType = "numeric"
-              />
+                <Text className="text-xl text-grey pr-2 mt-3 text-gray-700">+92</Text>
+                <CTextInput
+                  placeholder="f.e 3xx12345678"
+                  twClass="p-3 px-4 mt-3 text-lg w-5/6"
+                  handleChange={handleChange}
+                  keyboardType="numeric"
+                />
               </View>
               <CButton
                 title={'Sign In'}
@@ -165,7 +165,7 @@ const Login = ({navigation, route}) => {
               <CTextInput
                 placeholder="XXXXXX"
                 twClass="p-3 px-4 mt-3 text-lg"
-                keyboardType = "numeric"
+                keyboardType="numeric"
                 handleChange={handleCode}
               />
               <CButton title={'Confirm Code'} twClass="mt-4"
