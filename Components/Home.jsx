@@ -42,6 +42,7 @@ const Home = () => {
     const { user, setUser } = useContext(UserContext);
     const [isLoader, setIsLoader] = useState(false);
     const [pickedUser, setPickedUser] = useState(false);
+    const [searchingRide, setSearchingRide] = useState(false);
 
     // const ref = firebase.app().database('https://omr-app-93d29-default-rtdb.asia-southeast1.firebasedatabase.app/').ref('/users/location')
 
@@ -363,9 +364,11 @@ const Home = () => {
 
     const invertRideState = () => {
         // console.log("HERES USER: ", user)
+        setSearchingRide(true);
         updateLocation(user.uid, origin, dropOff);
         // setRide(x => !x);
         getActiveLoaders();
+
     }
 
     const deleteRideNotification = (key) => {
@@ -453,9 +456,9 @@ const Home = () => {
                                     <Text className="text-md" >Dropoff: {user.dropoffName}</Text>
                                     <View className="flex gap-x-2 flex-row mt-2 self-end ">
                                         <TouchableOpacity
-                                            // onPress={() => {
-                                            //     handleAction
-                                            // }}
+                                            onPress={() => {
+                                                deleteRideNotification(key)
+                                            }}
                                             className="bg-[#ffffff] px-3 border border-[#1a1a1a] rounded py-1"
                                         >
                                             <Text className="text-lg text-[#1a1a1a]">Decline</Text>
@@ -470,7 +473,6 @@ const Home = () => {
                                         </TouchableOpacity>
                                     </View>
                                 </View>
-
                             ))
                         )
                         :
@@ -479,7 +481,6 @@ const Home = () => {
                 </View>
             )
             }
-
 
             <SlideView >
                 {
@@ -503,15 +504,15 @@ const Home = () => {
                             <View onLayout={(event) => slideViewHeight == 0 ? setSlideViewHeight(event.nativeEvent.layout.height) : null} className=" pt-2 px-4 flex flex-col gap-4 z-[-4]">
 
                                 <View className=" rounded-md flex flex-row justify-evenly items-center w-auto">
-                                    <View className="flex flex-col justify-center items-center gap-1 w-1/3 bg-gray-100 rounded">
+                                    <View className="flex flex-col justify-center items-center gap-1 w-1/3  rounded">
                                         <Image source={require('../imgs/pickupIcon.png')} style={{ width: 50 }} />
                                         <Text className="text-[15px] text-black pb-3">Pickup Truck</Text>
                                     </View>
-                                    <View className="flex flex-col justify-center items-center gap-1 w-1/3 bg-gray-100 rounded">
+                                    <View className="flex flex-col justify-center items-center gap-1 w-1/3  rounded">
                                         <Image source={require('../imgs/boxTruckIcon.png')} style={{ width: 50 }} />
                                         <Text className="text-[15px] text-black pb-3">Box Truck</Text>
                                     </View>
-                                    <View className="flex flex-col justify-center items-center gap-1 w-1/3 bg-gray-100 rounded">
+                                    <View className="flex flex-col justify-center items-center gap-1 w-1/3  rounded">
                                         <Image source={require('../imgs/semiTruckIcon.png')} style={{ width: 55 }} />
                                         <Text className="text-[15px] relative bottom-[5] text-black pb-1">Semi Truck</Text>
                                     </View>
@@ -550,7 +551,8 @@ const Home = () => {
                                                 container: styles.mapsContainer,
                                                 textInputContainer: styles.mapsTextInputContainer,
                                                 textInput: styles.mapsTextInput,
-                                                listView: styles.mapsListView
+                                                listView: styles.mapsListView,
+                                                description: { color: '#1a1a1a' }
                                             }}
                                             fetchDetails={true}
                                         />
@@ -588,7 +590,8 @@ const Home = () => {
                                             container: styles.mapsContainer,
                                             textInputContainer: styles.mapsTextInputContainer,
                                             textInput: styles.mapsTextInput,
-                                            listView: styles.mapsListView
+                                            listView: styles.mapsListView,
+                                            description: { color: '#1a1a1a' }
                                         }}
                                         fetchDetails={true}
                                     />
@@ -596,9 +599,9 @@ const Home = () => {
                                 </View>
                                 {cost != check ? <Text className="text-[20px] text-black">Fare: {cost} PKR</Text> : null}
                                 <View className="w-auto ">
-                                    <Pressable onPress={invertRideState} className="">
-                                        <View className={`bg-[#131316] px-5 rounded-lg z-[-4] p-[10px]`}>
-                                            <Text className={`text-[18px] font-semibold text-center text-white`}>Let's go</Text>
+                                    <Pressable onPress={invertRideState} className="" disabled={searchingRide ? true : false}>
+                                        <View className={`${searchingRide ? "bg-slate-200" : "bg-[#131316]"} px-5 rounded-lg -z-50 p-[10px]`}>
+                                            <Text className={`text-[18px] font-semibold text-center text-white z-[-10]`}>{searchingRide ? "Finding a loader" : "Let's go"}</Text>
                                         </View>
                                     </Pressable>
                                 </View>
@@ -628,9 +631,11 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         alignItems: "center",
         position: "relative",
+        zIndex: 100,
         top: 0,
         left: 0,
-        color: "black"
+        color: "black",
+        // borderWidth: 1
 
     },
     mapsTextInput: {
@@ -638,19 +643,22 @@ const styles = StyleSheet.create({
         top: 2,
         backgroundColor: "transparent",
         color: "black",
-        zIndex: 1
+        zIndex: 100,
+
 
     },
     mapsTextInputContainer: {
         color: "black",
-        zIndex: 1
+        zIndex: 100,
+
+        // maxHeight: 50,
     },
     mapsListView: {
         backgroundColor: "white",
         position: "absolute",
         top: 50,
-        zIndex: 12,
-        color: "black"
+        zIndex: 100,
+        color: "red"
 
     }
 })
