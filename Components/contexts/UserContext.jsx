@@ -11,6 +11,7 @@ const ContextProvider = ({children}, navigation) => {
   //const [AsyncUserData, setAsyncUserData] = useState();
   const [hasData, setHasData] = useState(false);
   const [SignedUp, setSignedUp] = useState(false);
+  const [searchingRide, setSearchingRide] = useState(false);
   
   const storeUserData = async () => {
     try {
@@ -67,7 +68,7 @@ const ContextProvider = ({children}, navigation) => {
   // Store in Context API
   return (
     <UserContext.Provider
-      value={{user, setUser, hasData, SignedUp,setSignedUp}}>
+      value={{user, setUser, hasData, SignedUp, setSignedUp, searchingRide, setSearchingRide}}>
       {children}
     </UserContext.Provider>
   );

@@ -42,7 +42,7 @@ const Home = () => {
     const { user, setUser } = useContext(UserContext);
     const [isLoader, setIsLoader] = useState(false);
     const [pickedUser, setPickedUser] = useState(false);
-    const [searchingRide, setSearchingRide] = useState(false);
+    const {searchingRide, setSearchingRide} = useContext(UserContext);
 
     // const ref = firebase.app().database('https://omr-app-93d29-default-rtdb.asia-southeast1.firebasedatabase.app/').ref('/users/location')
 
