@@ -57,7 +57,8 @@ const UserLoaderInt = ({ navigation, currentRide, updateDropoff, setOnGoingRide,
   }, []);
 
   const createinterface = async () => {
-
+    console.log('creating interface');
+    console.log('user id', currentRide);
     if (user.photoURL === 'user' && !created) {
       const docSnap = await getDoc(DocRef);
       if (docSnap.exists()) {
@@ -71,9 +72,10 @@ const UserLoaderInt = ({ navigation, currentRide, updateDropoff, setOnGoingRide,
           userid: currentRide.userId,
           username: user.displayName,
           loaderid: currentRide.loaderId,
+          //update here with currentRide.loadername
           loadername: "Dummy",
-          userphone: user.phoneNumber,
-          loaderphone: user.loader_phone,
+          userphone: currentRide.user_phone,
+          loaderphone: currentRide.loader_phone,
           messages: [""],
           createdAt: new Date(),
           cost: cost,
@@ -238,6 +240,7 @@ const UserLoaderInt = ({ navigation, currentRide, updateDropoff, setOnGoingRide,
 
   useEffect(() => {
     if (created) {
+      console.log("new messages listener")
       const unsubscribe = firestore()
         .collection(currentRide.userId)
         .doc(currentRide.userId)
@@ -257,7 +260,7 @@ const UserLoaderInt = ({ navigation, currentRide, updateDropoff, setOnGoingRide,
   };
   const trycall = () => {
     const args = {
-      number: user.uid===currentRide.userId?user.loader_phone:user.user_phone,
+      number: user.uid===currentRide.userId?currentRide.loader_phone:currentRide.user_phone,
       prompt: true,
     };
     call(args).catch(console.error);
@@ -274,7 +277,7 @@ const UserLoaderInt = ({ navigation, currentRide, updateDropoff, setOnGoingRide,
           </View>
           <TouchableOpacity
             //Commented because it works for now
-            // onPress={trycall}
+            onPress={trycall}
             className="flex-row border border-gray-200 w-[350px] flex justify-between px-5 rounded-lg mt-3">
             <Text className="text-xl text-black mt-3">Call the loader</Text>
             <View className="rounded-full bg-white p-3 ">
@@ -299,6 +302,8 @@ const UserLoaderInt = ({ navigation, currentRide, updateDropoff, setOnGoingRide,
               />
             </View>
           </TouchableOpacity>
+          {/* update the chat styling here */}
+          {user?
           <View className="flex flex-col w-80">
             {messages.map((message, index) =>
               message.userId === user.uid ? (
@@ -315,16 +320,18 @@ const UserLoaderInt = ({ navigation, currentRide, updateDropoff, setOnGoingRide,
                 </Text>
               ),
             )}
-          </View>
+          </View>:<></>}
         </View>
       )}
       <View className="rounded-md flex justify-center items-center z-[-3]">
         <TextInput
+
           placeholder="Chat with your loader"
           // twClass="p-3 px-4 mt-3 text-lg w-[350]"
+          placeholderTextColor={"#97979B"}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
-          className={`border border-[#97979B] rounded-lg p-3 px-4 mt-3 text-lg w-[350]`}
+          className={`border border-[#97979B] rounded-lg p-3 px-4 mt-3 text-lg w-[350] text-black`}
           value={text}
           onChangeText={handleChange}
         />
