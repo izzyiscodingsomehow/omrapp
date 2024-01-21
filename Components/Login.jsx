@@ -6,6 +6,7 @@ import CTextInput from './custom/CTextInput';
 // import {useNavigation} from '@react-navigation/native';
 import auth from '@react-native-firebase/auth';
 import { UserContext } from './contexts/UserContext';
+import { set } from 'firebase/database';
 
 const Login = ({ navigation, route }) => {
   const settings = auth().settings;
@@ -34,7 +35,7 @@ const Login = ({ navigation, route }) => {
   const [confirm, setConfirm] = useState(null);
   const [code, setCode] = useState('');
   const { SignedUp } = useContext(UserContext);
-  const [phoneNumber, setPhoneNumber] = useState('051');
+  const [phoneNumber, setPhoneNumber] = useState('');
   const handleChange = text => {
     setPhoneNumber(text);
   };
@@ -48,6 +49,7 @@ const Login = ({ navigation, route }) => {
         console.log("confirmed");
       });
       setConfirm(null);
+      setCode('');
     } catch (e) {
       console.log(e);
     }
@@ -67,6 +69,7 @@ const Login = ({ navigation, route }) => {
           console.log("old user", userInfo);
           setUser(userInfo.user);
           setConfirm(null);
+          setCode('');
           //set async user data and in get data set user state and login the user
         }
       });
@@ -107,6 +110,7 @@ const Login = ({ navigation, route }) => {
     const confirmation = await auth().signInWithPhoneNumber(phoneNumber);
     //console.log(confirmation);
     setConfirm(confirmation);
+    setPhoneNumber('');
   }
   // styles
   const styles = StyleSheet.create({
