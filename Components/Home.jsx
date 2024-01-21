@@ -131,7 +131,8 @@ const Home = () => {
                             dropoffName,
                             loaderId: key,
                             userId: user.uid,
-                            user_phone: user.phoneNumber
+                            user_phone: user.phoneNumber,
+                            userName: user.displayName
                         }).then(() => {
 
                             console.log("sent notification");
@@ -356,7 +357,6 @@ const Home = () => {
 
         return result;
     }
-
     const notificationsRef = firebase.app().database('https://omr-app-93d29-default-rtdb.asia-southeast1.firebasedatabase.app/').ref(`notifications`); // Replace 'user1' with the user's ID
 
     useEffect(() => {
@@ -382,8 +382,10 @@ const Home = () => {
 
         };
 
-
-        notificationsRef.orderByChild('loaderId').equalTo(user.uid).on('value', onNotificationUpdate);
+        // check for null
+        if (user != null) {
+            notificationsRef.orderByChild('loaderId').equalTo(user.uid).on('value', onNotificationUpdate);
+        }
 
         // Return a cleanup function to unsubscribe when the component unmounts
 
@@ -446,11 +448,13 @@ const Home = () => {
                 dropoff: data.dropOff,
                 pickupName: data.pickupName,
                 dropoffName: data.dropoffName,
+                userName: data.userName,
                 loaderLocation: origin,
                 rideType: "truck",
                 cost,
                 user_phone: data.user_phone,
-                loader_phone
+                loader_phone,
+                loaderName: user.displayName
 
             }).then(() => {
                 deleteRideNotification(ride)

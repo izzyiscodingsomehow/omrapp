@@ -6,6 +6,7 @@ import {
   View,
   Image,
   TouchableOpacity,
+  ScrollView,
 } from 'react-native';
 import Geolocation from '@react-native-community/geolocation';
 import CButton from './custom/CButton';
@@ -262,7 +263,7 @@ const UserLoaderInt = ({ navigation, currentRide, updateDropoff, setOnGoingRide,
   };
   const trycall = () => {
     const args = {
-      number: user.uid===currentRide.userId?currentRide.loader_phone:currentRide.user_phone,
+      number: user.uid === currentRide.userId ? currentRide.loader_phone : currentRide.user_phone,
       prompt: true,
     };
     call(args).catch(console.error);
@@ -274,8 +275,9 @@ const UserLoaderInt = ({ navigation, currentRide, updateDropoff, setOnGoingRide,
       {!isFocused && !showEnd ? (
         <View className="ml-7 ">
           <View className="flex flex-row items-center gap-3">
-            <View className="w-[50px] h-[50px] bg-gray-200 rounded-full"></View>
-            <Text className="text-xl text-[#1a1a1a]">{user.displayName}</Text>
+            {/* <View className="w-[50px] h-[50px] bg-gray-200 rounded-full"></View> */}
+            <Image source={require(".././imgs/userPFP.png")} style={{ width: 50, height: 50, borderRadius: 100 }} />
+            <Text className="text-xl text-[#1a1a1a]">{user != null && user.photoURL != 'user' ? currentRide.userName : currentRide.loaderName}</Text>
           </View>
           <TouchableOpacity
             //Commented because it works for now
@@ -292,7 +294,7 @@ const UserLoaderInt = ({ navigation, currentRide, updateDropoff, setOnGoingRide,
         </View>
       ) : (
         <View className="ml-7">
-          <TouchableOpacity
+          {/* <TouchableOpacity
             //Commented because it works for now
             onPress={trycall}
             className="flex-row">
@@ -303,26 +305,28 @@ const UserLoaderInt = ({ navigation, currentRide, updateDropoff, setOnGoingRide,
                 style={{ width: 30, height: 30 }}
               />
             </View>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
           {/* update the chat styling here */}
-          {user?
-          <View className="flex flex-col w-80">
-            {messages.map((message, index) =>
-              message.userId === user.uid ? (
-                <Text
-                  className="text-lg text-white text-right w-auto self-end bg-[#000000] rounded-lg p-2"
-                  key={index}>
-                  {message.text}
-                </Text>
-              ) : (
-                <Text
-                  className="text-lg text-white text-left w-auto self-start bg-[#000000] rounded-lg p-2"
-                  key={index}>
-                  {message.text}
-                </Text>
-              ),
-            )}
-          </View>:<></>}
+          {user && user != null ? // adding check for null to avioid error
+            <ScrollView className="flex flex-col   w-[350px] gap-y-1 max-h-[200px]" scrollEnabled={true}>
+
+              {messages.map((message, index) =>
+
+                message.userId === user.uid ? (
+                  <Text
+                    className="text-lg text-white text-right w-auto self-end bg-[#000000] rounded-lg px-3 py-1"
+                    key={index}>
+                    {message.text}
+                  </Text>
+                ) : (
+                  <Text
+                    className="text-lg text-white text-left w-auto self-start bg-[#000000] rounded-lg px-3 py-1"
+                    key={index}>
+                    {message.text}
+                  </Text>
+                ),
+              )}
+            </ScrollView> : <></>}
         </View>
       )}
       <View className="rounded-md flex justify-center items-center z-[-3]">
