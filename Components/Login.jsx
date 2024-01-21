@@ -10,7 +10,7 @@ import { UserContext } from './contexts/UserContext';
 const Login = ({ navigation, route }) => {
   const settings = auth().settings;
   useEffect(() => {
-    settings.appVerificationDisabledForTesting = true;
+    settings.appVerificationDisabledForTesting = false;
     //console.log(settings.appVerificationDisabledForTesting);
   }, []);
 

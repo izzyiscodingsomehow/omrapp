@@ -16,7 +16,7 @@ import { doc, updateDoc, setDoc, getDoc } from 'firebase/firestore';
 import { RideContext } from './contexts/RideContext';
 import { db } from '../firebase';
 
-const UserLoaderInt = ({ navigation, route, currentRide, updateDropoff, setOnGoingRide, deleteOnGoingRide }) => {
+const UserLoaderInt = ({ navigation, currentRide, updateDropoff, setOnGoingRide, deleteOnGoingRide }) => {
 
   //chat handling code
   const [messages, setMessages] = useState([]);
