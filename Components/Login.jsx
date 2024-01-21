@@ -147,6 +147,7 @@ const Login = ({ navigation, route }) => {
               />
             </View>
           </SlideView>
+          
         </View>
       ) : (
         <View className="flex-1 items-center justify-center text-xl bg-white">

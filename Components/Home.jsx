@@ -46,6 +46,31 @@ const Home = () => {
 
     // const ref = firebase.app().database('https://omr-app-93d29-default-rtdb.asia-southeast1.firebasedatabase.app/').ref('/users/location')
 
+    // check if two objects are equal or not
+    const deepEqual = (obj1, obj2) => {
+        const keys1 = Object.keys(obj1);
+        const keys2 = Object.keys(obj2);
+
+        if (keys1.length !== keys2.length) {
+            return false;
+        }
+
+        for (const key of keys1) {
+            const val1 = obj1[key];
+            const val2 = obj2[key];
+
+            if (typeof val1 === 'object' && typeof val2 === 'object') {
+                if (!deepEqual(val1, val2)) {
+                    return false;
+                }
+            } else if (val1 !== val2) {
+                return false;
+            }
+        }
+
+        return true;
+    };
+
     const deleteOnGoingRide = (loaderId, userId) => {
         const ref = firebase.app().database('https://omr-app-93d29-default-rtdb.asia-southeast1.firebasedatabase.app/').ref('/ongoing-rides')
         const query = ref.orderByChild('loaderId').equalTo(loaderId);
@@ -127,7 +152,6 @@ const Home = () => {
             console.log("Error while fetching active loaders: ", err);
         }
     }
-
     function watchUsersLocation() {
         Geolocation.watchPosition(
 
@@ -285,8 +309,8 @@ const Home = () => {
                     }
                 }
             });
-            setOngoingRide(ride);
-            changeLocationWhenRide(ongoingRide.loaderId)
+            await setOngoingRide(ride);
+            await changeLocationWhenRide(ongoingRide.loaderId)
         };
 
         // Add the listener
@@ -322,27 +346,29 @@ const Home = () => {
 
         const onNotificationUpdate = async snapshot => {
             const data = await snapshot.val();
+            // console.log('data: ', data, 'noti: ', notification);;
+
+            // if (notification != data) {
+            // console.log('insdie notis');
             setNotification(data);
-            // console.log("the noti is running");
-            // console.log("noti data: ", notification, " with id: ", notification.userId);
+            setShowNotification(true);
             if (notification != null) {
 
                 Object.entries(notification).map(async ([key, user]) => {
                     console.log("Loader: ", user.loaderId, " and User:", user.userId);
                 })
-                setShowNotification(true);
             }
-        };
 
+        };
         const notificationsRef = firebase.app().database('https://omr-app-93d29-default-rtdb.asia-southeast1.firebasedatabase.app/').ref(`notifications`); // Replace 'user1' with the user's ID
 
         notificationsRef.orderByChild('loaderId').equalTo(user.uid).on('value', onNotificationUpdate);
 
         // Return a cleanup function to unsubscribe when the component unmounts
-        // checkForOnGoingRides();
+
         return () => notificationsRef.off('value', onNotificationUpdate);
 
-    }, [origin, showNotification]);
+    }, [origin, showNotification, notification]);
 
     // temp region
     const [region, setRegion] = useState({
