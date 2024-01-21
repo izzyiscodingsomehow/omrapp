@@ -1,6 +1,6 @@
 import React from 'react';
 import { createDrawerNavigator } from '@react-navigation/drawer';
-import { NavigationContainer, DefaultTheme, useIsFocused, useNavigation } from '@react-navigation/native';
+import { NavigationContainer, DefaultTheme,} from '@react-navigation/native';
 import Login from './Components/Login';
 import LogOut from './Components/LogOut';
 import Home from './Components/Home';
@@ -37,11 +37,11 @@ function DrawerStack() {
       }}>
       <Drawer.Screen name="Login" component={Login}  options={{
                   drawerItemStyle: { display: 'none' },
-                  headerShown: false, gestureEnabled: false,
+                  headerShown: false, swipeEnabled:false
         }}/>
       <Drawer.Screen name="SignUp" component={SignUp}  options={{
                   drawerItemStyle: { display: 'none' },
-                  headerShown: false, gestureEnabled: false,
+                  headerShown: false, swipeEnabled:false
         }}/>
       <Drawer.Screen name="Home" component={Home} />
       <Drawer.Screen name="UserLoaderInt" component={UserLoaderInt} options={{
