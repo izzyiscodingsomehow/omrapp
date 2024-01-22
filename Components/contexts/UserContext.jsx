@@ -4,6 +4,11 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 //import {get} from 'react-native/Libraries/TurboModule/TurboModuleRegistry';
 import {useNetInfo} from '@react-native-community/netinfo';
 import RNRestart from 'react-native-restart';
+import {checkMultiple,
+  PERMISSIONS,
+  request,
+  requestMultiple,
+  RESULTS,} from 'react-native-permissions';
 const UserContext = createContext([]);
 const ContextProvider = ({children}, navigation) => {
   const {isConnected} = useNetInfo();
@@ -24,6 +29,71 @@ const ContextProvider = ({children}, navigation) => {
       }
     } catch (error) {
       console.log('Error while storing user data: ', error, '\n');
+    }
+  };
+  useEffect(() => {
+    checkLocationPermissions();
+  }, []);
+
+  const checkLocationPermissions = async () => {
+    try {
+      const locationPermissionsStatus = await checkMultiple([
+        PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION,
+        PERMISSIONS.ANDROID.ACCESS_COARSE_LOCATION,
+      ]);
+
+      console.log('Fine Location', locationPermissionsStatus[PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION]);
+      console.log('Coarse Location', locationPermissionsStatus[PERMISSIONS.ANDROID.ACCESS_COARSE_LOCATION]);
+
+      // Check individual permission statuses
+      if (
+        locationPermissionsStatus[PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION] === RESULTS.GRANTED &&
+        locationPermissionsStatus[PERMISSIONS.ANDROID.ACCESS_COARSE_LOCATION] === RESULTS.GRANTED
+      ) {
+        console.log('Both fine and coarse location permissions granted');
+        // Proceed with accessing location here
+        return;
+      } else {
+        // Handle the case where some or all location permissions are not granted
+        await requestLocationPermissions();
+      }
+    } catch (error) {
+      console.error('Error checking location permissions:', error);
+    }
+  };
+
+  const requestLocationPermissions = async () => {
+    try {
+      const locationPermissionsStatus = await requestMultiple([
+        PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION,
+        PERMISSIONS.ANDROID.ACCESS_COARSE_LOCATION,
+      ]);
+
+      console.log('Fine Location', locationPermissionsStatus[PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION]);
+      console.log('Coarse Location', locationPermissionsStatus[PERMISSIONS.ANDROID.ACCESS_COARSE_LOCATION]);
+
+      // Check individual permission statuses after the request
+      if (
+        locationPermissionsStatus[PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION] === RESULTS.GRANTED &&
+        locationPermissionsStatus[PERMISSIONS.ANDROID.ACCESS_COARSE_LOCATION] === RESULTS.GRANTED
+      ) {
+        console.log('Both fine and coarse location permissions granted after request');
+        // Proceed with accessing location here
+      } else {
+        console.log('Some or all location permissions not granted after request');
+        Alert.alert(
+          'Permissions Required!',
+          'Please allow the necessary permissions for the app to function', 
+          [
+            {
+              text: 'OK.',
+              onPress: () => requestLocationPermissions(),
+            },
+          ]
+          );
+      }
+    } catch (error) {
+      console.error('Error requesting location permissions:', error);
     }
   };
   useEffect(() => {

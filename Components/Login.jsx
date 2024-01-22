@@ -171,7 +171,7 @@ const Login = ({ navigation, route }) => {
               <Text className="text-xl text-black">Enter OTP</Text>
               <CTextInput
                 placeholder="XXXXXX"
-                twClass="p-3 px-4 mt-3 text-lg"
+                twClass="p-3 px-4 mt-3 text-lg z-100"
                 keyboardType="numeric"
                 handleChange={handleCode}
               />

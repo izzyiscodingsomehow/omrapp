@@ -13,7 +13,7 @@ const Settings = () => {
   //console.log(user.displayName);
   const [name, setName] = useState('');
   const update = {
-    displayName: name,
+    displayName: name==='' ? user.displayName : name,
     photoURL: toggleCheckBox ? "loader" : "user",
   }
   const updateuserinfo = async (userInfo) => {
@@ -35,7 +35,7 @@ const Settings = () => {
     // position the earth bg
   });
   return (
-    <View className="flex-1 items-center text-xl bg-white mt-5">
+    <View className="flex-1 items-center justify-center text-xl bg-white">
       {/* OMR logo */}
       <Image source={require('../imgs/OMR.png')} width={50} height={50} />
 
