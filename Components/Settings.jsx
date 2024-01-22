@@ -47,7 +47,7 @@ const Settings = () => {
         className="absolute mt-10"
         style={styles.backgroundImage}
       />
-      <SlideView className="">
+      <SlideView className="" twClass="h-72">
       <View className="p-5">
           <Text className="text-xl text-black">Change Your Name:</Text>
           <CTextInput

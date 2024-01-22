@@ -132,7 +132,7 @@ const Login = ({ navigation, route }) => {
             style={styles.backgroundImage}
           />
 
-          <SlideView className="">
+          <SlideView className="" twClass="h-72">
             <View className="p-5">
               <Text className="text-xl text-black">Sign In With Phone Number</Text>
               <View className={` rounded-lg p-3 px-4 mt-3 text-lg items-center flex flex-row`}>
@@ -166,7 +166,7 @@ const Login = ({ navigation, route }) => {
             style={styles.backgroundImage}
           />
 
-          <SlideView className="">
+          <SlideView className="" twClass="h-60">
             <View className="p-5">
               <Text className="text-xl text-black">Enter OTP</Text>
               <CTextInput

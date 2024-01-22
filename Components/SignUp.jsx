@@ -50,7 +50,7 @@ const SignUp = ({ navigation }) => {
         style={styles.backgroundImage}
       />
 
-      <SlideView className="">
+      <SlideView twClass="h-72">
         <View className="p-5">
           <Text className="text-xl text-black">Enter Your Full Name:</Text>
           <CTextInput

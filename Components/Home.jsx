@@ -536,7 +536,7 @@ const Home = () => {
             }
 
             {/* Add your custom tailwind classes to twClass*/}
-            <SlideView twClass="">
+            <SlideView twClass="2/5">
                 {
                     ongoingRide ?
                         <UserLoaderInt currentRide={ongoingRide} updateDropoff={updateDropoff} setOnGoingRide={setOngoingRide} deleteOnGoingRide={deleteOnGoingRide} />

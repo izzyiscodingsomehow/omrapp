@@ -51,7 +51,7 @@ const SlideView = ({ height, children, twClass }) => {
 
   //[styles.container, {transform: [{translateY : animatedHeight}] } {...panResponder.panHandlers}
   return (
-    <View className={`mt-5 w-full rounded-t-3xl absolute bottom-0 pb-5 shadow-lg bg-white h-2/5 ${twClass}`}>
+    <View className={`mt-5 w-full rounded-t-3xl absolute bottom-0 pb-5 shadow-lg bg-white ${twClass}`}>
       <View className={`bg-[#97979B] opacity-50 w-1/5 h-[4px] rounded-full mx-auto mt-3 mb-5 `}></View>
       {children}
     </View>
