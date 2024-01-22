@@ -3,13 +3,15 @@ import { View, Text, Image } from 'react-native'
 import { DrawerContentScrollView, DrawerItemList } from '@react-navigation/drawer'
 import { UserContext } from '../contexts/UserContext';
 
+
+export function formatPhoneNumber(phoneNumber) {
+    return phoneNumber.replace(/^(\+92)(\d{3})(\d+)/, '$1 $2 $3');
+}
+
 const CustomDrawer = (props) => {
 
     const { user, setUser } = useContext(UserContext);
 
-    function formatPhoneNumber(phoneNumber) {
-        return phoneNumber.replace(/^(\+92)(\d{3})(\d+)/, '$1 $2 $3');
-    }
     let phoneNumber = null;
     if (user) {
         phoneNumber = formatPhoneNumber(user.phoneNumber);

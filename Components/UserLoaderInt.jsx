@@ -92,7 +92,7 @@ const UserLoaderInt = ({ navigation, currentRide, updateDropoff, setOnGoingRide,
       }
     }
   };
-  const {setSearchingRide} = useContext(UserContext);
+  const { setSearchingRide } = useContext(UserContext);
   const endRide = () => {
     setSearchingRide(false);
     setShowEnd(true);
