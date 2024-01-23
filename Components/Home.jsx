@@ -608,7 +608,7 @@ const Home = ({ navigation }) => {
                                             <Text className="text-lg text-[#6a6a6a]">{user ? formatPhoneNumber(user.phoneNumber) : "You"}</Text>
                                         </View>
                                     </View>
-                                    <Text className="mt-5 border rounded-lg border-[#8a8a8a] px-5 text-xl py-2 text-center">Waiting for a rider</Text>
+                                    <Text className="mt-5 border rounded-lg border-[#8a8a8a] px-5 text-xl py-2 text-center text-[#6a6a6a]">Waiting for a rider</Text>
                                 </View>
                             </>
                             :
