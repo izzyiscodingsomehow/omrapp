@@ -28,7 +28,7 @@ import { useBackHandler } from '@react-navigation/native';
 const MAX_RADIUS = 10;
 // const auth = firebase.auth();
 
-const Home = ({navigation}) => {
+const Home = ({ navigation }) => {
 
     const [position, setPosition] = useState({
         latitude: 0,
@@ -53,16 +53,16 @@ const Home = ({navigation}) => {
 
     useEffect(() => {
         const handleBackButton = () => {
-        // Your custom logic here
-        // Returning true will prevent the default goBack behavior
-        return true;
+            // Your custom logic here
+            // Returning true will prevent the default goBack behavior
+            return true;
         };
 
         const backHandler = BackHandler.addEventListener('hardwareBackPress', handleBackButton);
 
         return () => {
-        // Remove the event listener when the component unmounts
-        backHandler.remove();
+            // Remove the event listener when the component unmounts
+            backHandler.remove();
         };
     }, [navigation]);
 
@@ -115,7 +115,9 @@ const Home = ({navigation}) => {
                 dropoff,
                 role: user.photoURL
 
-            }).then(() => console.log('Data set.'));
+            }).then(() => {
+                console.log('Current location pushed to database!');
+            })
             // invertRideState();
         } catch (err) {
             console.log("Firebase database Error: ", err);
@@ -127,7 +129,7 @@ const Home = ({navigation}) => {
             const snapshot = await firebase.app().database('https://omr-app-93d29-default-rtdb.asia-southeast1.firebasedatabase.app/').ref('users').orderByChild('role').equalTo('loader').once('value');
             if (snapshot.exists()) {
                 const loaders = await snapshot.val();
-                console.log('Loaders: ', loaders);
+                // console.log('Loaders: ', loaders);
 
                 const filteredUsers = Object.entries(loaders)
                     .filter(([key, user]) => user.role === 'loader')
@@ -173,7 +175,32 @@ const Home = ({navigation}) => {
             console.log("Error while fetching active loaders: ", err);
         }
     }
+
+    function moveToCurrentLocation() {
+        // Manually update the region when the button is pressed
+        Geolocation.getCurrentPosition(
+            async (position) => {
+                const currentRegion = {
+                    latitude: position.coords.latitude,
+                    longitude: position.coords.longitude,
+                    latitudeDelta: 0.05,
+                    longitudeDelta: 0.05,
+                };
+                setRegion(currentRegion);
+                // You can also update other state variables like origin here if needed
+            },
+            (error) => {
+                console.log("ERROR CODE: ", error.code, "MESSAGE: ", error.message);
+            },
+            {
+                enableHighAccuracy: true,
+            }
+        );
+    }
+
+
     function watchUsersLocation() {
+        console.log('hereeeeee');
         Geolocation.watchPosition(
 
             async (position) => {
@@ -182,7 +209,6 @@ const Home = ({navigation}) => {
                     latitude: position.coords.latitude,
                     longitude: position.coords.longitude,
                 })
-
                 setRegion({
                     latitude: position.coords.latitude,
                     longitude: position.coords.longitude,
@@ -190,7 +216,7 @@ const Home = ({navigation}) => {
                     longitudeDelta: 0.05,
                 })
 
-                updateLocation(user.uid, origin, dropOff);
+                await updateLocation(user.uid, { latitude: position.coords.latitude, longitude: position.coords.longitude }, dropOff);
 
                 let dist = calculateDistance(origin, dropOff);
 
@@ -246,7 +272,7 @@ const Home = ({navigation}) => {
 
 
     useEffect(() => {
-        console.log("COST in use: ", cost);
+        // console.log("COST in use: ", cost);
     }, [cost]);
 
 
@@ -264,7 +290,7 @@ const Home = ({navigation}) => {
                 if (snapshot.exists()) {
                     // Data found, update the state
                     // setUserData(snapshot.val());
-                    console.log("here is the user: ", snapshot.val());
+                    // console.log("here is the user: ", snapshot.val());
 
                     if (snapshot.val().role == 'loader') {
                         setIsLoader(true);
@@ -401,7 +427,6 @@ const Home = ({navigation}) => {
             }
 
         };
-
         // check for null
         if (user != null) {
             notificationsRef.orderByChild('loaderId').equalTo(user.uid).on('value', onNotificationUpdate);
@@ -411,7 +436,7 @@ const Home = ({navigation}) => {
 
         return () => notificationsRef.off('value', onNotificationUpdate);
 
-    }, [origin, showNotification, notification, notificationsRef, region]);
+    }, [origin, region, showNotification, notification, notificationsRef]);
 
     // temp region
     const [region, setRegion] = useState({
@@ -562,6 +587,18 @@ const Home = ({navigation}) => {
                         :
                         user && user.photoURL == 'loader' ?
                             <>
+                                <Pressable
+                                    onPress={() => moveToCurrentLocation()}
+                                    style={{
+                                        position: "absolute",
+                                        top: -70,
+                                        right: 15
+                                    }}
+                                >
+                                    <View className="rounded-full bg-white p-3">
+                                        <Image source={require('../imgs/currentLocation.png')} style={{ width: 30, height: 30 }} />
+                                    </View>
+                                </Pressable>
                                 <View className="flex flex-col px-7">
                                     <View className="flex flex-row items-center gap-3">
                                         {/* <View className="w-[50px] h-[50px] bg-gray-200 rounded-full"></View> */}
@@ -577,8 +614,8 @@ const Home = ({navigation}) => {
                             :
 
                             <>
-                                <TouchableOpacity
-                                    onPress={watchUsersLocation}
+                                <Pressable
+                                    onPress={() => moveToCurrentLocation()}
                                     style={{
                                         position: "absolute",
                                         top: -70,
@@ -588,7 +625,7 @@ const Home = ({navigation}) => {
                                     <View className="rounded-full bg-white p-3">
                                         <Image source={require('../imgs/currentLocation.png')} style={{ width: 30, height: 30 }} />
                                     </View>
-                                </TouchableOpacity>
+                                </Pressable>
                                 <View onLayout={(event) => slideViewHeight == 0 ? setSlideViewHeight(event.nativeEvent.layout.height) : null} className=" pt-2 px-4 flex flex-col gap-4 z-[-4]">
 
                                     {/* <View className=" rounded-md flex flex-row justify-evenly items-center w-auto">
