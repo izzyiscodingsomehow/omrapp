@@ -26,13 +26,13 @@ const CustomDrawer = (props) => {
                         <Image source={require("../../imgs/userPFP.png")} style={{ width: 50, height: 50, borderRadius: 100 }} />
                         <View className="">
                             <Text className="text-[16px] text-black">{user ? user.displayName : "Jamal Kamal"}</Text>
-                            <Text className="text-[14px]">{phoneNumber ? phoneNumber : "N/A"}</Text>
+                            <Text className="text-[14px] text-gray-500">{phoneNumber ? phoneNumber : "N/A"}</Text>
                         </View>
                     </View>
                     <DrawerItemList {...props} />
                 </DrawerContentScrollView>
                 <View className=" px-5 py-3 w-full opacity-60">
-                    <Text className="text-left">2024 OMR © All Rights Limited</Text>
+                    <Text className="text-left text-gray-500">2024 OMR © All Rights Limited</Text>
                 </View>
             </View>
 
