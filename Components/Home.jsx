@@ -22,11 +22,13 @@ import auth from '@react-native-firebase/auth';
 import haversine from 'haversine-distance'
 import CButton from './custom/CButton';
 import { formatPhoneNumber } from './custom/CustomDrawer';
-
+import { useNavigation } from '@react-navigation/native';
+import { BackHandler } from 'react-native';
+import { useBackHandler } from '@react-navigation/native';
 const MAX_RADIUS = 10;
 // const auth = firebase.auth();
 
-const Home = () => {
+const Home = ({navigation}) => {
 
     const [position, setPosition] = useState({
         latitude: 0,
@@ -46,7 +48,23 @@ const Home = () => {
     const [pickedUser, setPickedUser] = useState(false);
     const { searchingRide, setSearchingRide } = useContext(UserContext);
 
-    // const ref = firebase.app().database('https://omr-app-93d29-default-rtdb.asia-southeast1.firebasedatabase.app/').ref('/users/location')
+    //Prevents user from going back to login screen after logging in
+    // const navigation = useNavigation();
+
+    useEffect(() => {
+        const handleBackButton = () => {
+        // Your custom logic here
+        // Returning true will prevent the default goBack behavior
+        return true;
+        };
+
+        const backHandler = BackHandler.addEventListener('hardwareBackPress', handleBackButton);
+
+        return () => {
+        // Remove the event listener when the component unmounts
+        backHandler.remove();
+        };
+    }, [navigation]);
 
     // check if two objects are equal or not
     const deepEqual = (obj1, obj2) => {

@@ -42,15 +42,12 @@ const ContextProvider = ({children}, navigation) => {
         PERMISSIONS.ANDROID.ACCESS_COARSE_LOCATION,
       ]);
 
-      console.log('Fine Location', locationPermissionsStatus[PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION]);
-      console.log('Coarse Location', locationPermissionsStatus[PERMISSIONS.ANDROID.ACCESS_COARSE_LOCATION]);
-
       // Check individual permission statuses
       if (
         locationPermissionsStatus[PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION] === RESULTS.GRANTED &&
         locationPermissionsStatus[PERMISSIONS.ANDROID.ACCESS_COARSE_LOCATION] === RESULTS.GRANTED
       ) {
-        console.log('Both fine and coarse location permissions granted');
+        //console.log('Both fine and coarse location permissions granted');
         // Proceed with accessing location here
         return;
       } else {
@@ -69,18 +66,15 @@ const ContextProvider = ({children}, navigation) => {
         PERMISSIONS.ANDROID.ACCESS_COARSE_LOCATION,
       ]);
 
-      console.log('Fine Location', locationPermissionsStatus[PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION]);
-      console.log('Coarse Location', locationPermissionsStatus[PERMISSIONS.ANDROID.ACCESS_COARSE_LOCATION]);
-
       // Check individual permission statuses after the request
       if (
         locationPermissionsStatus[PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION] === RESULTS.GRANTED &&
         locationPermissionsStatus[PERMISSIONS.ANDROID.ACCESS_COARSE_LOCATION] === RESULTS.GRANTED
       ) {
-        console.log('Both fine and coarse location permissions granted after request');
+        //console.log('Both fine and coarse location permissions granted after request');
         // Proceed with accessing location here
       } else {
-        console.log('Some or all location permissions not granted after request');
+        //console.log('Some or all location permissions not granted after request');
         Alert.alert(
           'Permissions Required!',
           'Please allow the necessary permissions for the app to function', 
@@ -97,9 +91,7 @@ const ContextProvider = ({children}, navigation) => {
     }
   };
   useEffect(() => {
-    console.log( 'isConnected: ', isConnected)
     if (isConnected) {
-      console.log('Connected to internet!');
     }
     else if (isConnected===false) {
       Alert.alert(
@@ -127,14 +119,14 @@ const ContextProvider = ({children}, navigation) => {
       console.log('Error while getting user data from AsyncStorage: ', error, '\n');
     }
   };
-  useEffect(() => {
-      if (!user) {
-        getUserData();
-      }
-      if (user) {
-        storeUserData();
-      }
-  }, [user,hasData]);
+  // useEffect(() => {
+  //     if (!user) {
+  //       getUserData();
+  //     }
+  //     if (user) {
+  //       storeUserData();
+  //     }
+  // }, [user,hasData]);
   // Store in Context API
   return (
     <UserContext.Provider

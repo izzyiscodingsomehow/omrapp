@@ -16,7 +16,7 @@ const Settings = () => {
     displayName: name==='' ? user.displayName : name,
     photoURL: toggleCheckBox ? "loader" : "user",
   }
-  const updateuserinfo = async (userInfo) => {
+  const updateuserinfo = async () => {
     try {
       await auth().currentUser.updateProfile(update);
       console.log("current", auth().currentUser);

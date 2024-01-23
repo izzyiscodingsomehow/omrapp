@@ -7,9 +7,9 @@ const LogOut = ({ navigation }) => {
   const {user, setUser} = useContext(UserContext);
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
-        navigation.navigate('Login');
         auth().signOut().then(() => console.log('User signed out!'));
         setUser(null);
+        navigation.navigate('Login');
         console.log('logout');
         clearAll();
     });

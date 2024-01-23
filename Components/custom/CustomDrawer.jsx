@@ -11,7 +11,8 @@ export function formatPhoneNumber(phoneNumber) {
 const CustomDrawer = (props) => {
 
     const { user, setUser } = useContext(UserContext);
-
+    React.useEffect(() => {
+    }, [user]);
     let phoneNumber = null;
     if (user) {
         phoneNumber = formatPhoneNumber(user.phoneNumber);
@@ -20,7 +21,6 @@ const CustomDrawer = (props) => {
     return (
         <>
             <View style={{ flex: 1 }}>
-
                 <DrawerContentScrollView {...props} style={{}} className="">
                     <View style={{ paddingVertical: 15, flex: 1, flexDirection: 'row', alignItems: "center", gap: 15 }} className="border-b border-b-[#D2D3D4] mx-4 mb-2">
                         <Image source={require("../../imgs/userPFP.png")} style={{ width: 50, height: 50, borderRadius: 100 }} />

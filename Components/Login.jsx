@@ -15,21 +15,6 @@ const Login = ({ navigation, route }) => {
     //console.log(settings.appVerificationDisabledForTesting);
   }, []);
 
-  // const [initializing, setInitializing] = useState(true);
-  // const [user, setUser] = useState();
-
-  // // // Handle user state changes
-  // function onAuthStateChanged(user) {
-  //   //console.log(user);
-  //   console.log('user');
-  //   if (initializing) setInitializing(false);
-  // }
-
-  // useEffect(() => {
-  //   const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
-  //   return subscriber; // unsubscribe on unmount
-  // }, []);
-
   //if (initializing) return null;
   const { user, setUser } = useContext(UserContext);
   const [confirm, setConfirm] = useState(null);
@@ -42,6 +27,25 @@ const Login = ({ navigation, route }) => {
   const handleCode = text => {
     setCode(text);
   };
+  const onAuthStateChanged = (user) => {
+    if (user) {
+      // User is signed in
+      setUser(user);
+      console.log('User is signed in!');
+    } else {
+      // User is signed out
+      console.log('User is signed out!');
+      setUser(null);
+    }
+  };
+
+  useEffect(() => {
+    // Subscribe to auth state changes
+    const unsubscribe = auth().onAuthStateChanged(onAuthStateChanged);
+
+    // Unsubscribe when component unmounts
+    return () => unsubscribe();
+  }, []);
   const confirmSignup = async () => {
     try {
       await confirm.confirm(code).then(userInfo => {
