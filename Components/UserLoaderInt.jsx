@@ -28,7 +28,7 @@ const UserLoaderInt = ({ navigation, currentRide, updateDropoff, setOnGoingRide,
   const { user, setUser } = useContext(UserContext);
   const [DocRef, setDocRef] = useState(null);
   const [created, setCreated] = useState(false);
-  const { cost, setCost } = useContext(RideContext);
+  //const { cost, setCost } = useContext(RideContext);
   const { ride, setRide } = useContext(RideContext)
   const [showEnd, setShowEnd] = useState(false);
   const [position, setPosition] = useState({
@@ -81,7 +81,7 @@ const UserLoaderInt = ({ navigation, currentRide, updateDropoff, setOnGoingRide,
           loaderphone: currentRide.loader_phone,
           messages: [""],
           createdAt: new Date(),
-          cost: cost,
+          //cost: cost,
           usertransstart: false,
           loadertransstart: false,
           usertransend: false,
@@ -284,7 +284,7 @@ const UserLoaderInt = ({ navigation, currentRide, updateDropoff, setOnGoingRide,
             //Commented because it works for now
             onPress={trycall}
             className="flex-row border border-gray-200 w-[350px] flex justify-between px-5 rounded-lg mt-3">
-            <Text className="text-xl text-black mt-3">Call the loader</Text>
+            <Text className="text-xl text-black mt-3">Call the {user.photoURL=="loader"?"client":"loader"}.</Text>
             <View className="rounded-full bg-white p-3 ">
               <Image
                 source={require('../imgs/phone_icon.png')}
@@ -367,7 +367,7 @@ const UserLoaderInt = ({ navigation, currentRide, updateDropoff, setOnGoingRide,
             <View></View>
           )}
 
-          {
+          {/* {
             showEnd ?
               (
                 <>
@@ -375,7 +375,7 @@ const UserLoaderInt = ({ navigation, currentRide, updateDropoff, setOnGoingRide,
                 </>
               ) :
               <></>
-          }
+          } */}
         </View>
       </View>
 

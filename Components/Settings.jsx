@@ -9,18 +9,29 @@ import CheckBox from '@react-native-community/checkbox';
 const Settings = () => {
     const { user, setUser } = useContext(UserContext);
   const [toggleCheckBox, setToggleCheckBox] = useState(false)
-
+  const checkToggle = () => {
+    if(user.photoURL==="user"&&toggleCheckBox===true){
+      return "loader"
+    }
+    else if(user.photoURL==="loader"&&toggleCheckBox===true){
+      return "user"
+    }
+    else{
+      return user.photoURL
+    }
+  }
   //console.log(user.displayName);
   const [name, setName] = useState('');
   const update = {
     displayName: name==='' ? user.displayName : name,
-    photoURL: toggleCheckBox ? "loader" : "user",
+    photoURL: checkToggle(),
   }
   const updateuserinfo = async () => {
     try {
       await auth().currentUser.updateProfile(update);
       console.log("current", auth().currentUser);
       setUser(auth().currentUser);
+      setToggleCheckBox(false);
     } catch (e) {
       console.log("Signup Error: ", e);
     }
@@ -57,7 +68,7 @@ const Settings = () => {
           />
           <View className="rounded-lg py-3 mv-5 text-lg items-center flex flex-row">
           <Text className="text-xl text-black">
-          Do You Want to Become a Loader?
+          Do You Want to Become a {user.photoURL==="user"? "Loader" : "User"}?
           </Text>
           <View className="px-2">
           <CheckBox

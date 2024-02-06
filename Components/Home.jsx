@@ -42,7 +42,7 @@ const Home = ({ navigation }) => {
     const [ongoingRide, setOngoingRide] = useState(null);
     const [slideViewHeight, setSlideViewHeight] = useState(0);
     const [rideInProgress, setRideInProgress] = useState(false);
-    const { cost, setCost } = useContext(RideContext);
+    //const { cost, setCost } = useContext(RideContext);
     const { user, setUser } = useContext(UserContext);
     const [isLoader, setIsLoader] = useState(false);
     const [pickedUser, setPickedUser] = useState(false);
@@ -248,32 +248,32 @@ const Home = ({ navigation }) => {
 
     }
 
-    const [newcost, setNewCost] = useState(0);
+    //const [newcost, setNewCost] = useState(0);
     let check = 0;
 
 
-    useEffect(() => {
-        //write code for getting cost doc from firebase
-        const unsubscribe = firestore()
-            .collection("Cost")
-            .doc("cost-current")
-            .onSnapshot(snapshot => {
-                setNewCost(snapshot.data().cost);
-                check = snapshot.data().cost;
-            });
+    // useEffect(() => {
+    //     //write code for getting cost doc from firebase
+    //     const unsubscribe = firestore()
+    //         .collection("Cost")
+    //         .doc("cost-current")
+    //         .onSnapshot(snapshot => {
+    //             setNewCost(snapshot.data().cost);
+    //             check = snapshot.data().cost;
+    //         });
 
-        return () => unsubscribe();
-    }, []);
-
-
-    const handleDirectionsReady = (result) => {
-        setCost(result.distance * newcost);
-    };
+    //     return () => unsubscribe();
+    // }, []);
 
 
-    useEffect(() => {
-        // console.log("COST in use: ", cost);
-    }, [cost]);
+    // const handleDirectionsReady = (result) => {
+    //     setCost(result.distance * newcost);
+    // };
+
+
+    // useEffect(() => {
+    //     // console.log("COST in use: ", cost);
+    // }, [cost]);
 
 
     // weird name i know, but this just checks if the user is the loader and updates his dropoff location
@@ -496,7 +496,7 @@ const Home = ({ navigation }) => {
                 userName: data.userName,
                 loaderLocation: origin,
                 rideType: "truck",
-                cost,
+                //cost,
                 user_phone: data.user_phone,
                 loader_phone,
                 loaderName: user.displayName
@@ -721,9 +721,9 @@ const Home = ({ navigation }) => {
                                             fetchDetails={true}
                                         />
                                         <Image source={require('../imgs/arrowRightPNG.png')} style={{ width: 20, marginRight: 20 }} />
-                                    </View>
+                                    {/* </View>
                                     {cost != check ? <Text className="text-[20px] text-black">Fare: {cost} PKR</Text> : null}
-                                    <View className="w-auto ">
+                                    <View className="w-auto "> */}
                                         <Pressable onPress={invertRideState} className="" disabled={searchingRide ? true : false}>
                                             <View className={`${searchingRide ? "bg-slate-200" : "bg-[#131316]"} px-5 rounded-lg -z-50 p-[10px]`}>
                                                 <Text className={`text-[18px] font-semibold text-center text-white z-[-10]`}>{searchingRide ? "Finding a loader" : "Let's go"}</Text>
