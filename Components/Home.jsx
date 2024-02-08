@@ -13,10 +13,11 @@ import auth from '@react-native-firebase/auth';
 import haversine from 'haversine-distance'
 import { formatPhoneNumber } from './custom/CustomDrawer';
 import { BackHandler } from 'react-native';
+import Geocoder from 'react-native-geocoding';
+
 const MAX_RADIUS = 10;
 
 const Home = ({ navigation }) => {
-
     const [position, setPosition] = useState({
         latitude: 0,
         longitude: 0,
@@ -509,11 +510,24 @@ const Home = ({ navigation }) => {
 
     const onLocationSelect = (event) => {
         if (toggleOrigin) {
-            console.log(event.nativeEvent.coordinate);
+            Geocoder.from(event.nativeEvent.coordinate.latitude, event.nativeEvent.coordinate.longitude)
+                .then(json => {
+                        var addressComponent = json.results[0].address_components[0];
+                        console.log("ADDRESS: ", addressComponent);
+                        //setOrigin(addressComponent);
+                })
+                .catch(error => console.warn(error));
+            console.log("toggle",event.nativeEvent.coordinate);
             setToggleOrigin(false);
             setOrigin({ latitude: event.nativeEvent.coordinate.latitude, longitude: event.nativeEvent.coordinate.longitude });
         }
         else if (toggleDropoff) {
+            // Geocoder.from(event.nativeEvent.coordinate.latitude, event.nativeEvent.coordinate.longitude)
+            //     .then(json => {
+            //             var addressComponent = json.results[0].address_components[0];
+            //             setOrigin(addressComponent);
+            //     })
+            //     .catch(error => console.warn(error));
             console.log(event.nativeEvent.coordinate);
             setToggleDropoff(false);
             setDropOff({ latitude: event.nativeEvent.coordinate.latitude, longitude: event.nativeEvent.coordinate.longitude });
@@ -536,7 +550,8 @@ const Home = ({ navigation }) => {
             </TouchableOpacity>
         );
     };
-
+    
+    Geocoder.init("AIzaSyBzkP_jIc71HLCelXc5UtgNZu1jhFIs9Q4");
     return (
         <View style={styles.container}>
             <MapView
@@ -644,9 +659,9 @@ const Home = ({ navigation }) => {
                                         <Image source={require('../imgs/currentLocation.png')} style={{ width: 30, height: 30 }} />
                                     </View>
                                 </Pressable>
-                                <View onLayout={(event) => slideViewHeight == 0 ? setSlideViewHeight(event.nativeEvent.layout.height) : null} className={`pt-2 flex flex-col px-4 gap-4 z-[-4]`}>
+                                <View onLayout={(event) => slideViewHeight == 0 ? setSlideViewHeight(event.nativeEvent.layout.height) : null} className={`pt-2 flex flex-col px-4 gap-4 z-[4]`}>
                                     <View className="flex">
-                                        <View className="bg-[#E9E9EA]  rounded-md flex flex-row justify-center items-center relative z-[-2]">
+                                        <View className="bg-[#E9E9EA]  rounded-md flex flex-row justify-center items-center relative z-[2]">
                                             <Image source={require('../imgs/searchPNG.png')} style={{ width: 20, marginLeft: 20 }} />
                                             {/* <TextInput placeholder='Pickup location' className="w-[70%]  mx-auto text-xl" /> */}
                                             <GooglePlacesAutocomplete
@@ -701,7 +716,7 @@ const Home = ({ navigation }) => {
                                             </Pressable>
                                         </View>
                                     </View>
-                                    <View className="bg-[#E9E9EA]  rounded-md flex flex-row justify-center items-center z-[-3]">
+                                    <View className="bg-[#E9E9EA]  rounded-md flex flex-row justify-center items-center z-[1]">
                                         <Image source={require('../imgs/searchPNG.png')} style={{ width: 20, marginLeft: 20 }} />
                                         {/* <TextInput placeholder='Dropoff location' className="w-[70%]  mx-auto text-xl" /> */}
                                         <GooglePlacesAutocomplete
@@ -742,15 +757,14 @@ const Home = ({ navigation }) => {
                                         </Pressable>
                                         {/* <Image source={require('../imgs/arrowRightPNG.png')} style={{ width: 20, marginRight: 20 }} /> */}
                                     </View>
-                                    <Pressable onPress={invertRideState} className="ml-2" disabled={searchingRide ? true : false}>
-                                        <View className={`${searchingRide ? "bg-slate-200" : "bg-[#131316]"} px-5 rounded-lg -z-50 p-[10px]`}>
-                                            <Text className={`text-[18px] font-semibold text-center text-white z-[-10]`}>{searchingRide ? "Finding a loader" : "Let's go"}</Text>
+                                    <Pressable onPress={invertRideState} className="ml-2 z-0"  disabled={searchingRide ? true : false}>
+                                        <View className={`${searchingRide ? "bg-slate-200" : "bg-[#131316]"} px-5 rounded-lg p-[10px]`}>
+                                            <Text className={`text-[18px] font-semibold text-center text-white `}>{searchingRide ? "Finding a loader" : "Let's go"}</Text>
                                         </View>
                                     </Pressable>
 
                                 </View>
                             </>
-
                 }
             </SlideView>
         </View >

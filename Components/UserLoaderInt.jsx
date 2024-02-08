@@ -332,7 +332,6 @@ const UserLoaderInt = ({ navigation, currentRide, updateDropoff, setOnGoingRide,
       )}
       <View className="rounded-md flex justify-center items-center z-[-3]">
         <TextInput
-
           placeholder="Chat with your loader"
           // twClass="p-3 px-4 mt-3 text-lg w-[350]"
           placeholderTextColor={"#97979B"}
