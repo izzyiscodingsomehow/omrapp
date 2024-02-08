@@ -1,32 +1,19 @@
 import React, { useContext, useEffect, useState } from 'react'
-import { StyleSheet, Text, View, Image, TouchableOpacity, Pressable, Button } from 'react-native'
+import { StyleSheet, Text, View, Image, TouchableOpacity, Pressable } from 'react-native'
 import MapView, { Marker } from 'react-native-maps'
 import MapViewDirections from 'react-native-maps-directions'
-import firestore from '@react-native-firebase/firestore';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete'
 import Geolocation from 'react-native-geolocation-service';
 import SlideView from './custom/SlideView'
-import { RideContext } from './contexts/RideContext'
-import { endRide, clearRide } from './contexts/RideContext'
 import { UserContext } from './contexts/UserContext'
 import UserLoaderInt from './UserLoaderInt'
-//import { or } from 'firebase/firestore'
 import 'firebase/database'
-//import database from '@react-native-firebase/database'
 import { firebase } from '@react-native-firebase/database'
 import auth from '@react-native-firebase/auth';
-// import { app } from '../firebase'
-// import { set, update } from 'firebase/database'
-// import { doc, getDoc } from 'firebase/firestore';
-// import { db } from '../firebase';
 import haversine from 'haversine-distance'
-import CButton from './custom/CButton';
 import { formatPhoneNumber } from './custom/CustomDrawer';
-import { useNavigation } from '@react-navigation/native';
 import { BackHandler } from 'react-native';
-import { useBackHandler } from '@react-navigation/native';
 const MAX_RADIUS = 10;
-// const auth = firebase.auth();
 
 const Home = ({ navigation }) => {
 
@@ -34,7 +21,6 @@ const Home = ({ navigation }) => {
         latitude: 0,
         longitude: 0,
     });
-
     const [notification, setNotification] = useState(null);
     const [showNotification, setShowNotification] = useState(false);
     const [pickupName, setPickupName] = useState(null);
@@ -47,6 +33,8 @@ const Home = ({ navigation }) => {
     const [isLoader, setIsLoader] = useState(false);
     const [pickedUser, setPickedUser] = useState(false);
     const { searchingRide, setSearchingRide } = useContext(UserContext);
+    const [toggleOrigin, setToggleOrigin] = useState(false);
+    const [toggleDropoff, setToggleDropoff] = useState(false);
 
     //Prevents user from going back to login screen after logging in
     // const navigation = useNavigation();
@@ -517,7 +505,36 @@ const Home = ({ navigation }) => {
         // Update the database accordingly
         setShowNotification(false);
         exchangeData(key);
-        // console.log(user.uid, " accepted the ride of ", notification);
+    };
+
+    const onLocationSelect = (event) => {
+        if (toggleOrigin) {
+            console.log(event.nativeEvent.coordinate);
+            setToggleOrigin(false);
+            setOrigin({ latitude: event.nativeEvent.coordinate.latitude, longitude: event.nativeEvent.coordinate.longitude });
+        }
+        else if (toggleDropoff) {
+            console.log(event.nativeEvent.coordinate);
+            setToggleDropoff(false);
+            setDropOff({ latitude: event.nativeEvent.coordinate.latitude, longitude: event.nativeEvent.coordinate.longitude });
+        }
+        else {
+            console.log("Not in select mode");
+        }
+    }
+
+    const handleCustomOptionPress = () => {
+        // Handle selection of the custom option
+        console.log("Custom option selected: Home");
+    };
+    const renderCustomOption = () => {
+        return (
+            <TouchableOpacity onPress={handleCustomOptionPress}>
+                <View style={{ padding: 10, borderBottomWidth: 1, borderBottomColor: '#ccc' }}>
+                    <Text style={{ fontSize: 16 }}>Select location on map</Text>
+                </View>
+            </TouchableOpacity>
+        );
     };
 
     return (
@@ -526,6 +543,7 @@ const Home = ({ navigation }) => {
                 style={styles.mapView}
                 region={region}
                 onRegionChangeComplete={(newRegion) => setRegion(newRegion)}
+                onPress={onLocationSelect}
             //customMapStyle={mapStyle}
             >
                 <Marker coordinate={origin} title='Your location' />
@@ -537,7 +555,7 @@ const Home = ({ navigation }) => {
                     apikey='AIzaSyBzkP_jIc71HLCelXc5UtgNZu1jhFIs9Q4'
                     strokeWidth={2}
                     strokeColor='#1a1a1a'
-                    onReady={handleDirectionsReady}
+                // onReady={handleDirectionsReady}
                 />
             </MapView>
             {showNotification && (
@@ -579,7 +597,7 @@ const Home = ({ navigation }) => {
             }
 
             {/* Add your custom tailwind classes to twClass*/}
-            <SlideView twClass="2/5">
+            <SlideView twClass={`2/5 ${toggleOrigin || toggleDropoff ? "hidden" : null}`}>
                 {
                     ongoingRide ?
                         <UserLoaderInt currentRide={ongoingRide} updateDropoff={updateDropoff} setOnGoingRide={setOngoingRide} deleteOnGoingRide={deleteOnGoingRide} />
@@ -626,23 +644,7 @@ const Home = ({ navigation }) => {
                                         <Image source={require('../imgs/currentLocation.png')} style={{ width: 30, height: 30 }} />
                                     </View>
                                 </Pressable>
-                                <View onLayout={(event) => slideViewHeight == 0 ? setSlideViewHeight(event.nativeEvent.layout.height) : null} className=" pt-2 px-4 flex flex-col gap-4 z-[-4]">
-
-                                    {/* <View className=" rounded-md flex flex-row justify-evenly items-center w-auto">
-                                    <View className="flex flex-col justify-center items-center gap-1 w-1/3  rounded">
-                                        <Image source={require('../imgs/pickupIcon.png')} style={{ width: 50 }} />
-                                        <Text className="text-[15px] text-black pb-3">Pickup Truck</Text>
-                                    </View>
-                                    <View className="flex flex-col justify-center items-center gap-1 w-1/3  rounded">
-                                        <Image source={require('../imgs/boxTruckIcon.png')} style={{ width: 50 }} />
-                                        <Text className="text-[15px] text-black pb-3">Box Truck</Text>
-                                    </View>
-                                    <View className="flex flex-col justify-center items-center gap-1 w-1/3  rounded">
-                                        <Image source={require('../imgs/semiTruckIcon.png')} style={{ width: 55 }} />
-                                        <Text className="text-[15px] relative bottom-[5] text-black pb-1">Semi Truck</Text>
-                                    </View>
-                                </View> */}
-
+                                <View onLayout={(event) => slideViewHeight == 0 ? setSlideViewHeight(event.nativeEvent.layout.height) : null} className={`pt-2 flex flex-col px-4 gap-4 z-[-4]`}>
                                     <View className="flex">
                                         <View className="bg-[#E9E9EA]  rounded-md flex flex-row justify-center items-center relative z-[-2]">
                                             <Image source={require('../imgs/searchPNG.png')} style={{ width: 20, marginLeft: 20 }} />
@@ -668,6 +670,19 @@ const Home = ({ navigation }) => {
                                                     }
 
                                                 }}
+                                                // renderRow={}
+                                                // predefinedPlaces={["Select location on map"]}
+                                                renderRow={(rowData, sessionToken, isHighlighted) => (
+                                                    // <View style={{ padding: 10, borderBottomWidth: 1, borderBottomColor: '#ccc' }}>
+                                                    <Text style={{ fontSize: 16 }}>{rowData.description}</Text>
+                                                    // </View>
+                                                )}
+                                                fetchDetails={true}
+                                                renderCustomRow={(rowData, sessionToken, isHighlighted) => (
+                                                    <View>
+                                                        {renderCustomOption()}
+                                                    </View>
+                                                )}
                                                 query={{
                                                     key: "AIzaSyBzkP_jIc71HLCelXc5UtgNZu1jhFIs9Q4",
                                                     language: 'en'
@@ -679,9 +694,11 @@ const Home = ({ navigation }) => {
                                                     listView: styles.mapsListView,
                                                     description: { color: '#1a1a1a' }
                                                 }}
-                                                fetchDetails={true}
                                             />
-                                            <Image source={require('../imgs/arrowRightPNG.png')} style={{ width: 20, marginRight: 20 }} />
+                                            {/* <Image source={require('../imgs/pin.png')} style={{ width: '30px', height: '30px', borderWidth: 1, margin: 0 }} /> */}
+                                            <Pressable className="opacity-40" onPress={() => setToggleOrigin(true)} >
+                                                <Image source={require('../imgs/pin.png')} style={{ borderWidth: 1, top: 0, marginRight: 20 }} />
+                                            </Pressable>
                                         </View>
                                     </View>
                                     <View className="bg-[#E9E9EA]  rounded-md flex flex-row justify-center items-center z-[-3]">
@@ -720,16 +737,16 @@ const Home = ({ navigation }) => {
                                             }}
                                             fetchDetails={true}
                                         />
-                                        <Image source={require('../imgs/arrowRightPNG.png')} style={{ width: 20, marginRight: 20 }} />
-                                    {/* </View>
-                                    {cost != check ? <Text className="text-[20px] text-black">Fare: {cost} PKR</Text> : null}
-                                    <View className="w-auto "> */}
-                                        <Pressable onPress={invertRideState} className="" disabled={searchingRide ? true : false}>
-                                            <View className={`${searchingRide ? "bg-slate-200" : "bg-[#131316]"} px-5 rounded-lg -z-50 p-[10px]`}>
-                                                <Text className={`text-[18px] font-semibold text-center text-white z-[-10]`}>{searchingRide ? "Finding a loader" : "Let's go"}</Text>
-                                            </View>
+                                        <Pressable className="opacity-40" onPress={() => setToggleOrigin(true)} >
+                                            <Image source={require('../imgs/pin.png')} style={{ borderWidth: 1, top: 0, marginRight: 20 }} />
                                         </Pressable>
+                                        {/* <Image source={require('../imgs/arrowRightPNG.png')} style={{ width: 20, marginRight: 20 }} /> */}
                                     </View>
+                                    <Pressable onPress={invertRideState} className="ml-2" disabled={searchingRide ? true : false}>
+                                        <View className={`${searchingRide ? "bg-slate-200" : "bg-[#131316]"} px-5 rounded-lg -z-50 p-[10px]`}>
+                                            <Text className={`text-[18px] font-semibold text-center text-white z-[-10]`}>{searchingRide ? "Finding a loader" : "Let's go"}</Text>
+                                        </View>
+                                    </Pressable>
 
                                 </View>
                             </>
