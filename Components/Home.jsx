@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState, useRef } from 'react'
 import { StyleSheet, Text, View, Image, TouchableOpacity, Pressable } from 'react-native'
 import MapView, { Marker } from 'react-native-maps'
 import MapViewDirections from 'react-native-maps-directions'
@@ -22,6 +22,8 @@ const Home = ({ navigation }) => {
         latitude: 0,
         longitude: 0,
     });
+    const pickupRef = useRef();
+    const dropoffRef = useRef();
     const [notification, setNotification] = useState(null);
     const [showNotification, setShowNotification] = useState(false);
     const [pickupName, setPickupName] = useState(null);
@@ -29,16 +31,13 @@ const Home = ({ navigation }) => {
     const [ongoingRide, setOngoingRide] = useState(null);
     const [slideViewHeight, setSlideViewHeight] = useState(0);
     const [rideInProgress, setRideInProgress] = useState(false);
-    //const { cost, setCost } = useContext(RideContext);
     const { user, setUser } = useContext(UserContext);
     const [isLoader, setIsLoader] = useState(false);
     const [pickedUser, setPickedUser] = useState(false);
     const { searchingRide, setSearchingRide } = useContext(UserContext);
     const [toggleOrigin, setToggleOrigin] = useState(false);
     const [toggleDropoff, setToggleDropoff] = useState(false);
-
-    //Prevents user from going back to login screen after logging in
-    // const navigation = useNavigation();
+    const API_KEY = 'AIzaSyBzkP_jIc71HLCelXc5UtgNZu1jhFIs9Q4';
 
     useEffect(() => {
         const handleBackButton = () => {
@@ -118,22 +117,17 @@ const Home = ({ navigation }) => {
             const snapshot = await firebase.app().database('https://omr-app-93d29-default-rtdb.asia-southeast1.firebasedatabase.app/').ref('users').orderByChild('role').equalTo('loader').once('value');
             if (snapshot.exists()) {
                 const loaders = await snapshot.val();
-                // console.log('Loaders: ', loaders);
-
                 const filteredUsers = Object.entries(loaders)
                     .filter(([key, user]) => user.role === 'loader')
                     .reduce((acc, [key, user]) => ({ ...acc, [key]: user }), {});
 
                 // Map over the filtered users, log keys and user data
                 Object.entries(filteredUsers).map(async ([key, loader]) => {
-                    console.log('User key:', key);
-                    console.log('User data:', loader);
 
                     // check which loaders are near the user
                     const notiRef = firebase.app().database('https://omr-app-93d29-default-rtdb.asia-southeast1.firebasedatabase.app/').ref(`notifications`);
                     const distance = calculateDistance(origin, loader.pickup);
                     if (distance <= MAX_RADIUS) {
-                        console.log(key, " is near the user");
                         await notiRef.child(notiRef.push().key).set({
                             message: `Ride requested by ${user.displayName}`,
                             origin,
@@ -189,7 +183,6 @@ const Home = ({ navigation }) => {
 
 
     function watchUsersLocation() {
-        console.log('hereeeeee');
         Geolocation.watchPosition(
 
             async (position) => {
@@ -230,16 +223,11 @@ const Home = ({ navigation }) => {
     }
 
     const calculateDistance = (user, loader) => {
-        console.log(user, loader);
         const distance = ((haversine(user, loader) / 1000) * 400) / 1000 // getting distance in meters and converting to kilometers;
         console.log("Distance: ", distance);
         return distance;
 
     }
-
-    //const [newcost, setNewCost] = useState(0);
-    let check = 0;
-
 
     // useEffect(() => {
     //     //write code for getting cost doc from firebase
@@ -253,16 +241,6 @@ const Home = ({ navigation }) => {
 
     //     return () => unsubscribe();
     // }, []);
-
-
-    // const handleDirectionsReady = (result) => {
-    //     setCost(result.distance * newcost);
-    // };
-
-
-    // useEffect(() => {
-    //     // console.log("COST in use: ", cost);
-    // }, [cost]);
 
 
     // weird name i know, but this just checks if the user is the loader and updates his dropoff location
@@ -279,21 +257,15 @@ const Home = ({ navigation }) => {
                 if (snapshot.exists()) {
                     // Data found, update the state
                     // setUserData(snapshot.val());
-                    // console.log("here is the user: ", snapshot.val());
-
                     if (snapshot.val().role == 'loader') {
                         setIsLoader(true);
                         if (!pickedUser) {
                             await updateDropoff(userId, ongoingRide.pickup)
-
                         }
                         else {
                             await updateDropoff(userId, ongoingRide.dropoff)
                         }
-
                     }
-
-
                 } else {
                     // No data found for the given UID
                     // setUserData(null);
@@ -329,7 +301,6 @@ const Home = ({ navigation }) => {
             await snapshot.forEach((childSnapshot) => {
                 // Check if loaderId matches the condition
                 if (user.photoURL == 'loader') {
-                    console.log("OK SO HERE YOU ARE: ", childSnapshot.val().loaderId);
                     if (childSnapshot.val().loaderId == loaderIdToFilter) {
                         ride = {
                             key: childSnapshot.key,
@@ -352,7 +323,6 @@ const Home = ({ navigation }) => {
 
         // Add the listener
         ongoingRidesRef.on('value', onValueChange);
-        console.log("this is the current ride: ", ongoingRide);
         setRideInProgress(true);
         if (ongoingRide != null) {
             setRegion({
@@ -395,39 +365,26 @@ const Home = ({ navigation }) => {
     const notificationsRef = firebase.app().database('https://omr-app-93d29-default-rtdb.asia-southeast1.firebasedatabase.app/').ref(`notifications`); // Replace 'user1' with the user's ID
 
     useEffect(() => {
-        //Geolocation.requestAuthorization();
-        // getCurrentPosition();
         watchUsersLocation();
-        // console.log("POSITION: ", position);
 
         const onNotificationUpdate = async snapshot => {
             const data = await snapshot.val();
-            // console.log('data: ', data, 'noti: ', notification);;
-
-            // if (notification != data) {
-            // console.log('insdie notis');
             setNotification(data);
             setShowNotification(true);
             if (notification != null) {
-
                 Object.entries(notification).map(async ([key, user]) => {
-                    console.log("Loader: ", user.loaderId, " and User:", user.userId);
                 })
             }
-
         };
         // check for null
         if (user != null) {
             notificationsRef.orderByChild('loaderId').equalTo(user.uid).on('value', onNotificationUpdate);
         }
-
         // Return a cleanup function to unsubscribe when the component unmounts
-
         return () => notificationsRef.off('value', onNotificationUpdate);
 
     }, [origin, region, showNotification, notification, notificationsRef]);
 
-    // temp region
     const [region, setRegion] = useState({
         latitude: 0,
         longitude: 0,
@@ -446,10 +403,8 @@ const Home = ({ navigation }) => {
     });
 
     const invertRideState = () => {
-        // console.log("HERES USER: ", user)
         setSearchingRide(true);
         updateLocation(user.uid, origin, dropOff);
-        // setRide(x => !x);
         getActiveLoaders();
 
     }
@@ -469,8 +424,6 @@ const Home = ({ navigation }) => {
     const exchangeData = async (ride) => {
 
         const data = notification[ride];
-        console.log("ACCEPTINGGG", data);
-
         const loader_phone = await auth().currentUser.phoneNumber;
 
         const ref = firebase.app().database('https://omr-app-93d29-default-rtdb.asia-southeast1.firebasedatabase.app/').ref('ongoing-rides');
@@ -492,7 +445,6 @@ const Home = ({ navigation }) => {
 
             }).then(() => {
                 deleteRideNotification(ride)
-                console.log('New ride started')
             });
             // invertRideState();
         } catch (err) {
@@ -508,27 +460,69 @@ const Home = ({ navigation }) => {
         exchangeData(key);
     };
 
+    // converts coordinates to an actual location name (pickup)
+    function getOriginAddressFromCoordinates(latitude, longitude) {
+        return new Promise((resolve, reject) => {
+            fetch(
+                'https://maps.googleapis.com/maps/api/geocode/json?address=' +
+                latitude +
+                ',' +
+                longitude +
+                '&key=' +
+                API_KEY,
+            )
+                .then(response => response.json())
+                .then(responseJson => {
+                    if (responseJson.status === 'OK') {
+                        // the ref manipulates the value inside the autocomplete input
+                        pickupRef.current.setAddressText(responseJson?.results?.[0]?.formatted_address)
+                        setPickupName(responseJson?.results?.[0]?.formatted_address);
+                        resolve(responseJson?.results?.[0]?.formatted_address);
+                    } else {
+                        reject('not found');
+                    }
+                })
+                .catch(error => {
+                    reject(error);
+                });
+        });
+    }
+
+    // converts coordinates to an actual location name (dropoff)
+    function getDropoffAddressFromCoordinates(latitude, longitude) {
+        return new Promise((resolve, reject) => {
+            fetch(
+                'https://maps.googleapis.com/maps/api/geocode/json?address=' +
+                latitude +
+                ',' +
+                longitude +
+                '&key=' +
+                API_KEY,
+            )
+                .then(response => response.json())
+                .then(responseJson => {
+                    if (responseJson.status === 'OK') {
+                        // the ref manipulates the value inside the autocomplete input
+                        dropoffRef.current.setAddressText(responseJson?.results?.[0]?.formatted_address)
+                        setDropoffName(responseJson?.results?.[0]?.formatted_address);
+                        resolve(responseJson?.results?.[0]?.formatted_address);
+                    } else {
+                        reject('not found');
+                    }
+                })
+                .catch(error => {
+                    reject(error);
+                });
+        });
+    }
     const onLocationSelect = (event) => {
         if (toggleOrigin) {
-            Geocoder.from(event.nativeEvent.coordinate.latitude, event.nativeEvent.coordinate.longitude)
-                .then(json => {
-                        var addressComponent = json.results[0].address_components[0];
-                        console.log("ADDRESS: ", addressComponent);
-                        //setOrigin(addressComponent);
-                })
-                .catch(error => console.warn(error));
-            console.log("toggle",event.nativeEvent.coordinate);
+            getOriginAddressFromCoordinates(event.nativeEvent.coordinate.latitude, event.nativeEvent.coordinate.longitude);
             setToggleOrigin(false);
             setOrigin({ latitude: event.nativeEvent.coordinate.latitude, longitude: event.nativeEvent.coordinate.longitude });
         }
         else if (toggleDropoff) {
-            // Geocoder.from(event.nativeEvent.coordinate.latitude, event.nativeEvent.coordinate.longitude)
-            //     .then(json => {
-            //             var addressComponent = json.results[0].address_components[0];
-            //             setOrigin(addressComponent);
-            //     })
-            //     .catch(error => console.warn(error));
-            console.log(event.nativeEvent.coordinate);
+            getDropoffAddressFromCoordinates(event.nativeEvent.coordinate.latitude, event.nativeEvent.coordinate.longitude);
             setToggleDropoff(false);
             setDropOff({ latitude: event.nativeEvent.coordinate.latitude, longitude: event.nativeEvent.coordinate.longitude });
         }
@@ -537,20 +531,6 @@ const Home = ({ navigation }) => {
         }
     }
 
-    const handleCustomOptionPress = () => {
-        // Handle selection of the custom option
-        console.log("Custom option selected: Home");
-    };
-    const renderCustomOption = () => {
-        return (
-            <TouchableOpacity onPress={handleCustomOptionPress}>
-                <View style={{ padding: 10, borderBottomWidth: 1, borderBottomColor: '#ccc' }}>
-                    <Text style={{ fontSize: 16 }}>Select location on map</Text>
-                </View>
-            </TouchableOpacity>
-        );
-    };
-    
     Geocoder.init("AIzaSyBzkP_jIc71HLCelXc5UtgNZu1jhFIs9Q4");
     return (
         <View style={styles.container}>
@@ -666,12 +646,11 @@ const Home = ({ navigation }) => {
                                             {/* <TextInput placeholder='Pickup location' className="w-[70%]  mx-auto text-xl" /> */}
                                             <GooglePlacesAutocomplete
                                                 placeholder='Pickup location'
+                                                ref={pickupRef}
                                                 onPress={(data, details = null) => {
                                                     setPickupName(data.description);
                                                     if (details) {
                                                         const { location } = details.geometry;
-                                                        console.log("LOCATION: ", location.lat, "\n", location.lng)
-
                                                         setOrigin({
                                                             latitude: location.lat,
                                                             longitude: location.lng
@@ -683,21 +662,8 @@ const Home = ({ navigation }) => {
                                                             longitudeDelta: 0.05,
                                                         })
                                                     }
-
                                                 }}
-                                                // renderRow={}
-                                                // predefinedPlaces={["Select location on map"]}
-                                                renderRow={(rowData, sessionToken, isHighlighted) => (
-                                                    // <View style={{ padding: 10, borderBottomWidth: 1, borderBottomColor: '#ccc' }}>
-                                                    <Text style={{ fontSize: 16 }}>{rowData.description}</Text>
-                                                    // </View>
-                                                )}
                                                 fetchDetails={true}
-                                                renderCustomRow={(rowData, sessionToken, isHighlighted) => (
-                                                    <View>
-                                                        {renderCustomOption()}
-                                                    </View>
-                                                )}
                                                 query={{
                                                     key: "AIzaSyBzkP_jIc71HLCelXc5UtgNZu1jhFIs9Q4",
                                                     language: 'en'
@@ -721,11 +687,11 @@ const Home = ({ navigation }) => {
                                         {/* <TextInput placeholder='Dropoff location' className="w-[70%]  mx-auto text-xl" /> */}
                                         <GooglePlacesAutocomplete
                                             placeholder='Dropoff location'
+                                            ref={dropoffRef}
                                             onPress={(data, details = null) => {
                                                 setDropoffName(data.description);
                                                 if (details) {
                                                     const { location } = details.geometry;
-                                                    console.log("LOCATION: ", location.lat, "\n", location.lng)
                                                     setDropOff({
                                                         latitude: location.lat,
                                                         longitude: location.lng
@@ -752,12 +718,11 @@ const Home = ({ navigation }) => {
                                             }}
                                             fetchDetails={true}
                                         />
-                                        <Pressable className="opacity-40" onPress={() => setToggleOrigin(true)} >
+                                        <Pressable className="opacity-40" onPress={() => setToggleDropoff(true)} >
                                             <Image source={require('../imgs/pin.png')} style={{ borderWidth: 1, top: 0, marginRight: 20 }} />
                                         </Pressable>
-                                        {/* <Image source={require('../imgs/arrowRightPNG.png')} style={{ width: 20, marginRight: 20 }} /> */}
                                     </View>
-                                    <Pressable onPress={invertRideState} className="ml-2 z-0"  disabled={searchingRide ? true : false}>
+                                    <Pressable onPress={invertRideState} className="ml-2 z-0" disabled={searchingRide ? true : false}>
                                         <View className={`${searchingRide ? "bg-slate-200" : "bg-[#131316]"} px-5 rounded-lg p-[10px]`}>
                                             <Text className={`text-[18px] font-semibold text-center text-white `}>{searchingRide ? "Finding a loader" : "Let's go"}</Text>
                                         </View>
