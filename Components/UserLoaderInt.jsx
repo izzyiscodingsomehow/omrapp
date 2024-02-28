@@ -16,6 +16,7 @@ import firestore from '@react-native-firebase/firestore';
 import { doc, updateDoc, setDoc, getDoc } from 'firebase/firestore';
 import { RideContext } from './contexts/RideContext';
 import { db } from '../firebase';
+import { set, update } from 'firebase/database';
 
 const UserLoaderInt = ({ navigation, currentRide, updateDropoff, setOnGoingRide, deleteOnGoingRide }) => {
 
@@ -35,7 +36,7 @@ const UserLoaderInt = ({ navigation, currentRide, updateDropoff, setOnGoingRide,
     latitude: 0,
     longitude: 0,
   });
-
+  const [rideCount, setRideCount] = useState(0);
 
   // let usersid;
   // if (user.photoURL === 'loader') {
@@ -46,16 +47,32 @@ const UserLoaderInt = ({ navigation, currentRide, updateDropoff, setOnGoingRide,
   //   usersid = user.uid;
   // }
   // usersid = user.uid;
+  const handleridecount = async (count) => {
+    await setRideCount(count+1);
+    await updateRideCount();
+  }
+  useEffect(() => {
+        //write code for getting cost doc from firebase
+        const unsubscribe = firestore()
+            .collection("rideids")
+            .doc("ridecount")
+            .onSnapshot(snapshot => {
+                let count =snapshot.data().count;
+                console.log("count: ",count);
+                handleridecount(count);
+            });
 
+        return () => unsubscribe();
+    }, []);
   useEffect(() => {
     // console.log('user id', usersid);
-    setDocRef(doc(db, currentRide.userId, currentRide.userId));
+    setDocRef(doc(db, 'rides', `${rideCount}`));
     // console.log(route.params.usersid,route.params.usersname,route.params.usersphone);
-  }, []);
+  }, [rideCount]);
   useEffect(() => {
     //call create interface here
     createinterface();
-  }, []);
+  }, [rideCount]);
 
   const createinterface = async () => {
     console.log('creating interface');
@@ -71,12 +88,13 @@ const UserLoaderInt = ({ navigation, currentRide, updateDropoff, setOnGoingRide,
       }
 
       else {
-        await setDoc(doc(db, currentRide.userId, currentRide.userId), {
+        await setDoc(doc(db, 'rides', `${rideCount}`), {
+          rideid: rideCount,
           userid: currentRide.userId,
           username: user.displayName,
           loaderid: currentRide.loaderId,
           //update here with currentRide.loadername
-          loadername: "Dummy",
+          loadername: currentRide.loaderName,
           userphone: currentRide.user_phone,
           loaderphone: currentRide.loader_phone,
           messages: [""],
@@ -92,8 +110,14 @@ const UserLoaderInt = ({ navigation, currentRide, updateDropoff, setOnGoingRide,
       }
     }
   };
+  const updateRideCount = async () => {
+    await updateDoc(doc(db, 'rideids', 'ridecount'), {
+      count: rideCount,
+    });
+  };
   const { setSearchingRide } = useContext(UserContext);
-  const endRide = () => {
+  const endRide = async () => {
+    setDocRef(null);
     setSearchingRide(false);
     setShowEnd(true);
     setOnGoingRide(null);
@@ -246,8 +270,8 @@ const UserLoaderInt = ({ navigation, currentRide, updateDropoff, setOnGoingRide,
     if (created) {
       console.log("new messages listener")
       const unsubscribe = firestore()
-        .collection(currentRide.userId)
-        .doc(currentRide.userId)
+        .collection('rides')
+        .doc(`${rideCount}`)
         .onSnapshot(snapshot => {
           const newMessages = snapshot.data().messages.slice(1).map(msg => msg);
           setMessages(newMessages);

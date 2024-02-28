@@ -6,6 +6,8 @@ import CButton from './custom/CButton';
 import { UserContext } from './contexts/UserContext';
 import auth from '@react-native-firebase/auth';
 import CheckBox from '@react-native-community/checkbox';
+import RNRestart from 'react-native-restart';
+
 const Settings = () => {
     const { user, setUser } = useContext(UserContext);
   const [toggleCheckBox, setToggleCheckBox] = useState(false)
@@ -32,6 +34,7 @@ const Settings = () => {
       console.log("current", auth().currentUser);
       setUser(auth().currentUser);
       setToggleCheckBox(false);
+      RNRestart.restart();
     } catch (e) {
       console.log("Signup Error: ", e);
     }

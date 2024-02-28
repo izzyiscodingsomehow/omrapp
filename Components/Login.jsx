@@ -7,7 +7,7 @@ import CTextInput from './custom/CTextInput';
 import auth from '@react-native-firebase/auth';
 import { UserContext } from './contexts/UserContext';
 import { set } from 'firebase/database';
-
+import CLoader from './custom/CLoader';
 const Login = ({ navigation, route }) => {
   const settings = auth().settings;
   useEffect(() => {
@@ -110,19 +110,31 @@ const Login = ({ navigation, route }) => {
       signInWithPhoneNumber(phone);
     }
   };
-  async function signInWithPhoneNumber(phoneNumber) {
-    const confirmation = await auth().signInWithPhoneNumber(phoneNumber);
-    //console.log(confirmation);
-    setConfirm(confirmation);
-    setPhoneNumber('');
-  }
-  // styles
-  const styles = StyleSheet.create({
-    // position the earth bg
-  });
+  const [loading, setLoading] = useState(false);
+  const signInWithPhoneNumber = async (phoneNumber) => {
+    try {
+      // Set loading to true while waiting for response
+      setLoading(true);
+      
+      // Make the API call
+      const confirmation = await auth().signInWithPhoneNumber(phoneNumber);
+  
+      // Once the response is received, set loading to false and update the state
+      setLoading(false);
+      setConfirm(confirmation);
+    } catch (error) {
+      // Handle errors here
+      console.error("Error occurred:", error);
+      setLoading(false);
+    }
+  };
 
   return (
     <>
+      {loading ? (
+        <CLoader />
+      ) : (
+      <>
       {!confirm ? (
         <View className="flex-1 items-center justify-center text-xl bg-white">
           {/* OMR logo */}
@@ -133,7 +145,7 @@ const Login = ({ navigation, route }) => {
             source={require('../imgs/earthBg.png')}
             width={50}
             height={50}
-            style={styles.backgroundImage}
+            //style={styles.backgroundImage}
           />
 
           <SlideView className="" twClass="h-72">
@@ -167,7 +179,6 @@ const Login = ({ navigation, route }) => {
             source={require('../imgs/earthBg.png')}
             width={50}
             height={50}
-            style={styles.backgroundImage}
           />
 
           <SlideView className="" twClass="h-60">
@@ -185,7 +196,7 @@ const Login = ({ navigation, route }) => {
             </View>
           </SlideView>
         </View>
-      )}
+      )}</>)}
     </>
   );
 };
