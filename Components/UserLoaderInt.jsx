@@ -48,22 +48,22 @@ const UserLoaderInt = ({ navigation, currentRide, updateDropoff, setOnGoingRide,
   // }
   // usersid = user.uid;
   const handleridecount = async (count) => {
-    await setRideCount(count+1);
+    await setRideCount(count + 1);
     await updateRideCount();
   }
   useEffect(() => {
-        //write code for getting cost doc from firebase
-        const unsubscribe = firestore()
-            .collection("rideids")
-            .doc("ridecount")
-            .onSnapshot(snapshot => {
-                let count =snapshot.data().count;
-                console.log("count: ",count);
-                handleridecount(count);
-            });
+    //write code for getting cost doc from firebase
+    const unsubscribe = firestore()
+      .collection("rideids")
+      .doc("ridecount")
+      .onSnapshot(snapshot => {
+        let count = snapshot.data().count;
+        console.log("count: ", count);
+        handleridecount(count);
+      });
 
-        return () => unsubscribe();
-    }, []);
+    return () => unsubscribe();
+  }, []);
   useEffect(() => {
     // console.log('user id', usersid);
     setDocRef(doc(db, 'rides', `${rideCount}`));
@@ -162,12 +162,14 @@ const UserLoaderInt = ({ navigation, currentRide, updateDropoff, setOnGoingRide,
   const setNewStates = newStates => {
     setStates(newStates);
   };
+
   useEffect(() => {
     if (created) {
       const unsubscribe = firestore()
-        .collection(currentRide.userId)
-        .doc(currentRide.userId)
+        .collection('rides')
+        .doc(rideCount.toString())
         .onSnapshot(snapshot => {
+          console.log("snapshot: ", snapshot)
           setNewStates([
             snapshot.data().usertransstart,
             snapshot.data().loadertransstart,
@@ -244,6 +246,7 @@ const UserLoaderInt = ({ navigation, currentRide, updateDropoff, setOnGoingRide,
       const messageDocSnap = await getDoc(DocRef);
 
       // Get the current array of messages from the document data
+      console.log(messageDocSnap.data());
       const currentMessages = messageDocSnap.data().messages || [];
 
       // Append the new message to the array
@@ -308,7 +311,7 @@ const UserLoaderInt = ({ navigation, currentRide, updateDropoff, setOnGoingRide,
             //Commented because it works for now
             onPress={trycall}
             className="flex-row border border-gray-200 w-[350px] flex justify-between px-5 rounded-lg mt-3">
-            <Text className="text-xl text-black mt-3">Call the {user.photoURL=="loader"?"client":"loader"}.</Text>
+            <Text className="text-xl text-black mt-3">Call the {user.photoURL == "loader" ? "client" : "loader"}.</Text>
             <View className="rounded-full bg-white p-3 ">
               <Image
                 source={require('../imgs/phone_icon.png')}
@@ -332,26 +335,27 @@ const UserLoaderInt = ({ navigation, currentRide, updateDropoff, setOnGoingRide,
             </View>
           </TouchableOpacity> */}
           {/* update the chat styling here */}
-          {user && user != null ? // adding check for null to avioid error
-            <ScrollView className="flex flex-col   w-[350px] gap-y-1 max-h-[200px]" scrollEnabled={true}>
+          {/* {user && user != null ? // adding check for null to avioid error */}
+          <ScrollView className="flex flex-col   w-[350px] gap-y-1 max-h-[200px]" scrollEnabled={true}>
 
-              {messages.map((message, index) =>
+            {messages.map((message, index) =>
 
-                message.userId === user.uid ? (
-                  <Text
-                    className="text-lg text-white text-right w-auto self-end bg-[#000000] rounded-lg px-3 py-1"
-                    key={index}>
-                    {message.text}
-                  </Text>
-                ) : (
-                  <Text
-                    className="text-lg text-white text-left w-auto self-start bg-[#000000] rounded-lg px-3 py-1"
-                    key={index}>
-                    {message.text}
-                  </Text>
-                ),
-              )}
-            </ScrollView> : <></>}
+              message.userId === user.uid ? (
+                <Text
+                  className="text-lg text-white text-right w-auto self-end bg-[#000000] rounded-lg px-3 py-1"
+                  key={index}>
+                  {message.text}
+                </Text>
+              ) : (
+                <Text
+                  className="text-lg text-white text-left w-auto self-start bg-[#000000] rounded-lg px-3 py-1"
+                  key={index}>
+                  {message.text}
+                </Text>
+              ),
+            )}
+          </ScrollView>
+          {/* : <></>} */}
         </View>
       )}
       <View className="rounded-md flex justify-center items-center z-[-3]">

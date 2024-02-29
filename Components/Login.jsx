@@ -1,4 +1,4 @@
-import { View, Text, Image, StyleSheet,Alert } from 'react-native';
+import { View, Text, Image, StyleSheet, Alert } from 'react-native';
 import React, { useEffect, useState, useContext } from 'react';
 import CButton from './custom/CButton';
 import SlideView from './custom/SlideView';
@@ -81,7 +81,7 @@ const Login = ({ navigation, route }) => {
       console.log(e);
       Alert.alert(
         'Invalid OTP!',
-        'The verification code from SMS/TOTP is invalid. Please check and enter the correct verification code again.', );
+        'The verification code from SMS/TOTP is invalid. Please check and enter the correct verification code again.',);
     }
   };
   useEffect(() => {
@@ -103,7 +103,7 @@ const Login = ({ navigation, route }) => {
     if (phoneNumber.length < 10 || phoneNumber.length > 10) {
       Alert.alert(
         'Invalid Phone Number!',
-        'Please enter the number in correct form', );
+        'Please enter the number in correct form',);
       return;
     } else if (phoneNumber.length == 10) {
       const phone = '+92' + phoneNumber;
@@ -115,10 +115,10 @@ const Login = ({ navigation, route }) => {
     try {
       // Set loading to true while waiting for response
       setLoading(true);
-      
+
       // Make the API call
       const confirmation = await auth().signInWithPhoneNumber(phoneNumber);
-  
+
       // Once the response is received, set loading to false and update the state
       setLoading(false);
       setConfirm(confirmation);
@@ -134,69 +134,69 @@ const Login = ({ navigation, route }) => {
       {loading ? (
         <CLoader />
       ) : (
-      <>
-      {!confirm ? (
-        <View className="flex-1 items-center justify-center text-xl bg-white">
-          {/* OMR logo */}
-          <Image source={require('../imgs/OMR.png')} width={50} height={50} />
+        <>
+          {!confirm ? (
+            <View className="flex-1 items-center justify-center text-xl bg-white">
+              {/* OMR logo */}
+              <Image source={require('../imgs/OMR.png')} width={50} height={50} />
 
-          {/* earth background */}
-          <Image
-            source={require('../imgs/earthBg.png')}
-            width={50}
-            height={50}
-            //style={styles.backgroundImage}
-          />
-
-          <SlideView className="" twClass="h-72">
-            <View className="p-5">
-              <Text className="text-xl text-black">Sign In With Phone Number</Text>
-              <View className={` rounded-lg p-3 px-4 mt-3 text-lg items-center flex flex-row`}>
-                <Text className="text-xl text-grey pr-2 mt-3 text-gray-700">+92</Text>
-                <CTextInput
-                  placeholder="f.e 3xx12345678"
-                  twClass="p-3 px-4 mt-3 text-lg w-5/6"
-                  handleChange={handleChange}
-                  keyboardType="numeric"
-                />
-              </View>
-              <CButton
-                title={'Sign In'}
-                twClass="mt-4"
-                handlePress={handleClick}
+              {/* earth background */}
+              <Image
+                source={require('../imgs/earthBg.png')}
+                width={50}
+                height={50}
+              //style={styles.backgroundImage}
               />
+
+              <SlideView className="" twClass="h-72">
+                <View className="p-5">
+                  <Text className="text-xl text-black">Sign In With Phone Number</Text>
+                  <View className={` rounded-lg p-3 px-4 mt-3 text-lg items-center flex flex-row`}>
+                    <Text className="text-xl text-grey pr-2 mt-3 text-gray-700">+92</Text>
+                    <CTextInput
+                      placeholder="f.e 3xx12345678"
+                      twClass="p-3 px-4 mt-3 text-lg w-5/6"
+                      handleChange={handleChange}
+                      keyboardType="numeric"
+                    />
+                  </View>
+                  <CButton
+                    title={'Sign In'}
+                    twClass="mt-4"
+                    handlePress={handleClick}
+                  />
+                </View>
+              </SlideView>
+
             </View>
-          </SlideView>
-          
-        </View>
-      ) : (
-        <View className="flex-1 items-center justify-center text-xl bg-white">
-          {/* OMR logo */}
-          <Image source={require('../imgs/OMR.png')} width={50} height={50} />
+          ) : (
+            <View className="flex-1 items-center justify-center text-xl bg-white">
+              {/* OMR logo */}
+              <Image source={require('../imgs/OMR.png')} width={50} height={50} />
 
-          {/* earth background */}
-          <Image
-            source={require('../imgs/earthBg.png')}
-            width={50}
-            height={50}
-          />
+              {/* earth background */}
+              <Image
+                source={require('../imgs/earthBg.png')}
+                width={50}
+                height={50}
+              />
 
-          <SlideView className="" twClass="h-60">
-            <View className="p-5">
-              <Text className="text-xl text-black">Enter OTP</Text>
-              <CTextInput
-                placeholder="XXXXXX"
-                twClass="p-3 px-4 mt-3 text-lg z-100"
-                keyboardType="numeric"
-                handleChange={handleCode}
-              />
-              <CButton title={'Confirm Code'} twClass="mt-4"
-                handlePress={handleOTP}
-              />
+              <SlideView className="" twClass="h-60">
+                <View className="p-5">
+                  <Text className="text-xl text-black">Enter OTP</Text>
+                  <CTextInput
+                    placeholder="XXXXXX"
+                    twClass="p-3 px-4 mt-3 text-lg z-100"
+                    keyboardType="numeric"
+                    handleChange={handleCode}
+                  />
+                  <CButton title={'Confirm Code'} twClass="mt-4"
+                    handlePress={handleOTP}
+                  />
+                </View>
+              </SlideView>
             </View>
-          </SlideView>
-        </View>
-      )}</>)}
+          )}</>)}
     </>
   );
 };
