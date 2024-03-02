@@ -49,7 +49,9 @@ const UserLoaderInt = ({ navigation, currentRide, updateDropoff, setOnGoingRide,
   // usersid = user.uid;
   const handleridecount = async (count) => {
     await setRideCount(count + 1);
-    await updateRideCount();
+    if(user.photoURL=='loader'){
+    
+    await updateRideCount();}
   }
   useEffect(() => {
     //write code for getting cost doc from firebase
