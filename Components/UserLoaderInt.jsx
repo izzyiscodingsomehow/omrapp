@@ -18,7 +18,7 @@ import { RideContext } from './contexts/RideContext';
 import { db } from '../firebase';
 import { set, update } from 'firebase/database';
 
-const UserLoaderInt = ({ navigation, currentRide, updateDropoff, setOnGoingRide, deleteOnGoingRide }) => {
+const UserLoaderInt = ({ navigation, currentRide, updateDropoff, setOnGoingRide, deleteOnGoingRide, setRideSearch }) => {
 
   //chat handling code
   const [messages, setMessages] = useState([]);
@@ -49,9 +49,10 @@ const UserLoaderInt = ({ navigation, currentRide, updateDropoff, setOnGoingRide,
   // usersid = user.uid;
   const handleridecount = async (count) => {
     await setRideCount(count + 1);
-    if(user.photoURL=='loader'){
-    
-    await updateRideCount();}
+    if (user.photoURL == 'loader') {
+
+      await updateRideCount();
+    }
   }
   useEffect(() => {
     //write code for getting cost doc from firebase
@@ -117,10 +118,11 @@ const UserLoaderInt = ({ navigation, currentRide, updateDropoff, setOnGoingRide,
       count: rideCount,
     });
   };
-  const { setSearchingRide } = useContext(UserContext);
+  const { searchingRide, setSearchingRide } = useContext(UserContext);
   const endRide = async () => {
     setDocRef(null);
     setSearchingRide(false);
+    setRideSearch(false);
     setShowEnd(true);
     setOnGoingRide(null);
     deleteOnGoingRide(currentRide.loaderId, currentRide.userId);

@@ -229,19 +229,7 @@ const Home = ({ navigation }) => {
 
     }
 
-    // useEffect(() => {
-    //     //write code for getting cost doc from firebase
-    //     const unsubscribe = firestore()
-    //         .collection("Cost")
-    //         .doc("cost-current")
-    //         .onSnapshot(snapshot => {
-    //             setNewCost(snapshot.data().cost);
-    //             check = snapshot.data().cost;
-    //         });
-
-    //     return () => unsubscribe();
-    // }, []);
-
+   
 
     // weird name i know, but this just checks if the user is the loader and updates his dropoff location
     const changeLocationWhenRide = (userId) => {
@@ -595,7 +583,7 @@ const Home = ({ navigation }) => {
             <SlideView twClass={`2/5 ${toggleOrigin || toggleDropoff ? "hidden" : null}`}>
                 {
                     ongoingRide ?
-                        <UserLoaderInt currentRide={ongoingRide} updateDropoff={updateDropoff} setOnGoingRide={setOngoingRide} deleteOnGoingRide={deleteOnGoingRide} />
+                        <UserLoaderInt currentRide={ongoingRide} updateDropoff={updateDropoff} setOnGoingRide={setOngoingRide} deleteOnGoingRide={deleteOnGoingRide} setRideSearch={setSearchingRide}/>
                         // <Text>Loading</Text>
                         :
                         user && user.photoURL == 'loader' ?
