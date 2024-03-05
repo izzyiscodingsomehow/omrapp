@@ -1,16 +1,16 @@
 import React from 'react';
-import { createDrawerNavigator } from '@react-navigation/drawer';
-import { NavigationContainer, DefaultTheme,} from '@react-navigation/native';
+import {createDrawerNavigator} from '@react-navigation/drawer';
+import {NavigationContainer, DefaultTheme} from '@react-navigation/native';
 import Login from './Components/Login';
 import LogOut from './Components/LogOut';
 import Home from './Components/Home';
 import SignUp from './Components/SignUp';
 import CustomDrawer from './Components/custom/CustomDrawer';
-import { ContextProvider } from './Components/contexts/UserContext';
+import {ContextProvider} from './Components/contexts/UserContext';
 import FAQ from './Components/FAQ';
 import Settings from './Components/Settings';
 import UserLoaderInt from './Components/UserLoaderInt';
-import { RideContextProvider } from './Components/contexts/RideContext';
+import {RideContextProvider} from './Components/contexts/RideContext';
 const Drawer = createDrawerNavigator();
 
 function DrawerStack() {
@@ -35,23 +35,36 @@ function DrawerStack() {
           fontWeight: 'normal',
         },
       }}>
-      <Drawer.Screen name="Login" component={Login}  options={{
-                  drawerItemStyle: { display: 'none' },
-                  headerShown: false, swipeEnabled:false
-        }}/>
-      <Drawer.Screen name="SignUp" component={SignUp}  options={{
-                  drawerItemStyle: { display: 'none' },
-                  headerShown: false, swipeEnabled:false
-        }}/>
+      <Drawer.Screen
+        name="Login"
+        component={Login}
+        options={{
+          drawerItemStyle: {display: 'none'},
+          headerShown: false,
+          swipeEnabled: false,
+        }}
+      />
+      <Drawer.Screen
+        name="SignUp"
+        component={SignUp}
+        options={{
+          drawerItemStyle: {display: 'none'},
+          headerShown: false,
+          swipeEnabled: false,
+        }}
+      />
       <Drawer.Screen name="Home" component={Home} />
-      <Drawer.Screen name="UserLoaderInt" component={UserLoaderInt} options={{
-                  drawerItemStyle: { display: 'none' }
-                  // initialParams={{ usersid:"loader",usersname:"loader",usersphone:"3169973256" }}     
-        }}/>
+      <Drawer.Screen
+        name="UserLoaderInt"
+        component={UserLoaderInt}
+        options={{
+          drawerItemStyle: {display: 'none'},
+          // initialParams={{ usersid:"loader",usersname:"loader",usersphone:"3169973256" }}
+        }}
+      />
       <Drawer.Screen name="Settings" component={Settings} />
       <Drawer.Screen name="FAQ" component={FAQ} />
-      <Drawer.Screen name="Logout" component={LogOut}  />
-
+      <Drawer.Screen name="Logout" component={LogOut} />
     </Drawer.Navigator>
   );
 }

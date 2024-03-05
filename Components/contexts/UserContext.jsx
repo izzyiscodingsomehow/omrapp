@@ -4,20 +4,20 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 //import {get} from 'react-native/Libraries/TurboModule/TurboModuleRegistry';
 import {useNetInfo} from '@react-native-community/netinfo';
 import RNRestart from 'react-native-restart';
-import {checkMultiple,
+import {
+  checkMultiple,
   PERMISSIONS,
-  request,
   requestMultiple,
-  RESULTS,} from 'react-native-permissions';
+  RESULTS,
+} from 'react-native-permissions';
 const UserContext = createContext([]);
 const ContextProvider = ({children}, navigation) => {
   const {isConnected} = useNetInfo();
   const [user, setUser] = useState(null);
   //const [AsyncUserData, setAsyncUserData] = useState();
   const [hasData, setHasData] = useState(false);
-  const [SignedUp, setSignedUp] = useState(false);
   const [searchingRide, setSearchingRide] = useState(false);
-  
+
   const storeUserData = async () => {
     try {
       if (!hasData) {
@@ -44,8 +44,11 @@ const ContextProvider = ({children}, navigation) => {
 
       // Check individual permission statuses
       if (
-        locationPermissionsStatus[PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION] === RESULTS.GRANTED &&
-        locationPermissionsStatus[PERMISSIONS.ANDROID.ACCESS_COARSE_LOCATION] === RESULTS.GRANTED
+        locationPermissionsStatus[PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION] ===
+          RESULTS.GRANTED &&
+        locationPermissionsStatus[
+          PERMISSIONS.ANDROID.ACCESS_COARSE_LOCATION
+        ] === RESULTS.GRANTED
       ) {
         //console.log('Both fine and coarse location permissions granted');
         // Proceed with accessing location here
@@ -68,8 +71,11 @@ const ContextProvider = ({children}, navigation) => {
 
       // Check individual permission statuses after the request
       if (
-        locationPermissionsStatus[PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION] === RESULTS.GRANTED &&
-        locationPermissionsStatus[PERMISSIONS.ANDROID.ACCESS_COARSE_LOCATION] === RESULTS.GRANTED
+        locationPermissionsStatus[PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION] ===
+          RESULTS.GRANTED &&
+        locationPermissionsStatus[
+          PERMISSIONS.ANDROID.ACCESS_COARSE_LOCATION
+        ] === RESULTS.GRANTED
       ) {
         //console.log('Both fine and coarse location permissions granted after request');
         // Proceed with accessing location here
@@ -77,14 +83,14 @@ const ContextProvider = ({children}, navigation) => {
         //console.log('Some or all location permissions not granted after request');
         Alert.alert(
           'Permissions Required!',
-          'Please allow the necessary permissions for the app to function', 
+          'Please allow the necessary permissions for the app to function',
           [
             {
               text: 'OK.',
               onPress: () => requestLocationPermissions(),
             },
-          ]
-          );
+          ],
+        );
       }
     } catch (error) {
       console.error('Error requesting location permissions:', error);
@@ -92,18 +98,15 @@ const ContextProvider = ({children}, navigation) => {
   };
   useEffect(() => {
     if (isConnected) {
+    } else if (isConnected === false) {
+      Alert.alert('No Internet!', 'The app requires an internet connection.', [
+        {
+          text: 'Reload App',
+          onPress: () => RNRestart.restart(),
+        },
+      ]);
     }
-    else if (isConnected===false) {
-      Alert.alert(
-        'No Internet!',
-        'The app requires an internet connection.', [
-          {
-            text: 'Reload App',
-            onPress: () => RNRestart.restart(),
-          },
-        ]);
-    }
-}, [isConnected]);
+  }, [isConnected]);
   const getUserData = async () => {
     try {
       if (!hasData) {
@@ -116,7 +119,11 @@ const ContextProvider = ({children}, navigation) => {
         }
       }
     } catch (error) {
-      console.log('Error while getting user data from AsyncStorage: ', error, '\n');
+      console.log(
+        'Error while getting user data from AsyncStorage: ',
+        error,
+        '\n',
+      );
     }
   };
   // useEffect(() => {
@@ -130,7 +137,7 @@ const ContextProvider = ({children}, navigation) => {
   // Store in Context API
   return (
     <UserContext.Provider
-      value={{user, setUser, hasData, SignedUp, setSignedUp, searchingRide, setSearchingRide}}>
+      value={{user, setUser, hasData, searchingRide, setSearchingRide}}>
       {children}
     </UserContext.Provider>
   );
