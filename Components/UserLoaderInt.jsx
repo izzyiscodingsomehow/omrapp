@@ -47,13 +47,12 @@ const UserLoaderInt = ({ navigation, currentRide, updateDropoff, setOnGoingRide,
   //   usersid = user.uid;
   // }
   // usersid = user.uid;
-  const handleridecount = async (count) => {
-    await setRideCount(count + 1);
+  const handleridecount = async count => {
+    setRideCount(count + 1);
     if (user.photoURL == 'loader') {
-
       await updateRideCount();
     }
-  }
+  };
   useEffect(() => {
     //write code for getting cost doc from firebase
     const unsubscribe = firestore()
@@ -173,7 +172,7 @@ const UserLoaderInt = ({ navigation, currentRide, updateDropoff, setOnGoingRide,
         .collection('rides')
         .doc(rideCount.toString())
         .onSnapshot(snapshot => {
-          console.log("snapshot: ", snapshot)
+          //console.log("snapshot: ", snapshot)
           setNewStates([
             snapshot.data().usertransstart,
             snapshot.data().loadertransstart,
@@ -286,7 +285,7 @@ const UserLoaderInt = ({ navigation, currentRide, updateDropoff, setOnGoingRide,
 
       return () => unsubscribe();
     }
-  }, []);
+  }, [created]);
 
   //chat handling code ends here
 
