@@ -16,6 +16,12 @@ const Login = ({navigation, route}) => {
   const [confirm, setConfirm] = useState(null);
   const [code, setCode] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
+  const [twilioState, setTwilioState] = useState(false);
+  //twilio setup
+  const accountSID = 'AC00fa1891bd264775b197a6a959e836cb';
+  const authToken = '6c2574b04414b035ec6569058ef49d68';
+  const twilioClient = require('twilio')(accountSID, authToken);
+
   const handleChange = text => {
     setPhoneNumber(text);
   };
@@ -41,30 +47,71 @@ const Login = ({navigation, route}) => {
     // Unsubscribe when component unmounts
     return () => unsubscribe();
   }, []);
+
+  //change the function here to the verification one
+
+  let otp;
+  const twilioSystem = () => {
+    otp = Math.floor(100000 + Math.random() * 900000);
+    twilioClient.messages
+      .create({
+        body: 'Your OTP is ' + otp + ' for OMR verification',
+        from: '+12058585858',
+        to: '+923432616877',
+      })
+      .then(message => console.log(message.sid), setTwilioState(true))
+      .catch(err => console.log(err));
+  };
+
   const handleOTP = async () => {
-    try {
-      await confirm.confirm(code).then(userInfo => {
-        // auto code await confirm.confirm('123654').then(userInfo => {
-        //userInfo.additionalUserInfo.isNewUser = true;
-        if (!userInfo?.user?.displayName) {
-          console.log('new user');
-          navigation.navigate('SignUp');
-          //setConfirm(null);
-          //in signup update user info and then set async data "ASYNC DATA STORAGE CALLS GET DATA ALWAYS"and login the user
-        } else {
-          console.log('old user', userInfo);
-          setUser(userInfo.user);
-          setConfirm(null);
-          setCode('');
-          //set async user data and in get data set user state and login the user
-        }
-      });
-    } catch (e) {
-      console.log(e);
-      Alert.alert(
-        'Invalid OTP!',
-        'The verification code from SMS/TOTP is invalid. Please check and enter the correct verification code again.',
-      );
+    if (twilioState) {
+      if (code == otp) {
+        console.log('OTP verified');
+        // navigation.navigate('SignUp');
+        auth()
+          .signInAnonymously()
+          .then(() => {
+            console.log('User signed in anonymously');
+            console.log('current', auth().currentUser);
+            setUser(auth().currentUser);
+            setConfirm(null);
+            setCode('');
+            setTwilioState(false);
+          })
+          .catch(error => {
+            console.error(error);
+          });
+      } else {
+        Alert.alert(
+          'Invalid OTP!',
+          'The verification code from SMS/TOTP is invalid. Please check and enter the correct verification code again.',
+        );
+      }
+    } else {
+      try {
+        await confirm.confirm(code).then(userInfo => {
+          // auto code await confirm.confirm('123654').then(userInfo => {
+          //userInfo.additionalUserInfo.isNewUser = true;
+          if (!userInfo?.user?.displayName) {
+            console.log('new user');
+            navigation.navigate('SignUp');
+            //setConfirm(null);
+            //in signup update user info and then set async data "ASYNC DATA STORAGE CALLS GET DATA ALWAYS"and login the user
+          } else {
+            console.log('old user', userInfo);
+            setUser(userInfo.user);
+            setConfirm(null);
+            setCode('');
+            //set async user data and in get data set user state and login the user
+          }
+        });
+      } catch (e) {
+        console.log(e);
+        Alert.alert(
+          'Invalid OTP!',
+          'The verification code from SMS/TOTP is invalid. Please check and enter the correct verification code again.',
+        );
+      }
     }
   };
   useEffect(() => {
@@ -105,6 +152,7 @@ const Login = ({navigation, route}) => {
       // Handle errors here
       console.error('Error occurred:', error);
       setLoading(false);
+      twilioSystem();
     }
   };
 
@@ -114,7 +162,7 @@ const Login = ({navigation, route}) => {
         <CLoader />
       ) : (
         <>
-          {!confirm ? (
+          {!confirm || !twilioState ? (
             <View className="flex-1 items-center justify-center text-xl bg-white">
               {/* OMR logo */}
               <Image
