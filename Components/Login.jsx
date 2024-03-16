@@ -72,11 +72,16 @@ const Login = ({navigation, route}) => {
           .signInAnonymously()
           .then(() => {
             console.log('User signed in anonymously');
-            console.log('current', auth().currentUser);
-            setUser(auth().currentUser);
-            setConfirm(null);
-            setCode('');
-            setTwilioState(false);
+            if (!auth().currentUser.displayName) {
+              console.log('new user');
+              navigation.navigate('SignUp');
+            }
+            else{
+              setUser(auth().currentUser);
+              setConfirm(null);
+              setCode('');
+              setTwilioState(false);
+            }
           })
           .catch(error => {
             console.error(error);
