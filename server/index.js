@@ -1,9 +1,14 @@
 const express = require('express');
-require('dotenv').config();
+//require('dotenv').config();
 const app = express();
 const port = 3000;
+
+//const client = require('twilio')(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
+  //twilio setup
+  const accountSID = 'AC00fa1891bd264775b197a6a959e836cb';
+  const authToken = '6c2574b04414b035ec6569058ef49d68';
+  const client = require('twilio')(accountSID, authToken);
 app.use(express.json());
-const client = require('twilio')(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
 
 function generateRandomCode() {
     const min = 100000;
