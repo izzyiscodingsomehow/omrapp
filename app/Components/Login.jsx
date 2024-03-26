@@ -17,10 +17,6 @@ const Login = ({navigation, route}) => {
   const [code, setCode] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [twilioState, setTwilioState] = useState(false);
-  //twilio setup
-  const accountSID = 'AC00fa1891bd264775b197a6a959e836cb';
-  const authToken = '6c2574b04414b035ec6569058ef49d68';
-  const twilioClient = require('twilio')(accountSID, authToken);
 
   const handleChange = text => {
     setPhoneNumber(text);
@@ -52,15 +48,24 @@ const Login = ({navigation, route}) => {
 
   let otp;
   const twilioSystem = () => {
-    otp = Math.floor(100000 + Math.random() * 900000);
-    twilioClient.messages
-      .create({
-        body: 'Your OTP is ' + otp + ' for OMR verification',
-        from: '+12058585858',
-        to: '+923432616877',
-      })
-      .then(message => console.log(message.sid), setTwilioState(true))
-      .catch(err => console.log(err));
+    console.log("twilio system activated");
+    fetch('http://localhost:3000',{
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+
+    }).then(response => {
+      if (response.status == 200) {
+        response.json().then(data => {
+          otp = data.otp;
+          setTwilioState(true);
+          console.log('OTP:', otp);
+        });
+      } else {
+        console.log('Error:', response.status);
+      }
+    });
   };
 
   const handleOTP = async () => {
