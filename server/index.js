@@ -12,14 +12,15 @@ function generateRandomCode() {
 }
 
 // Define a route that sends a response to the client
-app.get('/', async (req, res) => {
+app.post('/generate', async (req, res) => {
     try {
+        const {phoneNumber} = req.body;
         const otp = generateRandomCode();
         await client.messages
             .create({
                 body: 'Your OTP is ' + otp,
                 from: '+15643330163',
-                to: '+923284963416'
+                to: phoneNumber
             })
             .then(message =>
                 res.status(200).json({ message, otp })
