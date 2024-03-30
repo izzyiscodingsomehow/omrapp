@@ -48,26 +48,32 @@ const Login = ({navigation, route}) => {
 
   let otp;
   const twilioSystem = () => {
-    console.log("twilio system activated");
-    fetch('http://localhost:3000',{
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-
-    }).then(response => {
-      if (response.status == 200) {
-        response.json().then(data => {
-          otp = data.otp;
-          setTwilioState(true);
-          console.log('OTP:', otp);
-        });
-      } else {
-        console.log('Error:', response.status);
+    fetch('http://localhost:3000/generate', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({phoneNumber}),
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
+      return response.json();
+    })
+    .then(data => {
+      console.log('response');
+      otp = data.otp;
+      setLoading(false);
+      setTwilioState(true);
+      console.log('OTP:', otp);
+    })
+    .catch(error => {
+      console.log('Fetch error:', error);
     });
   };
-
+  useEffect(() => {
+  }, [twilioState]);
   const handleOTP = async () => {
     if (twilioState) {
       if (code == otp) {
@@ -161,11 +167,10 @@ const Login = ({navigation, route}) => {
     } catch (error) {
       // Handle errors here
       console.error('Error occurred:', error);
-      setLoading(false);
+      
       twilioSystem();
     }
   };
-
   return (
     <>
       {loading ? (
