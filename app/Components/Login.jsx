@@ -1,18 +1,20 @@
-import {View, Text, Image, Alert} from 'react-native';
-import React, {useEffect, useState, useContext} from 'react';
+import { View, Text, Image, Alert } from 'react-native';
+import React, { useEffect, useState, useContext } from 'react';
 import CButton from './custom/CButton';
 import SlideView from './custom/SlideView';
 import CTextInput from './custom/CTextInput';
 import auth from '@react-native-firebase/auth';
-import {UserContext} from './contexts/UserContext';
+import { UserContext } from './contexts/UserContext';
 import CLoader from './custom/CLoader';
-const Login = ({navigation, route}) => {
+import axios from 'axios';
+
+const Login = ({ navigation, route }) => {
   const settings = auth().settings;
   useEffect(() => {
     settings.appVerificationDisabledForTesting = false;
   }, []);
 
-  const {user, setUser} = useContext(UserContext);
+  const { user, setUser } = useContext(UserContext);
   const [confirm, setConfirm] = useState(null);
   const [code, setCode] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -48,30 +50,19 @@ const Login = ({navigation, route}) => {
 
   let otp;
   const twilioSystem = () => {
-    fetch('http://localhost:3000/generate', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({phoneNumber}),
-    })
-    .then(response => {
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      return response.json();
-    })
-    .then(data => {
+    // replace the address with your local IP address, this will be fixed once we deploy the server
+    const res = axios.post("http://192.168.100.43:3000/generate", {
+      phoneNumber: `+92${phoneNumber}`
+    }).then(res => {
       console.log('response');
-      otp = data.otp;
+      otp = res.data.otp;
       setLoading(false);
       setTwilioState(true);
       console.log('OTP:', otp);
-    })
-    .catch(error => {
-      console.log('Fetch error:', error);
+    }).catch(error => {
+      console.log('Fetch error:', error.message);
     });
-  };
+  }
   useEffect(() => {
   }, [twilioState]);
   const handleOTP = async () => {
@@ -87,7 +78,7 @@ const Login = ({navigation, route}) => {
               console.log('new user');
               navigation.navigate('SignUp');
             }
-            else{
+            else {
               setUser(auth().currentUser);
               setConfirm(null);
               setCode('');
@@ -150,7 +141,8 @@ const Login = ({navigation, route}) => {
     }
     if (phoneNumber.length == 10) {
       const phone = '+92' + phoneNumber;
-      signInWithPhoneNumber(phone);
+      // signInWithPhoneNumber(phone);
+      twilioSystem();
     }
   };
   const [loading, setLoading] = useState(false);
@@ -167,7 +159,7 @@ const Login = ({navigation, route}) => {
     } catch (error) {
       // Handle errors here
       console.error('Error occurred:', error);
-      
+
       twilioSystem();
     }
   };
@@ -191,7 +183,7 @@ const Login = ({navigation, route}) => {
                 source={require('../imgs/earthBg.png')}
                 width={50}
                 height={50}
-                //style={styles.backgroundImage}
+              //style={styles.backgroundImage}
               />
 
               <SlideView className="" twClass="h-72">
