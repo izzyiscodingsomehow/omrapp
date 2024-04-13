@@ -19,6 +19,7 @@ const Login = ({ navigation, route }) => {
   const [code, setCode] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [twilioState, setTwilioState] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handleChange = text => {
     setPhoneNumber(text);
@@ -41,7 +42,6 @@ const Login = ({ navigation, route }) => {
   useEffect(() => {
     // Subscribe to auth state changes
     const unsubscribe = auth().onAuthStateChanged(onAuthStateChanged);
-
     // Unsubscribe when component unmounts
     return () => unsubscribe();
   }, []);
@@ -51,7 +51,8 @@ const Login = ({ navigation, route }) => {
   let otp;
   const twilioSystem = () => {
     // replace the address with your local IP address, this will be fixed once we deploy the server
-    const res = axios.post("http://192.168.100.43:3000/generate", {
+    //const res = axios.post("http://192.168.100.43:3000/generate", {
+    const res = axios.post("http://192.168.100.4:3000/generate", {
       phoneNumber: `+92${phoneNumber}`
     }).then(res => {
       console.log('response');
@@ -63,10 +64,10 @@ const Login = ({ navigation, route }) => {
       console.log('Fetch error:', error.message);
     });
   }
-  useEffect(() => {
-  }, [twilioState]);
+  // useEffect(() => {
+  // }, [twilioState]);
   const handleOTP = async () => {
-    if (twilioState) {
+    //if (twilioState) {
       if (code == otp) {
         console.log('OTP verified');
         // navigation.navigate('SignUp');
@@ -94,32 +95,32 @@ const Login = ({ navigation, route }) => {
           'The verification code from SMS/TOTP is invalid. Please check and enter the correct verification code again.',
         );
       }
-    } else {
-      try {
-        await confirm.confirm(code).then(userInfo => {
-          // auto code await confirm.confirm('123654').then(userInfo => {
-          //userInfo.additionalUserInfo.isNewUser = true;
-          if (!userInfo?.user?.displayName) {
-            console.log('new user');
-            navigation.navigate('SignUp');
-            //setConfirm(null);
-            //in signup update user info and then set async data "ASYNC DATA STORAGE CALLS GET DATA ALWAYS"and login the user
-          } else {
-            console.log('old user', userInfo);
-            setUser(userInfo.user);
-            setConfirm(null);
-            setCode('');
-            //set async user data and in get data set user state and login the user
-          }
-        });
-      } catch (e) {
-        console.log(e);
-        Alert.alert(
-          'Invalid OTP!',
-          'The verification code from SMS/TOTP is invalid. Please check and enter the correct verification code again.',
-        );
-      }
-    }
+    // } else {
+    //   try {
+    //     await confirm.confirm(code).then(userInfo => {
+    //       // auto code await confirm.confirm('123654').then(userInfo => {
+    //       //userInfo.additionalUserInfo.isNewUser = true;
+    //       if (!userInfo?.user?.displayName) {
+    //         console.log('new user');
+    //         navigation.navigate('SignUp');
+    //         //setConfirm(null);
+    //         //in signup update user info and then set async data "ASYNC DATA STORAGE CALLS GET DATA ALWAYS"and login the user
+    //       } else {
+    //         console.log('old user', userInfo);
+    //         setUser(userInfo.user);
+    //         setConfirm(null);
+    //         setCode('');
+    //         //set async user data and in get data set user state and login the user
+    //       }
+    //     });
+    //   } catch (e) {
+    //     console.log(e);
+    //     Alert.alert(
+    //       'Invalid OTP!',
+    //       'The verification code from SMS/TOTP is invalid. Please check and enter the correct verification code again.',
+    //     );
+    //   }
+    // }
   };
   useEffect(() => {
     if (user) {
@@ -145,31 +146,32 @@ const Login = ({ navigation, route }) => {
       twilioSystem();
     }
   };
-  const [loading, setLoading] = useState(false);
-  const signInWithPhoneNumber = async phoneNumber => {
-    try {
-      // Set loading to true while waiting for response
-      setLoading(true);
+  
+  // const signInWithPhoneNumber = async phoneNumber => {
+  //   try {
+  //     // Set loading to true while waiting for response
+  //     setLoading(true);
 
-      // Make the API call
-      const confirmation = await auth().signInWithPhoneNumber(phoneNumber);
-      // Once the response is received, set loading to false and update the state
-      setLoading(false);
-      setConfirm(confirmation);
-    } catch (error) {
-      // Handle errors here
-      console.error('Error occurred:', error);
+  //     // Make the API call
+  //     const confirmation = await auth().signInWithPhoneNumber(phoneNumber);
+  //     // Once the response is received, set loading to false and update the state
+  //     setLoading(false);
+  //     setConfirm(confirmation);
+  //   } catch (error) {
+  //     // Handle errors here
+  //     console.error('Error occurred:', error);
 
-      twilioSystem();
-    }
-  };
+  //     twilioSystem();
+  //   }
+  // };
   return (
     <>
       {loading ? (
         <CLoader />
       ) : (
         <>
-          {!confirm || !twilioState ? (
+        {/*!confirm ||  */}
+          {!twilioState ? (
             <View className="flex-1 items-center justify-center text-xl bg-white">
               {/* OMR logo */}
               <Image
